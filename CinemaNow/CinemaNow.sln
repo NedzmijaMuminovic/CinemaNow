@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33815.320
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CinemaNow.API", "CinemaNow.API\CinemaNow.API.csproj", "{05902FE9-9C24-417E-836A-BC058578F7E9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CinemaNow.Models", "CinemaNow.Model\CinemaNow.Models.csproj", "{7C2919A5-4BB6-4E74-9CE7-EEFF3F1F038E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CinemaNow.Services", "CinemaNow.Services\CinemaNow.Services.csproj", "{B21ED2ED-D9D5-4F3A-87CF-717E7E5DDAC7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{05902FE9-9C24-417E-836A-BC058578F7E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05902FE9-9C24-417E-836A-BC058578F7E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05902FE9-9C24-417E-836A-BC058578F7E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05902FE9-9C24-417E-836A-BC058578F7E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C2919A5-4BB6-4E74-9CE7-EEFF3F1F038E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C2919A5-4BB6-4E74-9CE7-EEFF3F1F038E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C2919A5-4BB6-4E74-9CE7-EEFF3F1F038E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C2919A5-4BB6-4E74-9CE7-EEFF3F1F038E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B21ED2ED-D9D5-4F3A-87CF-717E7E5DDAC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B21ED2ED-D9D5-4F3A-87CF-717E7E5DDAC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B21ED2ED-D9D5-4F3A-87CF-717E7E5DDAC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B21ED2ED-D9D5-4F3A-87CF-717E7E5DDAC7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CF57BF7D-F604-4B94-8526-981F80E768A7}
+	EndGlobalSection
+EndGlobal
