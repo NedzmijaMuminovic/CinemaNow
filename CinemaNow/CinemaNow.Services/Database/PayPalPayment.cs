@@ -9,9 +9,9 @@ public partial class PayPalPayment
 
     public int? UserId { get; set; }
 
-    public string? Info { get; set; }
+    public string Info { get; set; }
 
     public virtual ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
 
-    public virtual User? User { get; set; }
+    public virtual User User { get; set; }
 }

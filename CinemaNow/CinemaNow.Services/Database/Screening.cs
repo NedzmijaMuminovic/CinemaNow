@@ -13,11 +13,11 @@ public partial class Screening
 
     public TimeSpan? Time { get; set; }
 
-    public string? Hall { get; set; }
+    public string Hall { get; set; }
 
     public decimal? Price { get; set; }
 
-    public virtual Movie? Movie { get; set; }
+    public virtual Movie Movie { get; set; }
 
     public virtual ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
 

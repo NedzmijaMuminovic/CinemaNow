@@ -1,0 +1,78 @@
+﻿using CinemaNow.Models;
+using CinemaNow.Models.Requests;
+using CinemaNow.Services.Database;
+using MapsterMapper;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CinemaNow.Services
+{
+    public class UserService : IUserService
+    {
+        public Ib200033Context Context { get; set; }
+        public IMapper Mapper { get; set; }
+        public UserService(Ib200033Context context, IMapper mapper) { 
+            Context = context;
+            Mapper = mapper;
+        }
+
+        public virtual List<Models.User> GetList()
+        {
+            List<Models.User> result = new List<Models.User>();
+            var list = Context.Users.ToList();
+            //list.ForEach(x => result.Add(new Models.User()
+            //{
+            //    Id = x.Id,
+            //    Name = x.Name,
+            //    Surname = x.Surname,
+            //    Email = x.Email,
+            //    Username = x.Username
+            //}));
+
+            result = Mapper.Map(list, result);
+
+            return result;
+        }
+
+        public Models.User Insert(UserInsertRequest request)
+        {
+            if (request.Password != request.PasswordConfirmation)
+                throw new Exception("Password and PasswordConfirmation must be the same values.");
+
+            Database.User entity = new Database.User();
+            Mapper.Map(request, entity);
+
+            entity.PasswordSalt = GenerateSalt();
+            entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
+
+            Context.Add(entity);
+            Context.SaveChanges();
+
+            return Mapper.Map<Models.User>(entity);
+        }
+
+        public static string GenerateSalt()
+        {
+            var byteArray = RNGCryptoServiceProvider.GetBytes(16);
+
+            return Convert.ToBase64String(byteArray);
+        }
+        public static string GenerateHash(string salt, string password)
+        {
+            byte[] src = Convert.FromBase64String(salt);
+            byte[] bytes = Encoding.Unicode.GetBytes(password);
+            byte[] dst = new byte[src.Length + bytes.Length];
+
+            System.Buffer.BlockCopy(src, 0, dst, 0, src.Length);
+            System.Buffer.BlockCopy(bytes, 0, dst, src.Length, bytes.Length);
+
+            HashAlgorithm algorithm = HashAlgorithm.Create("SHA1");
+            byte[] inArray = algorithm.ComputeHash(dst);
+            return Convert.ToBase64String(inArray);
+        }
+    }
+}

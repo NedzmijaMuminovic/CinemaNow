@@ -1,11 +1,13 @@
 using CinemaNow.Services;
 using CinemaNow.Services.Database;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddTransient<IMovieService, MovieService>();
+builder.Services.AddTransient<IUserService, UserService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -15,6 +17,8 @@ builder.Services.AddSwaggerGen();
 var connectionString = builder.Configuration.GetConnectionString("CinemaNowConnection");
 builder.Services.AddDbContext<Ib200033Context>(options =>
     options.UseSqlServer(connectionString));
+
+builder.Services.AddMapster();
 
 var app = builder.Build();
 

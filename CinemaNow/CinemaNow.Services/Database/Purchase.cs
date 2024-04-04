@@ -19,15 +19,15 @@ public partial class Purchase
 
     public decimal? TotalPrice { get; set; }
 
-    public string? Status { get; set; }
+    public string Status { get; set; }
 
     public int? PayPalPaymentId { get; set; }
 
-    public virtual PayPalPayment? PayPalPayment { get; set; }
+    public virtual PayPalPayment PayPalPayment { get; set; }
 
-    public virtual Screening? Screening { get; set; }
+    public virtual Screening Screening { get; set; }
 
-    public virtual Seat? Seat { get; set; }
+    public virtual Seat Seat { get; set; }
 
-    public virtual User? User { get; set; }
+    public virtual User User { get; set; }
 }

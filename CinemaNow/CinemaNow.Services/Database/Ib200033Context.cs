@@ -256,9 +256,8 @@ public partial class Ib200033Context : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.Password)
-                .HasMaxLength(50)
-                .IsUnicode(false);
+            entity.Property(e => e.PasswordHash).HasMaxLength(128);
+            entity.Property(e => e.PasswordSalt).HasMaxLength(128);
             entity.Property(e => e.Surname)
                 .HasMaxLength(50)
                 .IsUnicode(false);
