@@ -11,7 +11,7 @@ public partial class Movie
 
     public string Genre { get; set; }
 
-    public int? Duration { get; set; }
+    public int Duration { get; set; }
 
     public string Synopsis { get; set; }
 

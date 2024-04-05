@@ -15,15 +15,15 @@ public partial class User
 
     public string Username { get; set; }
 
-    public string Image { get; set; }
+    public string PasswordSalt { get; set; }
+
+    public string PasswordHash { get; set; }
+
+    public string? Image { get; set; }
 
     public bool? IsUser { get; set; }
 
     public bool? IsAdmin { get; set; }
-
-    public string PasswordSalt { get; set; }
-
-    public string PasswordHash { get; set; }
 
     public virtual ICollection<PayPalPayment> PayPalPayments { get; set; } = new List<PayPalPayment>();
 

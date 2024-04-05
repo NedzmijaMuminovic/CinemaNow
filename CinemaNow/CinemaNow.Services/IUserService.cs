@@ -12,5 +12,6 @@ namespace CinemaNow.Services
     {
         List<User> GetList();
         User Insert(UserInsertRequest request);
+        User Update(int id, UserUpdateRequest request);
     }
 }

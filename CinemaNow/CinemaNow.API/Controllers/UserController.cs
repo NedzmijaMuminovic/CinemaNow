@@ -28,5 +28,11 @@ namespace CinemaNow.API.Controllers
         {
             return _service.Insert(request);
         }
+
+        [HttpPut("{id}")]
+        public User Update(int id, UserUpdateRequest request)
+        {
+            return _service.Update(id, request);
+        }
     }
 }

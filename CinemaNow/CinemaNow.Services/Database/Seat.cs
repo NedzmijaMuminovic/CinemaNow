@@ -9,9 +9,9 @@ public partial class Seat
 
     public string Name { get; set; }
 
-    public int? ScreeningId { get; set; }
+    public int ScreeningId { get; set; }
 
-    public bool? IsReserved { get; set; }
+    public bool IsReserved { get; set; }
 
     public virtual ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
 
