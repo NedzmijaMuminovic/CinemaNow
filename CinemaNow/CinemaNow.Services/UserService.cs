@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq.Dynamic.Core;
 
 namespace CinemaNow.Services
 {
@@ -40,8 +41,14 @@ namespace CinemaNow.Services
             if (!string.IsNullOrWhiteSpace(searchObject?.Username))
                 query = query.Where(x => x.Username == searchObject.Username);
 
-            if (searchObject.IsRoleIncluded == true)
+            if (searchObject?.IsRoleIncluded == true)
                 query = query.Include(x => x.Roles);
+
+            if (!string.IsNullOrWhiteSpace(searchObject?.OrderBy))
+                query = query.OrderBy(searchObject.OrderBy);
+
+            if (searchObject?.Page.HasValue == true && searchObject?.PageSize.HasValue == true) //paginacija
+            query = query.Skip(searchObject.Page.Value * searchObject.PageSize.Value).Take(searchObject.PageSize.Value);
 
             var list = query.ToList();
 

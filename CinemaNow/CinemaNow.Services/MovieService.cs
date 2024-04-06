@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq.Dynamic.Core;
 
 namespace CinemaNow.Services
 {
@@ -28,6 +29,12 @@ namespace CinemaNow.Services
 
             if (!string.IsNullOrWhiteSpace(searchObject?.FTS))
                 query = query.Where(x => x.Title.Contains(searchObject.FTS));
+
+            if (!string.IsNullOrWhiteSpace(searchObject?.OrderBy))
+                query = query.OrderBy(searchObject.OrderBy);
+
+            if (searchObject?.Page.HasValue == true && searchObject?.PageSize.HasValue == true) //paginacija
+                query = query.Skip(searchObject.Page.Value * searchObject.PageSize.Value).Take(searchObject.PageSize.Value);
 
             var list = query.ToList();
 
