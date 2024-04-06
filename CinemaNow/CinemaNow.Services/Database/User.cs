@@ -21,10 +21,6 @@ public partial class User
 
     public string? Image { get; set; }
 
-    public bool? IsUser { get; set; }
-
-    public bool? IsAdmin { get; set; }
-
     public virtual ICollection<PayPalPayment> PayPalPayments { get; set; } = new List<PayPalPayment>();
 
     public virtual ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
@@ -32,4 +28,6 @@ public partial class User
     public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
 
     public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+
+    public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
 }

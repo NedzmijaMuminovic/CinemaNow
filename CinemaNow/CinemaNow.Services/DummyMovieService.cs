@@ -1,4 +1,5 @@
 ﻿using CinemaNow.Models;
+using CinemaNow.Models.SearchObjects;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,11 +15,11 @@ namespace CinemaNow.Services
         { 
             new Movie()
             {
-                ID = 1,
+                Id = 1,
                 Title = "Barbie"
             }
         };
-        public List<Movie> GetList()
+        public List<Movie> GetList(MovieSearchObject searchObject)
         {
             return List;
         }

@@ -1,4 +1,5 @@
 ﻿using CinemaNow.Models;
+using CinemaNow.Models.SearchObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace CinemaNow.Services
 {
     public interface IMovieService
     {
-        List<Movie> GetList();
+        List<Movie> GetList(MovieSearchObject searchObject);
     }
 }

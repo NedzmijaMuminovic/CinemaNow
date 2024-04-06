@@ -9,8 +9,6 @@ public partial class Movie
 
     public string Title { get; set; }
 
-    public string Genre { get; set; }
-
     public int Duration { get; set; }
 
     public string Synopsis { get; set; }
@@ -20,4 +18,6 @@ public partial class Movie
     public virtual ICollection<Screening> Screenings { get; set; } = new List<Screening>();
 
     public virtual ICollection<Actor> Actors { get; set; } = new List<Actor>();
+
+    public virtual ICollection<Genre> Genres { get; set; } = new List<Genre>();
 }

@@ -1,7 +1,9 @@
 ﻿using CinemaNow.Models;
 using CinemaNow.Models.Requests;
+using CinemaNow.Models.SearchObjects;
 using CinemaNow.Services.Database;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,18 +22,28 @@ namespace CinemaNow.Services
             Mapper = mapper;
         }
 
-        public virtual List<Models.User> GetList()
+        public virtual List<Models.User> GetList(UserSearchObject searchObject)
         {
             List<Models.User> result = new List<Models.User>();
-            var list = Context.Users.ToList();
-            //list.ForEach(x => result.Add(new Models.User()
-            //{
-            //    Id = x.Id,
-            //    Name = x.Name,
-            //    Surname = x.Surname,
-            //    Email = x.Email,
-            //    Username = x.Username
-            //}));
+
+            var query = Context.Users.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchObject?.NameGTE))
+                query = query.Where(x=>x.Name.StartsWith(searchObject.NameGTE));
+
+            if (!string.IsNullOrWhiteSpace(searchObject?.SurnameGTE))
+                query = query.Where(x => x.Surname.StartsWith(searchObject.SurnameGTE));
+
+            if (!string.IsNullOrWhiteSpace(searchObject?.Email))
+                query = query.Where(x => x.Email == searchObject.Email);
+
+            if (!string.IsNullOrWhiteSpace(searchObject?.Username))
+                query = query.Where(x => x.Username == searchObject.Username);
+
+            if (searchObject.IsRoleIncluded == true)
+                query = query.Include(x => x.Roles);
+
+            var list = query.ToList();
 
             result = Mapper.Map(list, result);
 

@@ -1,4 +1,5 @@
 ﻿using CinemaNow.Models;
+using CinemaNow.Models.SearchObjects;
 using CinemaNow.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,9 +17,9 @@ namespace CinemaNow.API.Controllers
         }
 
         [HttpGet]
-        public List<Movie> GetList()
+        public List<Movie> GetList([FromQuery] MovieSearchObject searchObject)
         {
-            return _service.GetList();
+            return _service.GetList(searchObject);
         }
     }
 }
