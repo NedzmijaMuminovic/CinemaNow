@@ -11,7 +11,7 @@ namespace CinemaNow.Services
 {
     public interface IUserService
     {
-        List<User> GetList(UserSearchObject searchObject);
+        PagedResult<User> GetList(UserSearchObject searchObject);
         User Insert(UserInsertRequest request);
         User Update(int id, UserUpdateRequest request);
     }

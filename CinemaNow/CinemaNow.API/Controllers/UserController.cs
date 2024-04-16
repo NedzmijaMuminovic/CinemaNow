@@ -19,7 +19,7 @@ namespace CinemaNow.API.Controllers
         }
 
         [HttpGet]
-        public List<Models.User> GetList([FromQuery] UserSearchObject searchObject)
+        public PagedResult<User> GetList([FromQuery] UserSearchObject searchObject)
         {
             return _service.GetList(searchObject);
         }

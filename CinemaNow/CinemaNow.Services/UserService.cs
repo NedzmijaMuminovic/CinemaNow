@@ -23,7 +23,7 @@ namespace CinemaNow.Services
             Mapper = mapper;
         }
 
-        public virtual List<Models.User> GetList(UserSearchObject searchObject)
+        public virtual Models.PagedResult<Models.User> GetList(UserSearchObject searchObject)
         {
             List<Models.User> result = new List<Models.User>();
 
@@ -44,6 +44,8 @@ namespace CinemaNow.Services
             if (searchObject?.IsRoleIncluded == true)
                 query = query.Include(x => x.Roles);
 
+            int count = query.Count();
+
             if (!string.IsNullOrWhiteSpace(searchObject?.OrderBy))
                 query = query.OrderBy(searchObject.OrderBy);
 
@@ -52,9 +54,14 @@ namespace CinemaNow.Services
 
             var list = query.ToList();
 
-            result = Mapper.Map(list, result);
+            var resultList = Mapper.Map(list, result);
 
-            return result;
+            Models.PagedResult<Models.User> response = new Models.PagedResult<Models.User>();
+
+            response.ResultList = resultList;
+            response.Count = count;
+
+            return response;
         }
 
         public Models.User Insert(UserInsertRequest request)

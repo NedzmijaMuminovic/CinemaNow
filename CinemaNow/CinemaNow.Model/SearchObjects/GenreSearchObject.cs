@@ -4,8 +4,8 @@ using System.Text;
 
 namespace CinemaNow.Models.SearchObjects
 {
-    public class MovieSearchObject : BaseSearchObject
+    public class GenreSearchObject : BaseSearchObject
     {
-        public string? FTS { get; set; } //full text search
+        public string? NameGTE { get; set; }
     }
 }

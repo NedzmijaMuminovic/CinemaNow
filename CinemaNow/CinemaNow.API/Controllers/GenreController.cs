@@ -7,9 +7,9 @@ namespace CinemaNow.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class MovieController : BaseController<Movie, MovieSearchObject>
+    public class GenreController : BaseController<Genre, GenreSearchObject>
     {
-        public MovieController(IMovieService service) : base(service)
+        public GenreController(IGenreService service) : base(service)
         { 
         }
     }

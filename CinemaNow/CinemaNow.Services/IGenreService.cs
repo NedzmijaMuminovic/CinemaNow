@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CinemaNow.Services
 {
-    public interface IMovieService : IBaseService<Movie, MovieSearchObject>
+    public interface IGenreService : IBaseService<Genre, GenreSearchObject>
     {
     }
 }
