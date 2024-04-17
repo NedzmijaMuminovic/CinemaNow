@@ -14,23 +14,18 @@ using System.Linq.Dynamic.Core;
 
 namespace CinemaNow.Services
 {
-    public class UserService : IUserService
+    public class UserService : BaseCRUDService<Models.User, UserSearchObject, Database.User, UserInsertRequest, UserUpdateRequest>, IUserService
     {
-        public Ib200033Context Context { get; set; }
-        public IMapper Mapper { get; set; }
-        public UserService(Ib200033Context context, IMapper mapper) { 
-            Context = context;
-            Mapper = mapper;
+        public UserService(Ib200033Context context, IMapper mapper) : base(context, mapper)
+        {
         }
 
-        public virtual Models.PagedResult<Models.User> GetList(UserSearchObject searchObject)
+        public override IQueryable<Database.User> AddFilter(UserSearchObject searchObject, IQueryable<Database.User> query)
         {
-            List<Models.User> result = new List<Models.User>();
-
-            var query = Context.Users.AsQueryable();
+            query = base.AddFilter(searchObject, query);
 
             if (!string.IsNullOrWhiteSpace(searchObject?.NameGTE))
-                query = query.Where(x=>x.Name.StartsWith(searchObject.NameGTE));
+                query = query.Where(x => x.Name.StartsWith(searchObject.NameGTE));
 
             if (!string.IsNullOrWhiteSpace(searchObject?.SurnameGTE))
                 query = query.Where(x => x.Surname.StartsWith(searchObject.SurnameGTE));
@@ -44,41 +39,18 @@ namespace CinemaNow.Services
             if (searchObject?.IsRoleIncluded == true)
                 query = query.Include(x => x.Roles);
 
-            int count = query.Count();
-
-            if (!string.IsNullOrWhiteSpace(searchObject?.OrderBy))
-                query = query.OrderBy(searchObject.OrderBy);
-
-            if (searchObject?.Page.HasValue == true && searchObject?.PageSize.HasValue == true) //paginacija
-            query = query.Skip(searchObject.Page.Value * searchObject.PageSize.Value).Take(searchObject.PageSize.Value);
-
-            var list = query.ToList();
-
-            var resultList = Mapper.Map(list, result);
-
-            Models.PagedResult<Models.User> response = new Models.PagedResult<Models.User>();
-
-            response.ResultList = resultList;
-            response.Count = count;
-
-            return response;
+            return query;
         }
 
-        public Models.User Insert(UserInsertRequest request)
+        public override void BeforeInsert(UserInsertRequest request, Database.User entity)
         {
             if (request.Password != request.PasswordConfirmation)
                 throw new Exception("Password and PasswordConfirmation must be the same values.");
 
-            Database.User entity = new Database.User();
-            Mapper.Map(request, entity);
-
             entity.PasswordSalt = GenerateSalt();
             entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
 
-            Context.Add(entity);
-            Context.SaveChanges();
-
-            return Mapper.Map<Models.User>(entity);
+            base.BeforeInsert(request, entity);
         }
 
         public static string GenerateSalt()
@@ -87,6 +59,7 @@ namespace CinemaNow.Services
 
             return Convert.ToBase64String(byteArray);
         }
+
         public static string GenerateHash(string salt, string password)
         {
             byte[] src = Convert.FromBase64String(salt);
@@ -101,11 +74,9 @@ namespace CinemaNow.Services
             return Convert.ToBase64String(inArray);
         }
 
-        public Models.User Update(int id, UserUpdateRequest request)
+        public override void BeforeUpdate(UserUpdateRequest request, Database.User entity)
         {
-            var entity = Context.Users.Find(id);
-
-            Mapper.Map(request, entity);
+            base.BeforeUpdate(request, entity);
 
             if (request.Password != null)
             {
@@ -115,9 +86,6 @@ namespace CinemaNow.Services
                 entity.PasswordSalt = GenerateSalt();
                 entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
             }
-
-            Context.SaveChanges();
-            return Mapper.Map<Models.User>(entity);
         }
     }
 }

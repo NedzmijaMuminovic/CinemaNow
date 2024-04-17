@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CinemaNow.Services
 {
-    public class BaseService<TModel, TSearch, TDbEntity> : IBaseService<TModel, TSearch> where TSearch: BaseSearchObject where TDbEntity : class where TModel : class
+    public abstract class BaseService<TModel, TSearch, TDbEntity> : IBaseService<TModel, TSearch> where TSearch: BaseSearchObject where TDbEntity : class where TModel : class
     {
         public Ib200033Context Context { get; set; }
         public IMapper Mapper { get; set; }
@@ -32,11 +32,11 @@ namespace CinemaNow.Services
 
             int count = query.Count();
 
-            if (!string.IsNullOrWhiteSpace(search?.OrderBy))
-                query = query.OrderBy(search.OrderBy);
-
             if (search?.Page.HasValue == true && search?.PageSize.HasValue == true) //paginacija
                 query = query.Skip(search.Page.Value * search.PageSize.Value).Take(search.PageSize.Value);
+
+            if (!string.IsNullOrWhiteSpace(search?.OrderBy))
+                query = query.OrderBy(search.OrderBy);
 
             var list = query.ToList();
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CinemaNow.Models.SearchObjects
 {
-    public class UserSearchObject
+    public class UserSearchObject : BaseSearchObject
     {
         public string? NameGTE { get; set; } //gte - greater than/starts with, suprotno lte (lower)
         public string? SurnameGTE { get; set; }

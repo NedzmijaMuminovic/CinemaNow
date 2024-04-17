@@ -23,7 +23,7 @@ namespace CinemaNow.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public TModel GetbyID(int id)
+        public TModel GetByID(int id)
         {
             return _service.GetByID(id);
         }
