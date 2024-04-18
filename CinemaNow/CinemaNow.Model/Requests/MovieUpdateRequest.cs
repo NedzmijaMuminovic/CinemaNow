@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Numerics;
 
-namespace CinemaNow.Models
+namespace CinemaNow.Models.Requests
 {
-    public class Movie
+    public partial class MovieUpdateRequest
     {
-        public int Id { get; set; }
+
         public string Title { get; set; }
+
         public int Duration { get; set; }
 
         public string Synopsis { get; set; }
     }
+
 }

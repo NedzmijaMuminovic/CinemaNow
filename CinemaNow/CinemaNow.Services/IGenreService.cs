@@ -1,4 +1,5 @@
 ﻿using CinemaNow.Models;
+using CinemaNow.Models.Requests;
 using CinemaNow.Models.SearchObjects;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CinemaNow.Services
 {
-    public interface IGenreService : IBaseService<Genre, GenreSearchObject>
+    public interface IGenreService : IBaseCRUDService<Genre, GenreSearchObject, GenreUpsertRequest, GenreUpsertRequest>
     {
     }
 }

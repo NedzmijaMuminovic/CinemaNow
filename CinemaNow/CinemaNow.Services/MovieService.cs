@@ -8,10 +8,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Dynamic.Core;
+using CinemaNow.Models.Requests;
 
 namespace CinemaNow.Services
 {
-    public class MovieService : BaseService<Models.Movie, MovieSearchObject, Database.Movie>, IMovieService
+    public class MovieService : BaseCRUDService<Models.Movie, MovieSearchObject, Database.Movie, MovieInsertRequest, MovieUpdateRequest>, IMovieService
     {
         public MovieService(Ib200033Context context, IMapper mapper) : base(context, mapper) { 
         }

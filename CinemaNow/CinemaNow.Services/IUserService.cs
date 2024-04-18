@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CinemaNow.Services
 {
-    public interface IUserService : ICRUDService<User, UserSearchObject, UserInsertRequest, UserUpdateRequest>
+    public interface IUserService : IBaseCRUDService<User, UserSearchObject, UserInsertRequest, UserUpdateRequest>
     {
     }
 }

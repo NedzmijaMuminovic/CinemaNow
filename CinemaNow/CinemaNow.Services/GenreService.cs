@@ -8,10 +8,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Dynamic.Core;
+using CinemaNow.Models.Requests;
 
 namespace CinemaNow.Services
 {
-    public class GenreService : BaseService<Models.Genre, GenreSearchObject, Database.Genre>, IGenreService
+    public class GenreService : BaseCRUDService<Models.Genre, GenreSearchObject, Database.Genre, GenreUpsertRequest, GenreUpsertRequest>, IGenreService
     {
 
         public GenreService(Ib200033Context context, IMapper mapper) : base(context, mapper) {

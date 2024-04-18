@@ -7,20 +7,23 @@ namespace CinemaNow.API.Controllers
 {
     public class BaseCRUDController<TModel, TSearch, TInsert, TUpdate> : BaseController<TModel, TSearch> where TSearch : BaseSearchObject where TModel : class
     {
-        public BaseCRUDController(ICRUDService<TModel, TSearch, TInsert, TUpdate> service) : base(service)
+        protected new IBaseCRUDService<TModel, TSearch, TInsert, TUpdate> _service;
+
+        public BaseCRUDController(IBaseCRUDService<TModel, TSearch, TInsert, TUpdate> service) : base(service)
         {
+            _service = service;
         }
 
         [HttpPost]
         public TModel Insert(TInsert request)
         {
-            return (_service as ICRUDService<TModel, TSearch, TInsert, TUpdate>).Insert(request);
+            return _service.Insert(request);
         }
 
         [HttpPut("{id}")]
         public TModel Update(int id, TUpdate request)
         {
-            return (_service as ICRUDService<TModel, TSearch, TInsert, TUpdate>).Update(id, request);
+            return _service.Update(id, request);
         }
 
     }

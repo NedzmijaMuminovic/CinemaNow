@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CinemaNow.Services
 {
-    public interface ICRUDService<TModel, TSearch, TInsert, TUpdate> : IBaseService<TModel, TSearch> where TModel : class where TSearch : BaseSearchObject
+    public interface IBaseCRUDService<TModel, TSearch, TInsert, TUpdate> : IBaseService<TModel, TSearch> where TModel : class where TSearch : BaseSearchObject
     {
         TModel Insert(TInsert request);
         TModel Update(int id, TUpdate request);
