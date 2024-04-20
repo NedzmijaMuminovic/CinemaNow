@@ -15,6 +15,7 @@ builder.Services.AddTransient<BaseMovieState>();
 builder.Services.AddTransient<InitialMovieState>();
 builder.Services.AddTransient<DraftMovieState>();
 builder.Services.AddTransient<ActiveMovieState>();
+builder.Services.AddTransient<HiddenMovieState>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

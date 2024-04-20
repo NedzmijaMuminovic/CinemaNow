@@ -39,6 +39,16 @@ namespace CinemaNow.Services.MovieStateMachine
             throw new Exception("Method not allowed");
         }
 
+        public virtual Models.Movie Edit(int id)
+        {
+            throw new Exception("Method not allowed");
+        }
+
+        public virtual List<string> AllowedActions(Movie entity)
+        {
+            throw new Exception("Method not allowed");
+        }
+
         public BaseMovieState CreateState(string stateName)
         {
             switch (stateName)
@@ -49,6 +59,8 @@ namespace CinemaNow.Services.MovieStateMachine
                     return ServiceProvider.GetService<DraftMovieState>();
                 case "active":
                     return ServiceProvider.GetService<ActiveMovieState>();
+                case "hidden":
+                    return ServiceProvider.GetService<HiddenMovieState>();
                 default: throw new Exception("State not recognised");
             }
         }

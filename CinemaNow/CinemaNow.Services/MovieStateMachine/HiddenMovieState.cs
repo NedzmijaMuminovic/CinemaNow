@@ -1,6 +1,4 @@
-﻿using Azure.Core;
-using CinemaNow.Models.Requests;
-using CinemaNow.Services.Database;
+﻿using CinemaNow.Services.Database;
 using MapsterMapper;
 using System;
 using System.Collections.Generic;
@@ -10,17 +8,17 @@ using System.Threading.Tasks;
 
 namespace CinemaNow.Services.MovieStateMachine
 {
-    public class DraftMovieState : BaseMovieState
+    public class HiddenMovieState : BaseMovieState
     {
-        public DraftMovieState(Ib200033Context context, IMapper mapper, IServiceProvider serviceProvider) : base(context, mapper, serviceProvider)
+        public HiddenMovieState(Ib200033Context context, IMapper mapper, IServiceProvider serviceProvider) : base(context, mapper, serviceProvider)
         {
         }
 
-        public override Models.Movie Update(int id, MovieUpdateRequest request)
+        public override Models.Movie Edit(int id)
         {
             var set = Context.Set<Movie>();
             var entity = set.Find(id);
-            Mapper.Map(request, entity);
+            entity.StateMachine = "draft";
             Context.SaveChanges();
             return Mapper.Map<Models.Movie>(entity);
         }
@@ -34,18 +32,9 @@ namespace CinemaNow.Services.MovieStateMachine
             return Mapper.Map<Models.Movie>(entity);
         }
 
-        public override Models.Movie Hide(int id)
-        {
-            var set = Context.Set<Movie>();
-            var entity = set.Find(id);
-            entity.StateMachine = "hidden";
-            Context.SaveChanges();
-            return Mapper.Map<Models.Movie>(entity);
-        }
-
         public override List<string> AllowedActions(Movie entity)
         {
-            return new List<string>() { nameof(Activate), nameof(Update), nameof(Hide) };
+            return new List<string>() { nameof(Edit), nameof(Activate) };
         }
 
     }

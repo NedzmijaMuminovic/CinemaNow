@@ -25,6 +25,10 @@ namespace CinemaNow.Services.MovieStateMachine
             return Mapper.Map<Movie>(entity);
         }
 
-        
+        public override List<string> AllowedActions(Database.Movie entity)
+        {
+            return new List<string>() { nameof(Insert) };
+        }
+
     }
 }

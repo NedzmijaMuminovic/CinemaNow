@@ -19,5 +19,24 @@ namespace CinemaNow.API.Controllers
         {
             return (_service as IMovieService).Activate(id);
         }
+
+        [HttpPut("{id}/edit")]
+        public Movie Edit(int id)
+        {
+            return (_service as IMovieService).Edit(id);
+        }
+
+        [HttpPut("{id}/hide")]
+        public Movie Hide(int id)
+        {
+            return (_service as IMovieService).Hide(id);
+        }
+
+        [HttpGet("{id}/allowedActions")]
+        public List<string> AllowedActions(int id)
+        {
+            return (_service as IMovieService).AllowedActions(id);
+        }
+
     }
 }

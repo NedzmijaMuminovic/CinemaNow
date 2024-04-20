@@ -50,5 +50,35 @@ namespace CinemaNow.Services
             var state = BaseMovieState.CreateState(entity.StateMachine);
             return state.Activate(id);
         }
+
+        public Models.Movie Edit(int id)
+        {
+            var entity = GetByID(id);
+            var state = BaseMovieState.CreateState(entity.StateMachine);
+            return state.Edit(id);
+        }
+
+        public Models.Movie Hide(int id)
+        {
+            var entity = GetByID(id);
+            var state = BaseMovieState.CreateState(entity.StateMachine);
+            return state.Hide(id);
+        }
+
+        public List<string> AllowedActions(int id)
+        {
+            if (id <= 0)
+            {
+                var state = BaseMovieState.CreateState("initial");
+                return state.AllowedActions(null);
+            }
+            else
+            {
+                var entity = Context.Movies.Find(id);
+                var state = BaseMovieState.CreateState(entity.StateMachine);
+                return state.AllowedActions(entity);
+            }
+        }
+
     }
 }

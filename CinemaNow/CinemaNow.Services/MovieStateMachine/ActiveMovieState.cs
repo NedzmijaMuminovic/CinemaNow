@@ -13,5 +13,20 @@ namespace CinemaNow.Services.MovieStateMachine
         public ActiveMovieState(Ib200033Context context, IMapper mapper, IServiceProvider serviceProvider) : base(context, mapper, serviceProvider)
         {
         }
+
+        public override Models.Movie Hide(int id)
+        {
+            var set = Context.Set<Movie>();
+            var entity = set.Find(id);
+            entity.StateMachine = "hidden";
+            Context.SaveChanges();
+            return Mapper.Map<Models.Movie>(entity);
+        }
+
+        public override List<string> AllowedActions(Movie entity)
+        {
+            return new List<string>() { nameof(Hide) };
+        }
+
     }
 }
