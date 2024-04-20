@@ -45,12 +45,11 @@ public partial class Ib200033Context : DbContext
     {
         modelBuilder.Entity<Actor>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Actor__3214EC27378EF45B");
+            entity.HasKey(e => e.Id).HasName("PK__Actor__3214EC278C4152EA");
 
             entity.ToTable("Actor");
 
             entity.Property(e => e.Id).HasColumnName("ID");
-            entity.Property(e => e.Image).IsUnicode(false);
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(50)
@@ -63,7 +62,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Genre>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Genre__3214EC2759B91761");
+            entity.HasKey(e => e.Id).HasName("PK__Genre__3214EC272ABBB787");
 
             entity.ToTable("Genre");
 
@@ -76,11 +75,14 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Movie>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Movie__3214EC273F3BB3B4");
+            entity.HasKey(e => e.Id).HasName("PK__Movie__3214EC27D42CAFBB");
 
             entity.ToTable("Movie");
 
             entity.Property(e => e.Id).HasColumnName("ID");
+            entity.Property(e => e.StateMachine)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.Synopsis)
                 .IsRequired()
                 .IsUnicode(false);
@@ -102,7 +104,7 @@ public partial class Ib200033Context : DbContext
                         .HasConstraintName("FK__MovieActo__Movie__35BCFE0A"),
                     j =>
                     {
-                        j.HasKey("MovieId", "ActorId").HasName("PK__MovieAct__EEA9AA9809FEAEF4");
+                        j.HasKey("MovieId", "ActorId").HasName("PK__MovieAct__EEA9AA984048F35D");
                         j.ToTable("MovieActor");
                         j.IndexerProperty<int>("MovieId").HasColumnName("MovieID");
                         j.IndexerProperty<int>("ActorId").HasColumnName("ActorID");
@@ -121,7 +123,7 @@ public partial class Ib200033Context : DbContext
                         .HasConstraintName("FK__MovieGenr__Movie__300424B4"),
                     j =>
                     {
-                        j.HasKey("MovieId", "GenreId").HasName("PK__MovieGen__BBEAC46FE3B20EE7");
+                        j.HasKey("MovieId", "GenreId").HasName("PK__MovieGen__BBEAC46FA9D9A917");
                         j.ToTable("MovieGenre");
                         j.IndexerProperty<int>("MovieId").HasColumnName("MovieID");
                         j.IndexerProperty<int>("GenreId").HasColumnName("GenreID");
@@ -130,7 +132,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<PayPalPayment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__PayPalPa__3214EC27E95F33BF");
+            entity.HasKey(e => e.Id).HasName("PK__PayPalPa__3214EC27810850B2");
 
             entity.ToTable("PayPalPayment");
 
@@ -148,7 +150,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Purchase>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Purchase__3214EC27CA21B94C");
+            entity.HasKey(e => e.Id).HasName("PK__Purchase__3214EC2762B80806");
 
             entity.ToTable("Purchase");
 
@@ -186,7 +188,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Rating>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Rating__3214EC274496D816");
+            entity.HasKey(e => e.Id).HasName("PK__Rating__3214EC2723851B86");
 
             entity.ToTable("Rating");
 
@@ -208,7 +210,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Reservation>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Reservat__3214EC27FA56070C");
+            entity.HasKey(e => e.Id).HasName("PK__Reservat__3214EC2725BB0DD8");
 
             entity.ToTable("Reservation");
 
@@ -241,7 +243,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Role__3214EC27106EA2D2");
+            entity.HasKey(e => e.Id).HasName("PK__Role__3214EC27FCB61EB5");
 
             entity.ToTable("Role");
 
@@ -254,7 +256,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Screening>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Screenin__3214EC27165F6516");
+            entity.HasKey(e => e.Id).HasName("PK__Screenin__3214EC27F3E66F88");
 
             entity.ToTable("Screening");
 
@@ -275,7 +277,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Seat>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Seat__3214EC27D366B1AD");
+            entity.HasKey(e => e.Id).HasName("PK__Seat__3214EC27AE55BB5D");
 
             entity.ToTable("Seat");
 
@@ -294,7 +296,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__User__3214EC27830D5173");
+            entity.HasKey(e => e.Id).HasName("PK__User__3214EC27D5FD53A4");
 
             entity.ToTable("User");
 
@@ -303,7 +305,6 @@ public partial class Ib200033Context : DbContext
                 .IsRequired()
                 .HasMaxLength(100)
                 .IsUnicode(false);
-            entity.Property(e => e.Image).IsUnicode(false);
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(50)
@@ -336,7 +337,7 @@ public partial class Ib200033Context : DbContext
                         .HasConstraintName("FK__UserRole__UserID__286302EC"),
                     j =>
                     {
-                        j.HasKey("UserId", "RoleId").HasName("PK__UserRole__AF27604F81B33CEB");
+                        j.HasKey("UserId", "RoleId").HasName("PK__UserRole__AF27604F42E699FC");
                         j.ToTable("UserRole");
                         j.IndexerProperty<int>("UserId").HasColumnName("UserID");
                         j.IndexerProperty<int>("RoleId").HasColumnName("RoleID");

@@ -9,12 +9,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Dynamic.Core;
 using CinemaNow.Models.Requests;
+using CinemaNow.Services.MovieStateMachine;
+using Azure.Core;
 
 namespace CinemaNow.Services
 {
     public class MovieService : BaseCRUDService<Models.Movie, MovieSearchObject, Database.Movie, MovieInsertRequest, MovieUpdateRequest>, IMovieService
     {
-        public MovieService(Ib200033Context context, IMapper mapper) : base(context, mapper) { 
+        public BaseMovieState BaseMovieState { get; set; }
+        public MovieService(Ib200033Context context, IMapper mapper, BaseMovieState baseMovieState) : base(context, mapper) { 
+            BaseMovieState = baseMovieState;
         }
 
         public override IQueryable<Database.Movie> AddFilter(MovieSearchObject search, IQueryable<Database.Movie> query)
@@ -27,5 +31,24 @@ namespace CinemaNow.Services
             return filteredQuery;
         }
 
+        public override Models.Movie Insert(MovieInsertRequest request)
+        {
+            var state = BaseMovieState.CreateState("initial");
+            return state.Insert(request);
+        }
+
+        public override Models.Movie Update(int id, MovieUpdateRequest request)
+        {
+            var entity = GetByID(id);
+            var state = BaseMovieState.CreateState(entity.StateMachine);
+            return state.Update(id, request);
+        }
+
+        public Models.Movie Activate(int id)
+        {
+            var entity = GetByID(id);
+            var state = BaseMovieState.CreateState(entity.StateMachine);
+            return state.Activate(id);
+        }
     }
 }

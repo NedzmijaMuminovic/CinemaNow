@@ -19,7 +19,9 @@ public partial class User
 
     public string PasswordHash { get; set; }
 
-    public string? Image { get; set; }
+    public byte[] Image { get; set; }
+
+    public byte[] ImageThumb { get; set; }
 
     public virtual ICollection<PayPalPayment> PayPalPayments { get; set; } = new List<PayPalPayment>();
 

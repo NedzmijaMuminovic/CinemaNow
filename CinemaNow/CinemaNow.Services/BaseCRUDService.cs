@@ -16,7 +16,7 @@ namespace CinemaNow.Services
         {
         }
 
-        public TModel Insert(TInsert request)
+        public virtual TModel Insert(TInsert request)
         {
             TDbEntity entity = Mapper.Map<TDbEntity>(request);
 
@@ -30,7 +30,7 @@ namespace CinemaNow.Services
 
         public virtual void BeforeInsert(TInsert request, TDbEntity entity) { }
 
-        public TModel Update(int id, TUpdate request)
+        public virtual TModel Update(int id, TUpdate request)
         {
             var set = Context.Set<TDbEntity>();
 

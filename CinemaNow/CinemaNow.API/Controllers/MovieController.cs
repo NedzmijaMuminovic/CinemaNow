@@ -13,5 +13,11 @@ namespace CinemaNow.API.Controllers
         public MovieController(IMovieService service) : base(service)
         { 
         }
+
+        [HttpPut("{id}/activate")]
+        public Movie Activate(int id)
+        {
+            return (_service as IMovieService).Activate(id);
+        }
     }
 }

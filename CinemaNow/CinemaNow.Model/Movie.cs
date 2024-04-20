@@ -11,5 +11,6 @@ namespace CinemaNow.Models
         public int Duration { get; set; }
 
         public string Synopsis { get; set; }
+        public string? StateMachine { get; set; }
     }
 }
