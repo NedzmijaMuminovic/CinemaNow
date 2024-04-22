@@ -11,14 +11,18 @@ using System.Linq.Dynamic.Core;
 using CinemaNow.Models.Requests;
 using CinemaNow.Services.MovieStateMachine;
 using Azure.Core;
+using Microsoft.Extensions.Logging;
 
 namespace CinemaNow.Services
 {
     public class MovieService : BaseCRUDService<Models.Movie, MovieSearchObject, Database.Movie, MovieInsertRequest, MovieUpdateRequest>, IMovieService
     {
         public BaseMovieState BaseMovieState { get; set; }
-        public MovieService(Ib200033Context context, IMapper mapper, BaseMovieState baseMovieState) : base(context, mapper) { 
+        ILogger<MovieService> _logger;
+
+        public MovieService(Ib200033Context context, IMapper mapper, BaseMovieState baseMovieState, ILogger<MovieService> logger) : base(context, mapper) { 
             BaseMovieState = baseMovieState;
+            _logger = logger;
         }
 
         public override IQueryable<Database.Movie> AddFilter(MovieSearchObject search, IQueryable<Database.Movie> query)
@@ -67,6 +71,7 @@ namespace CinemaNow.Services
 
         public List<string> AllowedActions(int id)
         {
+            _logger.LogInformation($"Allowed actions called for: {id}");
             if (id <= 0)
             {
                 var state = BaseMovieState.CreateState("initial");

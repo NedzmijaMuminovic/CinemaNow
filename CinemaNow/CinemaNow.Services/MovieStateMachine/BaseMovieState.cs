@@ -1,4 +1,5 @@
-﻿using CinemaNow.Models.Requests;
+﻿using CinemaNow.Models;
+using CinemaNow.Models.Requests;
 using CinemaNow.Services.Database;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,32 +22,32 @@ namespace CinemaNow.Services.MovieStateMachine
 
         public virtual Models.Movie Insert(MovieInsertRequest request)
         {
-            throw new Exception("Method not allowed");
+            throw new UserException("Method not allowed");
         }
 
         public virtual Models.Movie Update(int id, MovieUpdateRequest request)
         {
-            throw new Exception("Method not allowed");
+            throw new UserException("Method not allowed");
         }
 
         public virtual Models.Movie Activate(int id)
         {
-            throw new Exception("Method not allowed");
+            throw new UserException("Method not allowed");
         }
 
         public virtual Models.Movie Hide(int id)
         {
-            throw new Exception("Method not allowed");
+            throw new UserException("Method not allowed");
         }
 
         public virtual Models.Movie Edit(int id)
         {
-            throw new Exception("Method not allowed");
+            throw new UserException("Method not allowed");
         }
 
-        public virtual List<string> AllowedActions(Movie entity)
+        public virtual List<string> AllowedActions(Database.Movie entity)
         {
-            throw new Exception("Method not allowed");
+            throw new UserException("Method not allowed");
         }
 
         public BaseMovieState CreateState(string stateName)

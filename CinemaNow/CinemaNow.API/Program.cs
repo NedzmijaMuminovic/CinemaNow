@@ -1,3 +1,4 @@
+using CinemaNow.API.Filters;
 using CinemaNow.Services;
 using CinemaNow.Services.Database;
 using CinemaNow.Services.MovieStateMachine;
@@ -17,7 +18,10 @@ builder.Services.AddTransient<DraftMovieState>();
 builder.Services.AddTransient<ActiveMovieState>();
 builder.Services.AddTransient<HiddenMovieState>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers( x =>
+{
+    x.Filters.Add<ExceptionFilter>();
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

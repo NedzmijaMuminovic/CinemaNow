@@ -11,13 +11,17 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Dynamic.Core;
+using Microsoft.Extensions.Logging;
 
 namespace CinemaNow.Services
 {
     public class UserService : BaseCRUDService<Models.User, UserSearchObject, Database.User, UserInsertRequest, UserUpdateRequest>, IUserService
     {
-        public UserService(Ib200033Context context, IMapper mapper) : base(context, mapper)
+        ILogger<UserService> _logger;
+
+        public UserService(Ib200033Context context, IMapper mapper, ILogger<UserService> logger) : base(context, mapper)
         {
+            _logger = logger;
         }
 
         public override IQueryable<Database.User> AddFilter(UserSearchObject searchObject, IQueryable<Database.User> query)
@@ -44,6 +48,8 @@ namespace CinemaNow.Services
 
         public override void BeforeInsert(UserInsertRequest request, Database.User entity)
         {
+            _logger.LogInformation($"Adding user: {entity.Username}");
+
             if (request.Password != request.PasswordConfirmation)
                 throw new Exception("Password and PasswordConfirmation must be the same values.");
 
