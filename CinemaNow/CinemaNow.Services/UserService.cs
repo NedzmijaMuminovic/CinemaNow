@@ -93,5 +93,20 @@ namespace CinemaNow.Services
                 entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
             }
         }
+
+        public Models.User Login(string username, string password)
+        {
+            var entity = Context.Users.FirstOrDefault(x => x.Username == username);
+
+            if (entity == null)
+                return null;
+
+            var hash = GenerateHash(entity.PasswordSalt, password);
+
+            if (hash != entity.PasswordHash)
+                return null;
+
+            return this.Mapper.Map<Models.User>(entity);
+        }
     }
 }
