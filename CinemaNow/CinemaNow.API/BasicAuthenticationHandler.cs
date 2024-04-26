@@ -40,6 +40,11 @@ namespace CinemaNow.API
                     new Claim(ClaimTypes.NameIdentifier, user.Username)
                 };
 
+                foreach (var role in user.Roles)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role.Name));
+                }
+
                 var identity = new ClaimsIdentity(claims, Scheme.Name);
 
                 var principal = new ClaimsPrincipal(identity);

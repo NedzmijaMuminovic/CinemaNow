@@ -56,6 +56,12 @@ namespace CinemaNow.Services
             entity.PasswordSalt = GenerateSalt();
             entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
 
+            var role = Context.Roles.FirstOrDefault(r => r.Id == request.RoleId);
+            if (role == null)
+                throw new Exception("Role not found");
+
+            entity.Roles.Add(role);
+
             base.BeforeInsert(request, entity);
         }
 
@@ -96,7 +102,7 @@ namespace CinemaNow.Services
 
         public Models.User Login(string username, string password)
         {
-            var entity = Context.Users.FirstOrDefault(x => x.Username == username);
+            var entity = Context.Users.Include(x => x.Roles).FirstOrDefault(x => x.Username == username);
 
             if (entity == null)
                 return null;
