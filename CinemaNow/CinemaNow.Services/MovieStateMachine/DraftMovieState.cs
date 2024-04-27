@@ -1,6 +1,8 @@
 ﻿using Azure.Core;
+using CinemaNow.Models.Messages;
 using CinemaNow.Models.Requests;
 using CinemaNow.Services.Database;
+using EasyNetQ;
 using MapsterMapper;
 using System;
 using System.Collections.Generic;
@@ -31,7 +33,14 @@ namespace CinemaNow.Services.MovieStateMachine
             var entity = set.Find(id);
             entity.StateMachine = "active";
             Context.SaveChanges();
-            return Mapper.Map<Models.Movie>(entity);
+
+            var bus = RabbitHutch.CreateBus("host=localhost");
+
+            var mappedEntity = Mapper.Map<Models.Movie>(entity);
+            MovieActivated message = new MovieActivated { Movie = mappedEntity };
+            bus.PubSub.Publish(message);
+
+            return mappedEntity;
         }
 
         public override Models.Movie Hide(int id)
