@@ -53,7 +53,7 @@ namespace CinemaNow.Services
             return query;
         }
 
-        public TModel GetByID(int id)
+        public virtual TModel GetByID(int id)
         {
             var entity = Context.Set<TDbEntity>().Find(id);
 

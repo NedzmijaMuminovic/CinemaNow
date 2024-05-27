@@ -14,6 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddTransient<IMovieService, MovieService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IGenreService, GenreService>();
+builder.Services.AddTransient<IRoleService, RoleService>();
+builder.Services.AddTransient<IActorService, ActorService>();
 
 builder.Services.AddTransient<BaseMovieState>();
 builder.Services.AddTransient<InitialMovieState>();

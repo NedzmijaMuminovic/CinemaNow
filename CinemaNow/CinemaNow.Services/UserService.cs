@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Dynamic.Core;
 using Microsoft.Extensions.Logging;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CinemaNow.Services
 {
@@ -46,6 +47,16 @@ namespace CinemaNow.Services
             return query;
         }
 
+        public override Models.User GetByID(int id)
+        {
+            var entity = Context.Users.Include(u => u.Roles).FirstOrDefault(u => u.Id == id);
+
+            if (entity != null)
+                return Mapper.Map<Models.User>(entity);
+            else
+                return null;
+        }
+
         public override void BeforeInsert(UserInsertRequest request, Database.User entity)
         {
             _logger.LogInformation($"Adding user: {entity.Username}");
@@ -56,11 +67,14 @@ namespace CinemaNow.Services
             entity.PasswordSalt = GenerateSalt();
             entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
 
-            var role = Context.Roles.FirstOrDefault(r => r.Id == request.RoleId);
-            if (role == null)
-                throw new Exception("Role not found");
+            foreach (var roleId in request.RoleIds)
+            {
+                var role = Context.Roles.FirstOrDefault(r => r.Id == roleId);
+                if (role == null)
+                    throw new Exception($"Role with ID {roleId} not found");
 
-            entity.Roles.Add(role);
+                entity.Roles.Add(role);
+            }
 
             base.BeforeInsert(request, entity);
         }
@@ -97,6 +111,15 @@ namespace CinemaNow.Services
 
                 entity.PasswordSalt = GenerateSalt();
                 entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
+            }
+
+            foreach (var roleId in request.RoleIds)
+            {
+                var role = Context.Roles.FirstOrDefault(r => r.Id == roleId);
+                if (role == null)
+                    throw new Exception($"Role with ID {roleId} not found");
+
+                entity.Roles.Add(role);
             }
         }
 
