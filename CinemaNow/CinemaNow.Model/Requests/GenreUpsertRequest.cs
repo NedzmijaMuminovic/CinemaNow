@@ -6,6 +6,6 @@ namespace CinemaNow.Models.Requests
 {
     public partial class GenreUpsertRequest
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }

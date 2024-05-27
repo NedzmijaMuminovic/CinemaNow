@@ -16,6 +16,7 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IGenreService, GenreService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IActorService, ActorService>();
+builder.Services.AddTransient<IScreeningService, ScreeningService>();
 
 builder.Services.AddTransient<BaseMovieState>();
 builder.Services.AddTransient<InitialMovieState>();
