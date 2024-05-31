@@ -4,8 +4,8 @@ using System.Text;
 
 namespace CinemaNow.Models.Messages
 {
-    public class MovieActivated
+    public class ScreeningActivated
     {
-        public Movie Movie { get; set; }
+        public Screening Screening { get; set; }
     }
 }

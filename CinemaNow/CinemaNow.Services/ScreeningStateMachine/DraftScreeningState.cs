@@ -37,8 +37,8 @@ namespace CinemaNow.Services.ScreeningStateMachine
             var bus = RabbitHutch.CreateBus("host=localhost");
 
             var mappedEntity = Mapper.Map<Models.Screening>(entity);
-            //ScreeningActivated message = new ScreeningActivated { Screening = mappedEntity };
-            //bus.PubSub.Publish(message);
+            ScreeningActivated message = new ScreeningActivated { Screening = mappedEntity };
+            bus.PubSub.Publish(message);
 
             return mappedEntity;
         }

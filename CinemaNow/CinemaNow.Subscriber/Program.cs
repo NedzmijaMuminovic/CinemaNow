@@ -6,19 +6,19 @@ using EasyNetQ;
 Console.WriteLine("Hello, World!");
 
 var bus = RabbitHutch.CreateBus("host=localhost");
-await bus.PubSub.SubscribeAsync<MovieActivated>("console_printer", msg =>
+await bus.PubSub.SubscribeAsync<ScreeningActivated>("console_printer", msg =>
 {
-    Console.WriteLine($"Movie activated: {msg.Movie.Title}");
+    Console.WriteLine($"Screening activated: {msg.Screening.Movie.Title}");
 });
 
-await bus.PubSub.SubscribeAsync<MovieActivated>("console_printer", msg =>
+await bus.PubSub.SubscribeAsync<ScreeningActivated>("console_printer", msg =>
 {
-    Console.WriteLine($"Movie activated 2: {msg.Movie.Title}");
+    Console.WriteLine($"Screening activated 2: {msg.Screening.Movie.Title}");
 });
 
-await bus.PubSub.SubscribeAsync<MovieActivated>("mail_sender", msg =>
+await bus.PubSub.SubscribeAsync<ScreeningActivated>("mail_sender", msg =>
 {
-    Console.WriteLine($"Sending email for: {msg.Movie.Title}");
+    Console.WriteLine($"Sending email for: {msg.Screening.Movie.Title}");
     //to do: send email
 });
 
