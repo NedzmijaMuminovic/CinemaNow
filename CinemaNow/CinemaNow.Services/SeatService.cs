@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CinemaNow.Services
 {
-    public class SeatService : BaseCRUDService<Models.Seat, SeatSearchObject, Database.Seat, SeatUpsertRequest, SeatUpsertRequest>, ISeatService
+    public class SeatService : BaseCRUDService<Models.Seat, SeatSearchObject, Seat, SeatUpsertRequest, SeatUpsertRequest>, ISeatService
     {
         public SeatService(Ib200033Context context, IMapper mapper) : base(context, mapper)
         {

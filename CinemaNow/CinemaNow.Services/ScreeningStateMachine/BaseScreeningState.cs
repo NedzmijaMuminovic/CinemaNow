@@ -4,64 +4,64 @@ using CinemaNow.Services.Database;
 using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CinemaNow.Services.MovieStateMachine
+namespace CinemaNow.Services.ScreeningStateMachine
 {
-    public class BaseMovieState //izmijeniti cijelu ovu logiku, ovo je u demonstrativne svrhe (vjezba)
+    public class BaseScreeningState
     { 
         //initial, draft, active, hidden
         public Ib200033Context Context { get; set; }
         public IMapper Mapper { get; set; }
         public IServiceProvider ServiceProvider { get; set; }
 
-        public BaseMovieState(Ib200033Context context, IMapper mapper, IServiceProvider serviceProvider)
+        public BaseScreeningState(Ib200033Context context, IMapper mapper, IServiceProvider serviceProvider)
         {
             Context = context;
             Mapper = mapper;
             ServiceProvider = serviceProvider;
         }
 
-        public virtual Models.Movie Insert(MovieInsertRequest request)
+        public virtual Models.Screening Insert(ScreeningInsertRequest request)
         {
             throw new UserException("Method not allowed");
         }
 
-        public virtual Models.Movie Update(int id, MovieUpdateRequest request)
+        public virtual Models.Screening Update(int id, ScreeningUpdateRequest request)
         {
             throw new UserException("Method not allowed");
         }
 
-        public virtual Models.Movie Activate(int id)
+        public virtual Models.Screening Activate(int id)
         {
             throw new UserException("Method not allowed");
         }
 
-        public virtual Models.Movie Hide(int id)
+        public virtual Models.Screening Hide(int id)
         {
             throw new UserException("Method not allowed");
         }
 
-        public virtual Models.Movie Edit(int id)
+        public virtual Models.Screening Edit(int id)
         {
             throw new UserException("Method not allowed");
         }
 
-        public virtual List<string> AllowedActions(Database.Movie entity)
+        public virtual List<string> AllowedActions(Database.Screening entity)
         {
             throw new UserException("Method not allowed");
         }
 
-        public BaseMovieState CreateState(string stateName)
+        public BaseScreeningState CreateState(string stateName)
         {
             switch (stateName)
             {
                 case "initial":
-                    return ServiceProvider.GetService<InitialMovieState>();
+                    return ServiceProvider.GetService<InitialScreeningState>();
                 case "draft":
-                    return ServiceProvider.GetService<DraftMovieState>();
+                    return ServiceProvider.GetService<DraftScreeningState>();
                 case "active":
-                    return ServiceProvider.GetService<ActiveMovieState>();
+                    return ServiceProvider.GetService<ActiveScreeningState>();
                 case "hidden":
-                    return ServiceProvider.GetService<HiddenMovieState>();
+                    return ServiceProvider.GetService<HiddenScreeningState>();
                 default: throw new Exception("State not recognised");
             }
         }

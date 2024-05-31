@@ -11,5 +11,9 @@ namespace CinemaNow.Services
 {
     public interface IScreeningService : IBaseCRUDService<Screening, ScreeningSearchObject, ScreeningInsertRequest, ScreeningUpdateRequest>
     {
+        public Screening Activate(int id);
+        public Screening Edit(int id);
+        public Screening Hide(int id);
+        public List<string> AllowedActions(int id);
     }
 }

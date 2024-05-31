@@ -11,9 +11,5 @@ namespace CinemaNow.Services
 {
     public interface IMovieService : IBaseCRUDService<Movie, MovieSearchObject, MovieInsertRequest, MovieUpdateRequest>
     {
-        public Movie Activate(int id);
-        public Movie Edit(int id);
-        public Movie Hide(int id);
-        public List<string> AllowedActions(int id);
     }
 }

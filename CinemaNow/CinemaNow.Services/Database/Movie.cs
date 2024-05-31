@@ -7,17 +7,15 @@ public partial class Movie
 {
     public int Id { get; set; }
 
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
-    public int Duration { get; set; }
+    public int? Duration { get; set; }
 
-    public string Synopsis { get; set; }
+    public string? Synopsis { get; set; }
 
     public byte[]? Image { get; set; }
 
     public byte[]? ImageThumb { get; set; }
-
-    public string? StateMachine { get; set; }
 
     public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
 

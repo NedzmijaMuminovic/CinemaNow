@@ -2,7 +2,7 @@ using CinemaNow.API;
 using CinemaNow.API.Filters;
 using CinemaNow.Services;
 using CinemaNow.Services.Database;
-using CinemaNow.Services.MovieStateMachine;
+using CinemaNow.Services.ScreeningStateMachine;
 using Mapster;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
@@ -19,11 +19,11 @@ builder.Services.AddTransient<IActorService, ActorService>();
 builder.Services.AddTransient<IScreeningService, ScreeningService>();
 builder.Services.AddTransient<ISeatService, SeatService>();
 
-builder.Services.AddTransient<BaseMovieState>();
-builder.Services.AddTransient<InitialMovieState>();
-builder.Services.AddTransient<DraftMovieState>();
-builder.Services.AddTransient<ActiveMovieState>();
-builder.Services.AddTransient<HiddenMovieState>();
+builder.Services.AddTransient<BaseScreeningState>();
+builder.Services.AddTransient<InitialScreeningState>();
+builder.Services.AddTransient<DraftScreeningState>();
+builder.Services.AddTransient<ActiveScreeningState>();
+builder.Services.AddTransient<HiddenScreeningState>();
 
 builder.Services.AddControllers( x =>
 {
