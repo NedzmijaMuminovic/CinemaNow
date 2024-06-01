@@ -50,7 +50,6 @@ namespace CinemaNow.Services
 
         public override void BeforeInsert(ScreeningInsertRequest request, Screening entity)
         {
-            Console.WriteLine("BeforeInsert method called");
             var movie = Context.Movies.FirstOrDefault(m => m.Id == request.MovieId);
             if (movie == null)
                 throw new Exception("Movie not found");
@@ -60,7 +59,6 @@ namespace CinemaNow.Services
 
         public override void BeforeUpdate(ScreeningUpdateRequest request, Screening entity)
         {
-            Console.WriteLine("BeforeUpdate method called");
             base.BeforeUpdate(request, entity);
 
             var movie = Context.Movies.FirstOrDefault(m => m.Id == request.MovieId);
@@ -71,14 +69,20 @@ namespace CinemaNow.Services
         public override Models.Screening Insert(ScreeningInsertRequest request)
         {
             var state = BaseScreeningState.CreateState("initial");
-            return state.Insert(request);
+            var insertedScreening = state.Insert(request);
+
+            var entity = Context.Screenings.Include(s => s.Movie).FirstOrDefault(s => s.Id == insertedScreening.Id);
+            return Mapper.Map<Models.Screening>(entity);
         }
 
         public override Models.Screening Update(int id, ScreeningUpdateRequest request)
         {
             var entity = GetByID(id);
             var state = BaseScreeningState.CreateState(entity.StateMachine);
-            return state.Update(id, request);
+            var updatedScreening = state.Update(id, request);
+
+            var updatedEntity = Context.Screenings.Include(s => s.Movie).FirstOrDefault(s => s.Id == updatedScreening.Id);
+            return Mapper.Map<Models.Screening>(updatedEntity);
         }
 
         public Models.Screening Activate(int id)
