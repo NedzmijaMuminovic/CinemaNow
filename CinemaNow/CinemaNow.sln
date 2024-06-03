@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CinemaNow.Models", "CinemaN
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CinemaNow.Services", "CinemaNow.Services\CinemaNow.Services.csproj", "{B21ED2ED-D9D5-4F3A-87CF-717E7E5DDAC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CinemaNow.Subscriber", "CinemaNow.Subscriber\CinemaNow.Subscriber.csproj", "{A06D883C-AD7E-41EA-B0F7-8FE5E08CD77C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CinemaNow.Subscriber", "CinemaNow.Subscriber\CinemaNow.Subscriber.csproj", "{A06D883C-AD7E-41EA-B0F7-8FE5E08CD77C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{827E2D9F-B2B6-4774-A652-8BFF07630F1A}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
