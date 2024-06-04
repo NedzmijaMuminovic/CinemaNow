@@ -1,0 +1,36 @@
+version: '3'
+services:
+#mssql docker
+  cinemanow-sql:
+    image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=QWElkj132!
+      - MSSQL_PID=Developer
+    ports:
+      - 1401:1433
+    expose:
+      - 1433
+    networks:
+      - cinemanownet
+
+  cinemanow-api:
+    restart: unless-stopped
+    build:
+      context: .
+    environment:
+      - ConnectionStrings:CinemaNowConnection=Server=cinemanow-sql,1433;Database=CinemaNow;User=sa;Password=QWElkj132!;ConnectRetryCount=0; TrustServerCertificate=True
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - 7102:7102
+    networks:
+      - cinemanownet
+    links:
+      - cinemanow-sql
+    depends_on:
+      - cinemanow-sql
+      
+networks:
+  cinemanownet:
+    driver: bridge      

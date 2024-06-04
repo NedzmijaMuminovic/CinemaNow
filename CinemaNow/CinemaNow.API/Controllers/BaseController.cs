@@ -8,7 +8,7 @@ namespace CinemaNow.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize]
+    //[Authorize]
     public class BaseController<TModel, TSearch> : ControllerBase where TSearch : BaseSearchObject
     {
         protected IBaseService<TModel, TSearch> _service;
