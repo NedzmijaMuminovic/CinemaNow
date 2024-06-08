@@ -16,13 +16,11 @@ namespace CinemaNow.API.Controllers
         {
         }
 
-        [Authorize(Roles = "Admin")]
         public override Role Insert(RoleUpsertRequest request)
         {
             return base.Insert(request);
         }
 
-        [AllowAnonymous]
         public override PagedResult<Role> GetList([FromQuery] RoleSearchObject searchObject)
         {
             return base.GetList(searchObject);

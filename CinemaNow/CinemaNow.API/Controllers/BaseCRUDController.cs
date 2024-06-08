@@ -1,6 +1,7 @@
 ﻿using CinemaNow.Models.Requests;
 using CinemaNow.Models.SearchObjects;
 using CinemaNow.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaNow.API.Controllers
@@ -15,12 +16,14 @@ namespace CinemaNow.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public virtual TModel Insert(TInsert request)
         {
             return _service.Insert(request);
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public virtual TModel Update(int id, TUpdate request)
         {
             return _service.Update(id, request);

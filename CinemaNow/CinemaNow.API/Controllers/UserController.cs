@@ -20,5 +20,12 @@ namespace CinemaNow.API.Controllers
         {
             return (_service as IUserService).Login(username, password);
         }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public override Models.User Insert(UserInsertRequest request)
+        {
+            return base.Insert(request);
+        }
     }
 }
