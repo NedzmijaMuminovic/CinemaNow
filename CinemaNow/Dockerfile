@@ -1,12 +1,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 EXPOSE 7102
-
-COPY CinemaNow.API/certs/aspnetapp.pfx /https/aspnetapp.pfx
-
-ENV ASPNETCORE_URLS=https://+:7102
-ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-ENV ASPNETCORE_Kestrel__Certificates__Default__Password=nedzmija
+ENV ASPNETCORE_URLS=http://+:7102
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src

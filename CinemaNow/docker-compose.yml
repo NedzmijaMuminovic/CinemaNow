@@ -20,8 +20,9 @@ services:
     build:
       context: .
     environment:
-      - ConnectionStrings:CinemaNowConnection=Server=cinemanow-sql,1433;Database=CinemaNow;User=sa;Password=QWElkj132!;ConnectRetryCount=0; TrustServerCertificate=True
+      - ConnectionStrings__CinemaNowConnection=Server=cinemanow-sql,1433;Database=CinemaNow;User=sa;Password=QWElkj132!;ConnectRetryCount=0; TrustServerCertificate=True
       - ASPNETCORE_ENVIRONMENT=Development
+      - USE_HTTPS=false
     ports:
       - 7102:7102
     networks:

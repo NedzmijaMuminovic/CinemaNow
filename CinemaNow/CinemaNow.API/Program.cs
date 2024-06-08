@@ -31,25 +31,28 @@ builder.Services.AddControllers( x =>
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+if (builder.Environment.IsDevelopment())
 {
-    c.AddSecurityDefinition("basicAuth", new Microsoft.OpenApi.Models.OpenApiSecurityScheme()
+    builder.Services.AddSwaggerGen(c =>
     {
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-        Scheme = "basic"
-    });
-
-    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement()
-    {
+        c.AddSecurityDefinition("basicAuth", new Microsoft.OpenApi.Models.OpenApiSecurityScheme()
         {
-            new OpenApiSecurityScheme
+            Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+            Scheme = "basic"
+        });
+    
+        c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement()
+        {
             {
-                Reference = new OpenApiReference{Type = ReferenceType.SecurityScheme, Id = "basicAuth"}
-            },
-            new string[]{}
-        }
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference{Type = ReferenceType.SecurityScheme, Id = "basicAuth"}
+                },
+                new string[]{}
+            }
+        });
     });
-});
+}
 
 var connectionString = builder.Configuration.GetConnectionString("CinemaNowConnection");
 builder.Services.AddDbContext<Ib200033Context>(options =>
@@ -67,8 +70,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
+if (Environment.GetEnvironmentVariable("USE_HTTPS") == "true")
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthorization();
 
