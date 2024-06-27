@@ -31,7 +31,101 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: LoginPage(),
+    );
+  }
+}
+
+class LoginPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFF1C1C1E),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Image.asset(
+              'assets/logo.png',
+              height: 200,
+              width: 200,
+            ),
+            TextField(
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Color(0xFF2C2C2E),
+                hintText: 'Username',
+                hintStyle: TextStyle(color: Colors.white70),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide.none,
+                ),
+                prefixIcon: Icon(Icons.person, color: Colors.white70),
+              ),
+            ),
+            SizedBox(height: 20.0),
+            TextField(
+              style: TextStyle(color: Colors.white),
+              obscureText: true,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Color(0xFF2C2C2E),
+                hintText: 'Password',
+                hintStyle: TextStyle(color: Colors.white70),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide.none,
+                ),
+                prefixIcon: Icon(Icons.lock, color: Colors.white70),
+              ),
+            ),
+            SizedBox(height: 40.0),
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFD32F2F),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+              ),
+              child: Text(
+                'Login',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            SizedBox(height: 20.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Don't have an account? ",
+                  style: TextStyle(color: Colors.white70),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    // ADD navigation to the register page
+                  },
+                  child: Text(
+                    'Register',
+                    style: TextStyle(
+                      color: Color(0xFFD32F2F),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
