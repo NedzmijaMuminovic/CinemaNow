@@ -1,3 +1,5 @@
+import 'package:cinemanow_desktop/providers/auth_provider.dart';
+import 'package:cinemanow_desktop/providers/movie_provider.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -31,13 +33,15 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      home: LoginPage(),
     );
   }
 }
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+  LoginPage({super.key});
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +59,7 @@ class LoginPage extends StatelessWidget {
               width: 200,
             ),
             TextField(
+              controller: _usernameController,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 filled: true,
@@ -70,6 +75,7 @@ class LoginPage extends StatelessWidget {
             ),
             const SizedBox(height: 20.0),
             TextField(
+              controller: _passwordController,
               style: const TextStyle(color: Colors.white),
               obscureText: true,
               decoration: InputDecoration(
@@ -86,7 +92,20 @@ class LoginPage extends StatelessWidget {
             ),
             const SizedBox(height: 40.0),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () async {
+                MovieProvider provider = MovieProvider();
+                print(
+                    "Credentials: ${_usernameController.text}, ${_passwordController.text}");
+                AuthProvider.username = _usernameController.text;
+                AuthProvider.password = _passwordController.text;
+
+                try {
+                  var data = await provider.get();
+                  print("Authenticated");
+                } on Exception {
+                  print("Not authenticated");
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFD32F2F),
                 shape: RoundedRectangleBorder(
