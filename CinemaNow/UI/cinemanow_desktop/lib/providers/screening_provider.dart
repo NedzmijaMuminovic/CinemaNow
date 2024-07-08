@@ -3,11 +3,15 @@ import 'package:cinemanow_desktop/providers/auth_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
-class MovieProvider {
-  MovieProvider();
+class ScreeningProvider {
+  static String? _baseUrl;
+  ScreeningProvider() {
+    _baseUrl = const String.fromEnvironment("baseUrl",
+        defaultValue: "https://localhost:7102/");
+  }
 
   Future<dynamic> get() async {
-    var url = "https://localhost:7102/Movie";
+    var url = "${_baseUrl}Screening"; //?IsMovieIncluded=true
     var uri = Uri.parse(url);
     var response = await http.get(uri, headers: createHeaders());
 
