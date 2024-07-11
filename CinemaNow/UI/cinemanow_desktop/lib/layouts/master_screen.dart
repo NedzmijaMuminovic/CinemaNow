@@ -53,31 +53,49 @@ class MasterScreenState extends State<MasterScreen> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.home, color: Colors.white),
-              title: const Text('Home', style: TextStyle(color: Colors.white)),
+              leading: const Icon(
+                Icons.home,
+                color: Colors.white,
+                size: 32,
+              ),
+              title: const Text('Home',
+                  style: TextStyle(color: Colors.white, fontSize: 18)),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.movie, color: Colors.white),
-              title:
-                  const Text('Movies', style: TextStyle(color: Colors.white)),
+              leading: const Icon(
+                Icons.movie,
+                color: Colors.white,
+                size: 32,
+              ),
+              title: const Text('Movies',
+                  style: TextStyle(color: Colors.white, fontSize: 18)),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.bar_chart, color: Colors.white),
-              title:
-                  const Text('Reports', style: TextStyle(color: Colors.white)),
+              leading: const Icon(
+                Icons.bar_chart,
+                color: Colors.white,
+                size: 32,
+              ),
+              title: const Text('Reports',
+                  style: TextStyle(color: Colors.white, fontSize: 18)),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.person, color: Colors.white),
-              title: const Text('Admin', style: TextStyle(color: Colors.white)),
+              leading: const Icon(
+                Icons.person,
+                color: Colors.white,
+                size: 32,
+              ),
+              title: const Text('Admin',
+                  style: TextStyle(color: Colors.white, fontSize: 18)),
               onTap: () {
                 Navigator.pop(context);
               },
