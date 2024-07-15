@@ -1,23 +1,28 @@
 import 'dart:convert';
+import 'package:cinemanow_desktop/models/screening.dart';
 import 'package:cinemanow_desktop/providers/auth_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
-class ScreeningProvider {
+class ScreeningProvider<T> {
   static String? _baseUrl;
+
   ScreeningProvider() {
     _baseUrl = const String.fromEnvironment("baseUrl",
         defaultValue: "https://localhost:7102/");
   }
 
-  Future<dynamic> get() async {
-    var url = "${_baseUrl}Screening"; //?IsMovieIncluded=true
+  Future<List<Screening>> get() async {
+    var url = "${_baseUrl}Screening?IsMovieIncluded=true";
     var uri = Uri.parse(url);
     var response = await http.get(uri, headers: createHeaders());
 
     if (isValidResponse(response)) {
       var data = jsonDecode(response.body);
-      return data;
+      var result = List<Screening>.from(
+        data["resultList"].map((x) => Screening.fromJson(x)),
+      );
+      return result;
     } else {
       throw Exception("Unknown exception");
     }

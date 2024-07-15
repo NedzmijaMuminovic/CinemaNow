@@ -112,16 +112,22 @@ class LoginPage extends StatelessWidget {
                                 const MasterScreen(ScreeningListScreen())));
                       } on Exception catch (e) {
                         showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                                  title: const Text("Error"),
-                                  actions: [
-                                    TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: const Text("OK"))
-                                  ],
-                                  content: Text(e.toString()),
-                                ));
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: Colors.grey[900],
+                            title: const Text("Error",
+                                style: TextStyle(color: Colors.white)),
+                            content: Text(e.toString(),
+                                style: TextStyle(color: Colors.white)),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text("OK",
+                                    style: TextStyle(color: Colors.red)),
+                              ),
+                            ],
+                          ),
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(
