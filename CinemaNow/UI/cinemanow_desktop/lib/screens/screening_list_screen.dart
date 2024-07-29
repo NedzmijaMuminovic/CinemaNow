@@ -1,4 +1,5 @@
 import 'package:cinemanow_desktop/models/screening.dart';
+import 'package:cinemanow_desktop/models/search_result.dart';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -12,7 +13,7 @@ class ScreeningListScreen extends StatefulWidget {
 
 class _ScreeningListScreenState extends State<ScreeningListScreen> {
   ScreeningProvider provider = ScreeningProvider();
-  List<Screening> result = [];
+  SearchResult<Screening>? result;
   final TextEditingController _searchController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
 
@@ -24,7 +25,7 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
 
   Future<void> _fetchScreenings() async {
     try {
-      result = await provider.get();
+      result = await provider.getScreenings();
       setState(() {});
     } catch (e) {
       // Handle error
@@ -124,7 +125,7 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
                 Icon(Icons.calendar_today, color: Colors.grey[500]),
                 const SizedBox(width: 8),
                 Text(
-                  DateFormat('MM/dd/yyyy').format(_selectedDate),
+                  DateFormat('dd/MM/yyyy').format(_selectedDate),
                   style: TextStyle(color: Colors.grey[500]),
                 ),
               ],
@@ -188,18 +189,19 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
               crossAxisCount: crossAxisCount,
               crossAxisSpacing: 16.0,
               mainAxisSpacing: 16.0,
-              childAspectRatio: 1.0,
+              childAspectRatio: 1,
             ),
-            itemCount: result.length,
+            itemCount: result?.result.length,
             itemBuilder: (context, index) {
               return ScreeningCard(
                 imageUrl: 'assets/images/default.jpg',
-                title: result[index].movie?.title ?? 'Unknown Title',
-                date: result[index].date != null
-                    ? DateFormat('MM/dd/yyyy').format(result[index].date!)
+                title: result?.result[index].movie?.title ?? 'Unknown Title',
+                date: result?.result[index].date != null
+                    ? DateFormat('dd/MM/yyyy')
+                        .format(result!.result[index].date!)
                     : 'Unknown Date',
-                time: result[index].time ?? 'Unknown Time',
-                hall: result[index].hall ?? 'Unknown Hall',
+                time: result?.result[index].time ?? 'Unknown Time',
+                hall: result?.result[index].hall ?? 'Unknown Hall',
               );
             },
           );
@@ -241,7 +243,6 @@ class ScreeningCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
             borderRadius:
@@ -268,18 +269,66 @@ class ScreeningCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Flexible(
-                    child: ListView(
-                      padding: EdgeInsets.zero,
-                      children: [
-                        InfoRow(icon: Icons.calendar_today, text: date),
-                        InfoRow(icon: Icons.access_time, text: time),
-                        InfoRow(icon: Icons.location_on, text: hall),
-                      ],
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InfoRow(icon: Icons.calendar_today, text: date),
+                          InfoRow(icon: Icons.access_time, text: time),
+                          InfoRow(icon: Icons.location_on, text: hall),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
+            ),
+          ),
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            decoration: BoxDecoration(
+              color: Colors.grey[850],
+              borderRadius:
+                  const BorderRadius.vertical(bottom: Radius.circular(16.0)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[700],
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8.0,
+                      horizontal: 16.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  icon: const Icon(Icons.edit, color: Colors.white),
+                  label:
+                      const Text('Edit', style: TextStyle(color: Colors.white)),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8.0,
+                      horizontal: 16.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  icon: const Icon(Icons.delete, color: Colors.white),
+                  label: const Text('Delete',
+                      style: TextStyle(color: Colors.white)),
+                ),
+              ],
             ),
           ),
         ],
