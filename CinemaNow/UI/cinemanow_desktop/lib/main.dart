@@ -3,7 +3,6 @@ import 'package:cinemanow_desktop/providers/auth_provider.dart';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
 import 'package:cinemanow_desktop/screens/screening_list_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 void main() {
   runApp(const MyApp());
@@ -118,7 +117,7 @@ class LoginPage extends StatelessWidget {
                             title: const Text("Error",
                                 style: TextStyle(color: Colors.white)),
                             content: Text(e.toString(),
-                                style: TextStyle(color: Colors.white)),
+                                style: const TextStyle(color: Colors.white)),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context),
@@ -150,8 +149,8 @@ class LoginPage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Flexible(
-                        child: const Text(
+                      const Flexible(
+                        child: Text(
                           "Don't have an account? ",
                           style: TextStyle(color: Colors.white70),
                         ),

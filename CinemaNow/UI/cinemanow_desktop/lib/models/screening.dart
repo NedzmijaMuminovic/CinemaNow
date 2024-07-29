@@ -1,14 +1,28 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'movie.dart';
 
 part 'screening.g.dart';
 
 @JsonSerializable()
 class Screening {
-  @JsonKey(name: 'id')
-  int? screeningID;
+  int? id;
+  int? movieId;
+  DateTime? date;
+  String? time; //???
   String? hall;
+  double? price;
+  Movie? movie;
+  String? stateMachine;
 
-  Screening({this.screeningID, this.hall});
+  Screening(
+      {this.id,
+      this.movieId,
+      this.date,
+      this.time,
+      this.hall,
+      this.price,
+      this.movie,
+      this.stateMachine});
 
   /// Connect the generated [_$PersonFromJson] function to the `fromJson`
   /// factory.
