@@ -8,6 +8,7 @@ class Movie {
   String? title;
   int? duration;
   String? synopsis;
+  String? imageBase64;
 
   Movie({this.id, this.title, this.duration, this.synopsis});
 

@@ -28,5 +28,51 @@ namespace CinemaNow.Services
             return filteredQuery;
         }
 
+        public override Models.PagedResult<Models.Movie> GetPaged(MovieSearchObject search)
+        {
+            var pagedData = base.GetPaged(search);
+
+            foreach (var movie in pagedData.ResultList)
+            {
+                var dbMovie = Context.Set<Database.Movie>().Find(movie.Id);
+                if (dbMovie != null)
+                {
+                    movie.ImageBase64 = dbMovie.Image != null ? Convert.ToBase64String(dbMovie.Image) : null;
+                    movie.ImageThumbBase64 = dbMovie.ImageThumb != null ? Convert.ToBase64String(dbMovie.ImageThumb) : null;
+                }
+            }
+
+            return pagedData;
+        }
+
+
+
+        public override Models.Movie GetByID(int id)
+        {
+            var entity = Context.Set<Database.Movie>().Find(id);
+
+            if (entity != null)
+            {
+                var model = Mapper.Map<Models.Movie>(entity);
+
+                model.ImageBase64 = entity.Image != null ? Convert.ToBase64String(entity.Image) : null;
+                model.ImageThumbBase64 = entity.ImageThumb != null ? Convert.ToBase64String(entity.ImageThumb) : null;
+
+                return model;
+            }
+            else
+                return null;
+        }
+
+        public async Task UpdateMovieImage(int id, byte[] imageBytes)
+        {
+            var movie = Context.Set<Database.Movie>().Find(id);
+            if (movie != null)
+            {
+                movie.Image = imageBytes;
+                await Context.SaveChangesAsync();
+            }
+        }
+
     }
 }

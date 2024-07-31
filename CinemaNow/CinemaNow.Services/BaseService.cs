@@ -22,7 +22,7 @@ namespace CinemaNow.Services
             Mapper = mapper;
         }
 
-        public Models.PagedResult<TModel> GetPaged(TSearch search)
+        public virtual Models.PagedResult<TModel> GetPaged(TSearch search)
         {
             List<TModel> result = new List<TModel>();
 

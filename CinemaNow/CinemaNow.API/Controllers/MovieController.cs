@@ -13,5 +13,24 @@ namespace CinemaNow.API.Controllers
         public MovieController(IMovieService service) : base(service)
         { 
         }
+
+        [HttpPost("upload-image/{id}")]
+        public async Task<IActionResult> UploadImage(int id, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await file.CopyToAsync(memoryStream);
+                var imageBytes = memoryStream.ToArray();
+
+                var movieService = (IMovieService)_service;
+                await movieService.UpdateMovieImage(id, imageBytes);
+            }
+
+            return Ok();
+        }
+
     }
 }

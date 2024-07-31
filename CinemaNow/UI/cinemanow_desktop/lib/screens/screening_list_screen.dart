@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:cinemanow_desktop/models/screening.dart';
 import 'package:cinemanow_desktop/models/search_result.dart';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
+import 'package:cinemanow_desktop/providers/utils.dart';
 import 'package:cinemanow_desktop/widgets/date_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -188,10 +191,8 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
         builder: (context, constraints) {
           int crossAxisCount;
           if (constraints.maxWidth > 1200) {
-            crossAxisCount = 4;
-          } else if (constraints.maxWidth > 900) {
             crossAxisCount = 3;
-          } else if (constraints.maxWidth > 600) {
+          } else if (constraints.maxWidth > 900) {
             crossAxisCount = 2;
           } else {
             crossAxisCount = 1;
@@ -205,8 +206,11 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
             ),
             itemCount: result?.result.length,
             itemBuilder: (context, index) {
+              String? imageUrl = result?.result[index].movie?.imageBase64;
               return ScreeningCard(
-                imageUrl: 'assets/images/default.jpg',
+                imageUrl: imageUrl != null
+                    ? 'data:image/jpeg;base64,$imageUrl'
+                    : 'assets/images/default.jpg',
                 title: result?.result[index].movie?.title ?? 'Unknown Title',
                 date: result?.result[index].date != null
                     ? DateFormat('dd/MM/yyyy')
@@ -259,12 +263,26 @@ class ScreeningCard extends StatelessWidget {
           ClipRRect(
             borderRadius:
                 const BorderRadius.vertical(top: Radius.circular(16.0)),
-            child: Image.asset(
-              imageUrl,
-              height: 160,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+            child: imageUrl.startsWith('data:image')
+                ? Container(
+                    height: 250,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image:
+                            MemoryImage(base64Decode(imageUrl.split(',').last)),
+                        fit: BoxFit.cover,
+                        alignment: Alignment.topCenter,
+                      ),
+                    ),
+                  )
+                : Image.asset(
+                    imageUrl,
+                    height: 160,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topCenter,
+                  ),
           ),
           Expanded(
             child: Padding(

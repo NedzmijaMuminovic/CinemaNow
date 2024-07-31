@@ -11,5 +11,7 @@ namespace CinemaNow.Models
         public int? Duration { get; set; }
 
         public string? Synopsis { get; set; }
+        public string? ImageBase64 { get; set; }
+        public string? ImageThumbBase64 { get; set; }
     }
 }
