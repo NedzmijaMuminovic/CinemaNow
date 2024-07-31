@@ -10,7 +10,10 @@ class ScreeningProvider extends BaseProvider<Screening> {
     return Screening.fromJson(data);
   }
 
-  Future<SearchResult<Screening>> getScreenings() async {
-    return await get(filter: {"IsMovieIncluded": true});
+  Future<SearchResult<Screening>> getScreenings({dynamic filter}) async {
+    filter ??= {};
+    filter['IsMovieIncluded'] = 'true';
+
+    return await get(filter: filter);
   }
 }

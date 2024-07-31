@@ -35,6 +35,9 @@ namespace CinemaNow.Services
             if (search?.IsMovieIncluded == true)
                 filteredQuery = filteredQuery.Include(x => x.Movie);
 
+            if (search?.Date.HasValue == true)
+                filteredQuery = filteredQuery.Where(x => x.Date.HasValue && x.Date.Value.Date == search.Date.Value.Date);
+
             return filteredQuery;
         }
 

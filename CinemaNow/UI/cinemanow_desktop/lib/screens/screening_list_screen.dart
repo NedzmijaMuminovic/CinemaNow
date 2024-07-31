@@ -14,8 +14,8 @@ class ScreeningListScreen extends StatefulWidget {
 class _ScreeningListScreenState extends State<ScreeningListScreen> {
   ScreeningProvider provider = ScreeningProvider();
   SearchResult<Screening>? result;
-  final TextEditingController _searchController = TextEditingController();
-  DateTime _selectedDate = DateTime.now();
+  final TextEditingController _ftsEditingController = TextEditingController();
+  DateTime? _selectedDate;
 
   @override
   void initState() {
@@ -23,13 +23,12 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
     _fetchScreenings();
   }
 
-  Future<void> _fetchScreenings() async {
+  Future<void> _fetchScreenings({dynamic filter}) async {
     try {
-      result = await provider.getScreenings();
+      result = await provider.getScreenings(filter: filter);
       setState(() {});
     } catch (e) {
       // Handle error
-      print(e);
     }
   }
 
@@ -79,7 +78,7 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
-                    controller: _searchController,
+                    controller: _ftsEditingController,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: 'Search',
@@ -110,11 +109,31 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
                 builder: (BuildContext context, Widget? child) {
                   return Theme(
                     data: _buildDarkDatePickerTheme(context),
-                    child: child!,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Expanded(child: child!),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedDate = null;
+                              });
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text(
+                              'Clear Date',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 },
               );
-              if (pickedDate != null && pickedDate != _selectedDate) {
+              if (pickedDate != null) {
                 setState(() {
                   _selectedDate = pickedDate;
                 });
@@ -125,7 +144,9 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
                 Icon(Icons.calendar_today, color: Colors.grey[500]),
                 const SizedBox(width: 8),
                 Text(
-                  DateFormat('dd/MM/yyyy').format(_selectedDate),
+                  _selectedDate != null
+                      ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
+                      : 'Pick a Date',
                   style: TextStyle(color: Colors.grey[500]),
                 ),
               ],
@@ -135,7 +156,15 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
         const SizedBox(width: 16),
         ElevatedButton(
           onPressed: () async {
-            await _fetchScreenings();
+            var filter = {
+              'fts': _ftsEditingController.text,
+            };
+
+            if (_selectedDate != null) {
+              filter['date'] = DateFormat('yyyy-MM-dd').format(_selectedDate!);
+            }
+
+            await _fetchScreenings(filter: filter);
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.grey[850],
@@ -162,7 +191,7 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
             minimumSize: const Size(0, 55),
           ),
           child: Text(
-            'Add a new screening',
+            'Add',
             style: TextStyle(color: Colors.grey[500]),
           ),
         ),

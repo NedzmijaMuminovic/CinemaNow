@@ -1,6 +1,5 @@
 import 'package:cinemanow_desktop/layouts/master_screen.dart';
 import 'package:cinemanow_desktop/providers/auth_provider.dart';
-import 'package:cinemanow_desktop/providers/screening_provider.dart';
 import 'package:cinemanow_desktop/screens/screening_list_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -100,12 +99,10 @@ class LoginPage extends StatelessWidget {
                   const SizedBox(height: 20.0),
                   ElevatedButton(
                     onPressed: () async {
-                      ScreeningProvider provider = ScreeningProvider();
                       AuthProvider.username = _usernameController.text;
                       AuthProvider.password = _passwordController.text;
 
                       try {
-                        var data = await provider.get();
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) =>
                                 const MasterScreen(ScreeningListScreen())));
