@@ -1,8 +1,10 @@
 import 'package:cinemanow_desktop/models/screening.dart';
 import 'package:cinemanow_desktop/models/search_result.dart';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
+import 'package:cinemanow_desktop/widgets/date_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class ScreeningListScreen extends StatefulWidget {
   const ScreeningListScreen({super.key});
@@ -12,10 +14,17 @@ class ScreeningListScreen extends StatefulWidget {
 }
 
 class _ScreeningListScreenState extends State<ScreeningListScreen> {
-  ScreeningProvider provider = ScreeningProvider();
+  late ScreeningProvider provider;
   SearchResult<Screening>? result;
   final TextEditingController _ftsEditingController = TextEditingController();
   DateTime? _selectedDate;
+  bool _noScreeningsAvailable = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _fetchScreenings();
+  }
 
   @override
   void initState() {
@@ -25,8 +34,11 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
 
   Future<void> _fetchScreenings({dynamic filter}) async {
     try {
+      final provider = context.read<ScreeningProvider>();
       result = await provider.getScreenings(filter: filter);
-      setState(() {});
+      setState(() {
+        _noScreeningsAvailable = result?.result.isEmpty ?? true;
+      });
     } catch (e) {
       // Handle error
     }
@@ -45,18 +57,6 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
             _buildResultView(),
           ],
         ),
-      ),
-    );
-  }
-
-  ThemeData _buildDarkDatePickerTheme(BuildContext context) {
-    return ThemeData.dark().copyWith(
-      scaffoldBackgroundColor: Colors.grey[900],
-      dialogBackgroundColor: Colors.grey[900],
-      textTheme: const TextTheme(),
-      colorScheme: const ColorScheme.dark(
-        primary: Colors.red,
-        onPrimary: Colors.white,
       ),
     );
   }
@@ -99,58 +99,13 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
             color: Colors.grey[850],
             borderRadius: BorderRadius.circular(8.0),
           ),
-          child: InkWell(
-            onTap: () async {
-              DateTime? pickedDate = await showDatePicker(
-                context: context,
-                initialDate: _selectedDate,
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2101),
-                builder: (BuildContext context, Widget? child) {
-                  return Theme(
-                    data: _buildDarkDatePickerTheme(context),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Expanded(child: child!),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextButton(
-                            onPressed: () {
-                              setState(() {
-                                _selectedDate = null;
-                              });
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text(
-                              'Clear Date',
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              );
-              if (pickedDate != null) {
-                setState(() {
-                  _selectedDate = pickedDate;
-                });
-              }
+          child: DatePicker(
+            selectedDate: _selectedDate,
+            onDateSelected: (date) {
+              setState(() {
+                _selectedDate = date;
+              });
             },
-            child: Row(
-              children: [
-                Icon(Icons.calendar_today, color: Colors.grey[500]),
-                const SizedBox(width: 8),
-                Text(
-                  _selectedDate != null
-                      ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
-                      : 'Pick a Date',
-                  style: TextStyle(color: Colors.grey[500]),
-                ),
-              ],
-            ),
           ),
         ),
         const SizedBox(width: 16),
@@ -200,6 +155,34 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
   }
 
   Widget _buildResultView() {
+    if (_noScreeningsAvailable) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.movie, color: Colors.red, size: 60),
+            const SizedBox(height: 16),
+            Text(
+              'No Screenings Available',
+              style: TextStyle(
+                color: Colors.grey[500],
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Try selecting a different date or search term.',
+              style: TextStyle(
+                color: Colors.grey[400],
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Expanded(
       child: LayoutBuilder(
         builder: (context, constraints) {
