@@ -28,15 +28,7 @@ class MasterScreenState extends State<MasterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[900],
-      appBar: AppBar(
-        backgroundColor: Colors.grey[850],
-        actions: const [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Icon(Icons.search),
-          ),
-        ],
-      ),
+      appBar: AppBar(backgroundColor: Colors.grey[850]),
       drawer: Drawer(
         backgroundColor: Colors.grey[850],
         child: ListView(

@@ -1,3 +1,4 @@
+import 'package:cinemanow_desktop/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -18,18 +19,6 @@ class DatePicker extends StatefulWidget {
 class _DatePickerState extends State<DatePicker> {
   DateTime? _pickedDate;
 
-  ThemeData _buildDarkDatePickerTheme(BuildContext context) {
-    return ThemeData.dark().copyWith(
-      scaffoldBackgroundColor: Colors.grey[900],
-      dialogBackgroundColor: Colors.grey[900],
-      textTheme: const TextTheme(),
-      colorScheme: const ColorScheme.dark(
-        primary: Colors.red,
-        onPrimary: Colors.white,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -41,7 +30,7 @@ class _DatePickerState extends State<DatePicker> {
           lastDate: DateTime(2101),
           builder: (BuildContext context, Widget? child) {
             return Theme(
-              data: _buildDarkDatePickerTheme(context),
+              data: buildDarkTheme(context),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [

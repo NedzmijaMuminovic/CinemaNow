@@ -4,6 +4,7 @@ import 'package:cinemanow_desktop/models/screening.dart';
 import 'package:cinemanow_desktop/models/search_result.dart';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
 import 'package:cinemanow_desktop/widgets/date_picker.dart';
+import 'package:cinemanow_desktop/screens/add_screening_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -138,7 +139,13 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
         ),
         const SizedBox(width: 16),
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const AddScreeningScreen(),
+              ),
+            );
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.grey[850],
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -353,11 +360,11 @@ class ScreeningCard extends StatelessWidget {
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          title: Text(
+                          title: const Text(
                             'Confirm Deletion',
                             style: TextStyle(color: Colors.white),
                           ),
-                          content: Text(
+                          content: const Text(
                             'Are you sure you want to delete this screening?',
                             style: TextStyle(color: Colors.white),
                           ),
