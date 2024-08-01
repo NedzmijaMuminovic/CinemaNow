@@ -16,4 +16,8 @@ class ScreeningProvider extends BaseProvider<Screening> {
 
     return await get(filter: filter);
   }
+
+  Future<void> deleteScreening(int id) async {
+    await delete(id);
+  }
 }

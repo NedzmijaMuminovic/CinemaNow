@@ -49,6 +49,21 @@ namespace CinemaNow.Services
 
         public virtual void BeforeUpdate(TUpdate request, TDbEntity entity) { }
 
+        public virtual void Delete(int id)
+        {
+            var set = Context.Set<TDbEntity>();
+
+            var entity = set.Find(id);
+
+            if (entity == null)
+            {
+                throw new Exception("Entity not found");
+            }
+
+            set.Remove(entity);
+            Context.SaveChanges();
+        }
+
         public virtual Task UpdateImageAsync(int id, byte[] imageBytes)
         {
             throw new NotImplementedException("Override this method in the derived service.");

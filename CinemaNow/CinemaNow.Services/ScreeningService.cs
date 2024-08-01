@@ -66,11 +66,14 @@ namespace CinemaNow.Services
 
             foreach (var screening in pagedData.ResultList)
             {
-                var dbScreening = Context.Screenings.Include(s => s.Movie).FirstOrDefault(s => s.Id == screening.Id);
-                if (dbScreening?.Movie != null)
+                if (search?.IsMovieIncluded == true)
                 {
-                    screening.Movie.ImageBase64 = dbScreening.Movie.Image != null ? Convert.ToBase64String(dbScreening.Movie.Image) : null;
-                    screening.Movie.ImageThumbBase64 = dbScreening.Movie.ImageThumb != null ? Convert.ToBase64String(dbScreening.Movie.ImageThumb) : null;
+                    var dbScreening = Context.Screenings.Include(s => s.Movie).FirstOrDefault(s => s.Id == screening.Id);
+                    if (dbScreening?.Movie != null)
+                    {
+                        screening.Movie.ImageBase64 = dbScreening.Movie.Image != null ? Convert.ToBase64String(dbScreening.Movie.Image) : null;
+                        screening.Movie.ImageThumbBase64 = dbScreening.Movie.ImageThumb != null ? Convert.ToBase64String(dbScreening.Movie.ImageThumb) : null;
+                    }
                 }
             }
 

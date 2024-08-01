@@ -139,4 +139,19 @@ abstract class BaseProvider<T> with ChangeNotifier {
     });
     return query;
   }
+
+  Future<void> delete(int id) async {
+    var url = "$_baseUrl$_endpoint/$id";
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+
+    var response = await http.delete(uri, headers: headers);
+
+    if (isValidResponse(response)) {
+      notifyListeners();
+    } else {
+      throw Exception("Failed to delete item");
+    }
+  }
+
 }

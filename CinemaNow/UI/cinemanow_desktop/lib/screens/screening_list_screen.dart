@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:cinemanow_desktop/models/screening.dart';
 import 'package:cinemanow_desktop/models/search_result.dart';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
-import 'package:cinemanow_desktop/providers/utils.dart';
 import 'package:cinemanow_desktop/widgets/date_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -218,6 +217,8 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
                     : 'Unknown Date',
                 time: result?.result[index].time ?? 'Unknown Time',
                 hall: result?.result[index].hall ?? 'Unknown Hall',
+                screeningId: result?.result[index].id ?? 0,
+                onDelete: _fetchScreenings,
               );
             },
           );
@@ -233,6 +234,8 @@ class ScreeningCard extends StatelessWidget {
   final String date;
   final String time;
   final String hall;
+  final int screeningId;
+  final VoidCallback onDelete;
 
   const ScreeningCard({
     super.key,
@@ -241,6 +244,8 @@ class ScreeningCard extends StatelessWidget {
     required this.date,
     required this.time,
     required this.hall,
+    required this.screeningId,
+    required this.onDelete,
   });
 
   @override
@@ -278,7 +283,7 @@ class ScreeningCard extends StatelessWidget {
                   )
                 : Image.asset(
                     imageUrl,
-                    height: 160,
+                    height: 250,
                     width: double.infinity,
                     fit: BoxFit.cover,
                     alignment: Alignment.topCenter,
@@ -343,7 +348,59 @@ class ScreeningCard extends StatelessWidget {
                       const Text('Edit', style: TextStyle(color: Colors.white)),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final shouldDelete = await showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text(
+                            'Confirm Deletion',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          content: Text(
+                            'Are you sure you want to delete this screening?',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Colors.grey[900],
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: const Text(
+                                'No',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: const Text(
+                                'Yes',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    if (shouldDelete == true) {
+                      try {
+                        final provider = Provider.of<ScreeningProvider>(context,
+                            listen: false);
+                        await provider.deleteScreening(screeningId);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Screening successfully deleted!')),
+                        );
+                        onDelete();
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Failed to delete screening'),
+                          ),
+                        );
+                      }
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                     padding: const EdgeInsets.symmetric(

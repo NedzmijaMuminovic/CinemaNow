@@ -29,5 +29,12 @@ namespace CinemaNow.API.Controllers
             return _service.Update(id, request);
         }
 
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public virtual void Delete(int id)
+        {
+            _service.Delete(id);
+        }
+
     }
 }
