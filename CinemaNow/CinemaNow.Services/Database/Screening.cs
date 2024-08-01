@@ -19,7 +19,7 @@ public partial class Screening
 
     public string? StateMachine { get; set; }
 
-    public virtual Movie? Movie { get; set; }
+    public virtual Movie Movie { get; set; }
 
     public virtual ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
 

@@ -19,11 +19,11 @@ public partial class Reservation
 
     public decimal? TotalPrice { get; set; }
 
-    public string? Status { get; set; }
+    public string Status { get; set; }
 
-    public virtual Screening? Screening { get; set; }
+    public virtual Screening Screening { get; set; }
 
-    public virtual Seat? Seat { get; set; }
+    public virtual Seat Seat { get; set; }
 
-    public virtual User? User { get; set; }
+    public virtual User User { get; set; }
 }

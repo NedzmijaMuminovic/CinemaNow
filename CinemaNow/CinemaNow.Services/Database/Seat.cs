@@ -17,5 +17,5 @@ public partial class Seat
 
     public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 
-    public virtual Screening? Screening { get; set; }
+    public virtual Screening Screening { get; set; }
 }
