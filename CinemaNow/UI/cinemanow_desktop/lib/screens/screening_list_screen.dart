@@ -142,7 +142,11 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => const AddScreeningScreen(),
+                builder: (context) => AddScreeningScreen(
+                  onScreeningAdded: () {
+                    _fetchScreenings();
+                  },
+                ),
               ),
             );
           },
@@ -198,7 +202,7 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
           int crossAxisCount;
           if (constraints.maxWidth > 1200) {
             crossAxisCount = 3;
-          } else if (constraints.maxWidth > 900) {
+          } else if (constraints.maxWidth > 800) {
             crossAxisCount = 2;
           } else {
             crossAxisCount = 1;

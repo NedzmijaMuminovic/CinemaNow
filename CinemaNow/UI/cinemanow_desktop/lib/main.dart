@@ -1,6 +1,9 @@
 import 'package:cinemanow_desktop/layouts/master_screen.dart';
 import 'package:cinemanow_desktop/providers/auth_provider.dart';
+import 'package:cinemanow_desktop/providers/hall_provider.dart';
+import 'package:cinemanow_desktop/providers/movie_provider.dart';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
+import 'package:cinemanow_desktop/providers/view_mode_provider.dart';
 import 'package:cinemanow_desktop/screens/screening_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +12,9 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => MovieProvider()),
+        ChangeNotifierProvider(create: (_) => HallProvider()),
+        ChangeNotifierProvider(create: (_) => ViewModeProvider()),
         ChangeNotifierProvider(create: (_) => ScreeningProvider()),
       ],
       child: const MyApp(),
