@@ -1,3 +1,5 @@
+import 'package:cinemanow_desktop/models/hall.dart';
+import 'package:cinemanow_desktop/models/view_mode.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'movie.dart';
 
@@ -7,11 +9,14 @@ part 'screening.g.dart';
 class Screening {
   int? id;
   int? movieId;
+  int? hallId;
+  int? viewModeId;
   DateTime? date;
-  String? time; //???
-  String? hall;
+  String? time;
   double? price;
   Movie? movie;
+  Hall? hall;
+  ViewMode? viewMode;
   String? stateMachine;
 
   Screening(
@@ -19,9 +24,10 @@ class Screening {
       this.movieId,
       this.date,
       this.time,
-      this.hall,
       this.price,
       this.movie,
+      this.hall,
+      this.viewMode,
       this.stateMachine});
 
   /// Connect the generated [_$PersonFromJson] function to the `fromJson`

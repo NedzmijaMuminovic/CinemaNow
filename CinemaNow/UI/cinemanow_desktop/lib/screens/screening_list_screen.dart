@@ -222,8 +222,16 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
                     ? DateFormat('dd/MM/yyyy')
                         .format(result!.result[index].date!)
                     : 'Unknown Date',
-                time: result?.result[index].time ?? 'Unknown Time',
-                hall: result?.result[index].hall ?? 'Unknown Hall',
+                time: result?.result[index].time != null
+                    ? DateFormat('HH:mm').format(
+                        DateFormat('HH:mm').parse(result!.result[index].time!))
+                    : 'Unknown Time',
+                hall: result?.result[index].hall?.name ?? 'Unknown Hall',
+                viewMode:
+                    result?.result[index].viewMode?.name ?? 'Unknown View Mode',
+                price: result?.result[index].price != null
+                    ? result!.result[index].price.toString()
+                    : 'Unknown Price',
                 screeningId: result?.result[index].id ?? 0,
                 onDelete: _fetchScreenings,
               );
@@ -241,6 +249,8 @@ class ScreeningCard extends StatelessWidget {
   final String date;
   final String time;
   final String hall;
+  final String viewMode;
+  final String price;
   final int screeningId;
   final VoidCallback onDelete;
 
@@ -251,6 +261,8 @@ class ScreeningCard extends StatelessWidget {
     required this.date,
     required this.time,
     required this.hall,
+    required this.viewMode,
+    required this.price,
     required this.screeningId,
     required this.onDelete,
   });
@@ -319,6 +331,8 @@ class ScreeningCard extends StatelessWidget {
                           InfoRow(icon: Icons.calendar_today, text: date),
                           InfoRow(icon: Icons.access_time, text: time),
                           InfoRow(icon: Icons.location_on, text: hall),
+                          InfoRow(icon: Icons.video_call, text: viewMode),
+                          InfoRow(icon: Icons.attach_money, text: price),
                         ],
                       ),
                     ),

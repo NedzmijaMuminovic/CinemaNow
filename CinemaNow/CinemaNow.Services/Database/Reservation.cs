@@ -19,7 +19,7 @@ public partial class Reservation
 
     public decimal? TotalPrice { get; set; }
 
-    public string Status { get; set; }
+    public string? Status { get; set; }
 
     public virtual Screening Screening { get; set; }
 

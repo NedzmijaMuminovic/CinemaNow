@@ -35,6 +35,12 @@ namespace CinemaNow.Services
             if (search?.IsMovieIncluded == true)
                 filteredQuery = filteredQuery.Include(x => x.Movie);
 
+            if (search?.IsHallIncluded == true)
+                filteredQuery = filteredQuery.Include(x => x.Hall);
+
+            if (search?.IsViewModeIncluded == true)
+                filteredQuery = filteredQuery.Include(x => x.ViewMode);
+
             if (search?.Date.HasValue == true)
                 filteredQuery = filteredQuery.Where(x => x.Date.HasValue && x.Date.Value.Date == search.Date.Value.Date);
 
@@ -43,7 +49,7 @@ namespace CinemaNow.Services
 
         public override Models.Screening GetByID(int id)
         {
-            var entity = Context.Screenings.Include(s => s.Movie).FirstOrDefault(s => s.Id == id);
+            var entity = Context.Screenings.Include(s => s.Movie).Include(s => s.Hall).Include(s=>s.ViewMode).FirstOrDefault(s => s.Id == id);
 
             if (entity != null)
             {
@@ -86,6 +92,14 @@ namespace CinemaNow.Services
             if (movie == null)
                 throw new Exception("Movie not found");
 
+            var hall = Context.Halls.FirstOrDefault(h => h.Id == request.HallId);
+            if (hall == null)
+                throw new Exception("Hall not found");
+
+            var viewMode = Context.ViewModes.FirstOrDefault(vm => vm.Id == request.ViewModeId);
+            if (viewMode == null)
+                throw new Exception("ViewMode not found");
+
             base.BeforeInsert(request, entity);
         }
 
@@ -96,6 +110,14 @@ namespace CinemaNow.Services
             var movie = Context.Movies.FirstOrDefault(m => m.Id == request.MovieId);
             if (movie == null)
                 throw new Exception("Movie not found");
+
+            var hall = Context.Halls.FirstOrDefault(h => h.Id == request.HallId);
+            if (hall == null)
+                throw new Exception("Hall not found");
+
+            var viewMode = Context.ViewModes.FirstOrDefault(vm => vm.Id == request.ViewModeId);
+            if (viewMode == null)
+                throw new Exception("ViewMode not found");
         }
 
         public override Models.Screening Insert(ScreeningInsertRequest request)
@@ -103,7 +125,7 @@ namespace CinemaNow.Services
             var state = BaseScreeningState.CreateState("initial");
             var insertedScreening = state.Insert(request);
 
-            var entity = Context.Screenings.Include(s => s.Movie).FirstOrDefault(s => s.Id == insertedScreening.Id);
+            var entity = Context.Screenings.Include(s => s.Movie).Include(s => s.Hall).Include(s => s.ViewMode).FirstOrDefault(s => s.Id == insertedScreening.Id);
             return Mapper.Map<Models.Screening>(entity);
         }
 
@@ -113,7 +135,7 @@ namespace CinemaNow.Services
             var state = BaseScreeningState.CreateState(entity.StateMachine);
             var updatedScreening = state.Update(id, request);
 
-            var updatedEntity = Context.Screenings.Include(s => s.Movie).FirstOrDefault(s => s.Id == updatedScreening.Id);
+            var updatedEntity = Context.Screenings.Include(s => s.Movie).Include(s => s.Hall).Include(s => s.ViewMode).FirstOrDefault(s => s.Id == updatedScreening.Id);
             return Mapper.Map<Models.Screening>(updatedEntity);
         }
 

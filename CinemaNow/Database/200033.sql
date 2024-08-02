@@ -65,15 +65,28 @@ CREATE TABLE MovieActor (
     PRIMARY KEY (MovieID, ActorID)
 );
 
+CREATE TABLE Hall (
+    ID INT PRIMARY KEY IDENTITY,
+    Name VARCHAR(50)
+);
+
+CREATE TABLE ViewMode (
+    ID INT PRIMARY KEY IDENTITY,
+    Name VARCHAR(50)
+);
+
 CREATE TABLE Screening (
     ID INT PRIMARY KEY IDENTITY,
     MovieID INT,
+	HallID INT,
+	ViewModeID INT,
     Date DATE,
     Time TIME,
-    Hall VARCHAR(50),
     Price DECIMAL(10,2),
     StateMachine VARCHAR(50),
-    FOREIGN KEY (MovieID) REFERENCES Movie(ID) ON DELETE CASCADE
+    FOREIGN KEY (MovieID) REFERENCES Movie(ID) ON DELETE CASCADE,
+	FOREIGN KEY (HallID) REFERENCES Hall(ID) ON DELETE CASCADE,
+    FOREIGN KEY (ViewModeID) REFERENCES ViewMode(ID) ON DELETE CASCADE
 );
 
 CREATE TABLE PayPalPayment (
@@ -100,9 +113,9 @@ CREATE TABLE Reservation (
     NumberOfTickets INT,
     TotalPrice DECIMAL(10,2),
     Status VARCHAR(50),
-    FOREIGN KEY (UserID) REFERENCES [User](ID) ON DELETE CASCADE,
-    FOREIGN KEY (ScreeningID) REFERENCES Screening(ID) ON DELETE NO ACTION,
-    FOREIGN KEY (SeatID) REFERENCES Seat(ID) ON DELETE NO ACTION
+    FOREIGN KEY (UserID) REFERENCES [User](ID) ON DELETE NO ACTION,
+	FOREIGN KEY (ScreeningID) REFERENCES Screening(ID) ON DELETE NO ACTION,
+	FOREIGN KEY (SeatID) REFERENCES Seat(ID) ON DELETE NO ACTION
 );
 
 CREATE TABLE Purchase (
@@ -115,10 +128,10 @@ CREATE TABLE Purchase (
     TotalPrice DECIMAL(10,2),
     Status VARCHAR(50),
     PayPalPaymentID INT,
-    FOREIGN KEY (UserID) REFERENCES [User](ID) ON DELETE CASCADE,
+    FOREIGN KEY (UserID) REFERENCES [User](ID) ON DELETE NO ACTION,
     FOREIGN KEY (ScreeningID) REFERENCES Screening(ID) ON DELETE NO ACTION,
-    FOREIGN KEY (PayPalPaymentID) REFERENCES PayPalPayment(ID) ON DELETE NO ACTION,
-    FOREIGN KEY (SeatID) REFERENCES Seat(ID) ON DELETE NO ACTION
+    FOREIGN KEY (SeatID) REFERENCES Seat(ID) ON DELETE NO ACTION,
+    FOREIGN KEY (PayPalPaymentID) REFERENCES PayPalPayment(ID) ON DELETE NO ACTION
 );
 
 CREATE TABLE Rating (
@@ -179,11 +192,17 @@ VALUES
 (2, 2),
 (3, 3);
 
-INSERT INTO Screening (MovieID, Date, Time, Hall, Price, StateMachine)
+INSERT INTO Hall (Name)
+VALUES ('Hall 1'), ('Hall 2'), ('Hall 3');
+
+INSERT INTO ViewMode (Name)
+VALUES ('2D'), ('3D'), ('4DX');
+
+INSERT INTO Screening (MovieID, HallID, ViewModeID, Date, Time, Price, StateMachine)
 VALUES 
-(1, '2024-04-04', '18:00:00', 'Hall 1', 10.00, NULL),
-(2, '2024-04-05', '19:00:00', 'Hall 2', 12.00, NULL),
-(3, '2024-04-06', '20:00:00', 'Hall 3', 15.00, NULL);
+(1, 1, 1, '2024-04-04', '18:00:00', 10.00, NULL),
+(2, 2, 2, '2024-04-05', '19:00:00', 12.00, NULL),
+(3, 3, 3, '2024-04-06', '20:00:00', 15.00, NULL);
 
 INSERT INTO PayPalPayment (UserID, Info)
 VALUES 

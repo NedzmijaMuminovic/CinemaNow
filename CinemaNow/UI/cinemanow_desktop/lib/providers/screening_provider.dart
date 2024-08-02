@@ -13,6 +13,8 @@ class ScreeningProvider extends BaseProvider<Screening> {
   Future<SearchResult<Screening>> getScreenings({dynamic filter}) async {
     filter ??= {};
     filter['IsMovieIncluded'] = 'true';
+    filter['IsHallIncluded'] = 'true';
+    filter['IsViewModeIncluded'] = 'true';
 
     return await get(filter: filter);
   }

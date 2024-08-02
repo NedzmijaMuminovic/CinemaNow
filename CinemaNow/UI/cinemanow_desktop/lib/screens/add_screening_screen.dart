@@ -89,7 +89,7 @@ class _AddScreeningScreenState extends State<AddScreeningScreen> {
                 buildTimeField(
                     context, 'Time', 'Select a time', Icons.access_time),
                 buildInputField(
-                    context, 'Hall', 'Select a hall', Icons.meeting_room,
+                    context, 'Hall', 'Select a hall', Icons.location_on,
                     controller: _hallController),
                 buildInputField(context, 'View Mode', 'Select a view mode',
                     Icons.video_call,

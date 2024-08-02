@@ -18,6 +18,8 @@ builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IActorService, ActorService>();
 builder.Services.AddTransient<IScreeningService, ScreeningService>();
 builder.Services.AddTransient<ISeatService, SeatService>();
+builder.Services.AddTransient<IHallService, HallService>();
+builder.Services.AddTransient<IViewModeService, ViewModeService>();
 
 builder.Services.AddTransient<BaseScreeningState>();
 builder.Services.AddTransient<InitialScreeningState>();
