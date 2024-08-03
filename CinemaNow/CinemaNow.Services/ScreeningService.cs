@@ -42,7 +42,7 @@ namespace CinemaNow.Services
                 filteredQuery = filteredQuery.Include(x => x.ViewMode);
 
             if (search?.Date.HasValue == true)
-                filteredQuery = filteredQuery.Where(x => x.Date.HasValue && x.Date.Value.Date == search.Date.Value.Date);
+                filteredQuery = filteredQuery.Where(x => x.DateTime.HasValue && x.DateTime.Value.Date == search.Date.Value.Date);
 
             return filteredQuery;
         }

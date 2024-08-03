@@ -7,6 +7,8 @@ import 'package:cinemanow_desktop/providers/movie_provider.dart';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
 import 'package:cinemanow_desktop/providers/view_mode_provider.dart';
 import 'package:cinemanow_desktop/theme/theme.dart';
+import 'package:cinemanow_desktop/utilities/utils.dart';
+import 'package:cinemanow_desktop/widgets/common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -63,29 +65,35 @@ class _AddScreeningScreenState extends State<AddScreeningScreen> {
     }
 
     try {
-      final dateFormat = DateFormat.yMd();
-      final timeFormat = DateFormat.Hm();
+      final DateTime date =
+          DateFormat('MM/dd/yyyy').parseStrict(_dateController.text);
+      final TimeOfDay? time = parseTimeOfDay(_timeController.text);
 
-      final date = dateFormat.parse(_dateController.text);
-      final time = timeFormat.parse(_timeController.text);
+      if (time == null) {
+        print('Error: Invalid date or time');
+        return;
+      }
 
-      final dateTime =
-          DateTime(date.year, date.month, date.day, time.hour, time.minute);
+      final DateTime dateTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute,
+      );
 
       if (_dateController.text.isNotEmpty &&
           _timeController.text.isNotEmpty &&
           _priceController.text.isNotEmpty) {
         final screeningProvider =
             Provider.of<ScreeningProvider>(context, listen: false);
-        final newScreening = {
-          'movieId': _selectedMovie!.id,
-          'hallId': _selectedHall!.id,
-          'viewModeId': _selectedViewMode!.id,
-          'date': dateTime.toIso8601String(),
-          'price': double.parse(_priceController.text),
-        };
-
-        await screeningProvider.insert(newScreening);
+        await screeningProvider.addScreening(
+          _selectedMovie!,
+          _selectedHall!,
+          _selectedViewMode!,
+          dateTime,
+          double.parse(_priceController.text),
+        );
         if (widget.onScreeningAdded != null) {
           widget.onScreeningAdded!();
         }
@@ -95,52 +103,6 @@ class _AddScreeningScreenState extends State<AddScreeningScreen> {
       }
     } catch (e) {
       print('Error: $e');
-    }
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: buildDarkTheme(context),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null) {
-      setState(() {
-        _dateController.text = DateFormat.yMd().format(picked);
-      });
-    }
-  }
-
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: buildDarkTheme(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Colors.red,
-              onPrimary: Colors.white,
-            ),
-            buttonTheme: const ButtonThemeData(
-              textTheme: ButtonTextTheme.primary,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null) {
-      setState(() {
-        _timeController.text = picked.format(context);
-      });
     }
   }
 
@@ -176,10 +138,59 @@ class _AddScreeningScreenState extends State<AddScreeningScreen> {
                   icon: Icons.movie,
                   placeholder: 'Select a movie',
                 ),
-                buildDateField(
-                    context, 'Date', 'Select a date', Icons.calendar_today),
-                buildTimeField(
-                    context, 'Time', 'Select a time', Icons.access_time),
+                buildDateTimeField(
+                  context,
+                  'Date',
+                  'Select a date',
+                  Icons.calendar_today,
+                  _dateController,
+                  () async {
+                    final DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101),
+                      builder: (context, child) {
+                        return Theme(
+                          data: buildDarkTheme(context),
+                          child: child!,
+                        );
+                      },
+                    );
+
+                    if (pickedDate != null) {
+                      setState(() {
+                        _dateController.text =
+                            DateFormat('MM/dd/yyyy').format(pickedDate);
+                      });
+                    }
+                  },
+                ),
+                buildDateTimeField(
+                  context,
+                  'Time',
+                  'Select a time',
+                  Icons.access_time,
+                  _timeController,
+                  () async {
+                    final TimeOfDay? pickedTime = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.now(),
+                      builder: (context, child) {
+                        return Theme(
+                          data: buildDarkTheme(context),
+                          child: child!,
+                        );
+                      },
+                    );
+
+                    if (pickedTime != null) {
+                      setState(() {
+                        _timeController.text = pickedTime.format(context);
+                      });
+                    }
+                  },
+                ),
                 buildDropdown<Hall>(
                   label: 'Hall',
                   selectedValue: _selectedHall,
@@ -255,179 +266,4 @@ class _AddScreeningScreenState extends State<AddScreeningScreen> {
       ),
     );
   }
-
-  Widget buildInputField(
-      BuildContext context, String label, String placeholder, IconData icon,
-      {TextEditingController? controller}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          Expanded(
-            child: TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.grey[800],
-                hintText: placeholder,
-                hintStyle: const TextStyle(color: Colors.white70),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
-                ),
-                prefixIcon: Icon(icon, color: Colors.white),
-              ),
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildDateField(
-      BuildContext context, String label, String placeholder, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          Expanded(
-            child: TextField(
-              controller: _dateController,
-              readOnly: true,
-              onTap: () => _selectDate(context),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.grey[800],
-                hintText: placeholder,
-                hintStyle: const TextStyle(color: Colors.white70),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
-                ),
-                prefixIcon: Icon(icon, color: Colors.white),
-              ),
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildTimeField(
-      BuildContext context, String label, String placeholder, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          Expanded(
-            child: TextField(
-              controller: _timeController,
-              readOnly: true,
-              onTap: () => _selectTime(context),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.grey[800],
-                hintText: placeholder,
-                hintStyle: const TextStyle(color: Colors.white70),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
-                ),
-                prefixIcon: Icon(icon, color: Colors.white),
-              ),
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-Widget buildDropdown<T>({
-  required String label,
-  required T? selectedValue,
-  required List<T> items,
-  required String Function(T) displayValue,
-  required void Function(T?) onChanged,
-  required IconData icon,
-  String? placeholder,
-}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0),
-    child: Row(
-      children: [
-        SizedBox(
-          width: 120,
-          child: Text(
-            label,
-            style: const TextStyle(fontSize: 18, color: Colors.white),
-          ),
-        ),
-        Expanded(
-          child: DropdownButtonFormField<T>(
-            value: selectedValue,
-            items: items.map((T value) {
-              return DropdownMenuItem<T>(
-                value: value,
-                child: Text(displayValue(value)),
-              );
-            }).toList(),
-            onChanged: onChanged,
-            isExpanded: true,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.grey[800],
-              hintText: placeholder,
-              hintStyle: const TextStyle(color: Colors.white70),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding:
-                  EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
-              prefixIcon: Icon(icon, color: Colors.white),
-            ),
-            style: const TextStyle(color: Colors.white),
-            dropdownColor: Colors.grey[800],
-            iconEnabledColor: Colors.white,
-            icon: Icon(Icons.arrow_drop_down, color: Colors.white),
-            alignment: Alignment.centerLeft,
-          ),
-        ),
-      ],
-    ),
-  );
 }

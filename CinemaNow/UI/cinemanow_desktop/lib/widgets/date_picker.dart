@@ -19,50 +19,52 @@ class DatePicker extends StatefulWidget {
 class _DatePickerState extends State<DatePicker> {
   DateTime? _pickedDate;
 
+  Future<void> _pickDate() async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: widget.selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: buildDarkTheme(context),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(child: child!),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _pickedDate = null;
+                    });
+                    widget.onDateSelected(null);
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                    'Clear Date',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    if (pickedDate != null) {
+      setState(() {
+        _pickedDate = pickedDate;
+      });
+      widget.onDateSelected(pickedDate);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () async {
-        DateTime? pickedDate = await showDatePicker(
-          context: context,
-          initialDate: widget.selectedDate ?? DateTime.now(),
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2101),
-          builder: (BuildContext context, Widget? child) {
-            return Theme(
-              data: buildDarkTheme(context),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(child: child!),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _pickedDate = null;
-                        });
-                        widget.onDateSelected(null);
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text(
-                        'Clear Date',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-        if (pickedDate != null) {
-          setState(() {
-            _pickedDate = pickedDate;
-          });
-          widget.onDateSelected(pickedDate);
-        }
-      },
+      onTap: _pickDate,
       child: Row(
         children: [
           Icon(Icons.calendar_today, color: Colors.grey[500]),

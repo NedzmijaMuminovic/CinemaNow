@@ -11,8 +11,7 @@ class Screening {
   int? movieId;
   int? hallId;
   int? viewModeId;
-  DateTime? date;
-  String? time;
+  DateTime? dateTime;
   double? price;
   Movie? movie;
   Hall? hall;
@@ -22,8 +21,7 @@ class Screening {
   Screening(
       {this.id,
       this.movieId,
-      this.date,
-      this.time,
+      this.dateTime,
       this.price,
       this.movie,
       this.hall,
