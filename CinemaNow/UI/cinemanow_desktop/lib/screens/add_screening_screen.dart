@@ -94,6 +94,13 @@ class _AddScreeningScreenState extends State<AddScreeningScreen> {
           dateTime,
           double.parse(_priceController.text),
         );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Screening successfully added!'),
+          ),
+        );
+
         if (widget.onScreeningAdded != null) {
           widget.onScreeningAdded!();
         }
@@ -102,6 +109,11 @@ class _AddScreeningScreenState extends State<AddScreeningScreen> {
         print('Error: Missing required fields');
       }
     } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to add screening'),
+        ),
+      );
       print('Error: $e');
     }
   }

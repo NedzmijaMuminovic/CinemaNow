@@ -105,34 +105,66 @@ Widget buildDropdown<T>({
           ),
         ),
         Expanded(
-          child: DropdownButtonFormField<T>(
-            value: selectedValue,
-            items: items.map((T value) {
-              return DropdownMenuItem<T>(
-                value: value,
-                child: Text(displayValue(value)),
-              );
-            }).toList(),
-            onChanged: onChanged,
-            isExpanded: true,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.grey[800],
-              hintText: placeholder,
-              hintStyle: const TextStyle(color: Colors.white70),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
-              prefixIcon: Icon(icon, color: Colors.white),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey[800],
+              borderRadius: BorderRadius.circular(8.0),
             ),
-            style: const TextStyle(color: Colors.white),
-            dropdownColor: Colors.grey[800],
-            iconEnabledColor: Colors.white,
-            icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<T>(
+                value: selectedValue,
+                items: items.map((T value) {
+                  return DropdownMenuItem<T>(
+                    value: value,
+                    child: Text(
+                      displayValue(value),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  );
+                }).toList(),
+                onChanged: onChanged,
+                isExpanded: true,
+                hint: Row(
+                  children: [
+                    Icon(icon, color: Colors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      placeholder ?? '',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                selectedItemBuilder: (BuildContext context) {
+                  return items.map<Widget>((T value) {
+                    return Row(
+                      children: [
+                        Icon(icon, color: Colors.white),
+                        const SizedBox(width: 8),
+                        Text(
+                          displayValue(value),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList();
+                },
+                dropdownColor: Colors.grey[800],
+                iconEnabledColor: Colors.white,
+                icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                style: const TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            ),
           ),
         ),
       ],
