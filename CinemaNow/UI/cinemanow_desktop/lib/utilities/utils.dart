@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 String formatNumber(dynamic) {
-  var f = NumberFormat('###,00');
+  var f = NumberFormat('#,##0.00', 'de_DE');
   if (dynamic == null) {
     return "";
   }

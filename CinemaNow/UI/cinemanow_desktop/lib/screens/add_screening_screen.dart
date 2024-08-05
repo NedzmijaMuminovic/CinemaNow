@@ -59,8 +59,15 @@ class _AddScreeningScreenState extends State<AddScreeningScreen> {
   Future<void> _uploadScreening() async {
     if (_selectedMovie == null ||
         _selectedHall == null ||
-        _selectedViewMode == null) {
-      print('Error: Missing selected values');
+        _selectedViewMode == null ||
+        _dateController.text.isEmpty ||
+        _timeController.text.isEmpty ||
+        _priceController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all fields.'),
+        ),
+      );
       return;
     }
 
@@ -70,7 +77,11 @@ class _AddScreeningScreenState extends State<AddScreeningScreen> {
       final TimeOfDay? time = parseTimeOfDay(_timeController.text);
 
       if (time == null) {
-        print('Error: Invalid date or time');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Invalid time format.'),
+          ),
+        );
         return;
       }
 
@@ -87,12 +98,25 @@ class _AddScreeningScreenState extends State<AddScreeningScreen> {
           _priceController.text.isNotEmpty) {
         final screeningProvider =
             Provider.of<ScreeningProvider>(context, listen: false);
+
+        final priceText = _priceController.text.replaceAll(',', '.');
+        final price = double.tryParse(priceText);
+
+        if (price == null || price <= 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Price must be a positive number.'),
+            ),
+          );
+          return;
+        }
+
         await screeningProvider.addScreening(
           _selectedMovie!,
           _selectedHall!,
           _selectedViewMode!,
           dateTime,
-          double.parse(_priceController.text),
+          price,
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -105,8 +129,6 @@ class _AddScreeningScreenState extends State<AddScreeningScreen> {
           widget.onScreeningAdded!();
         }
         Navigator.of(context).pop();
-      } else {
-        print('Error: Missing required fields');
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -114,7 +136,6 @@ class _AddScreeningScreenState extends State<AddScreeningScreen> {
           content: Text('Failed to add screening'),
         ),
       );
-      print('Error: $e');
     }
   }
 

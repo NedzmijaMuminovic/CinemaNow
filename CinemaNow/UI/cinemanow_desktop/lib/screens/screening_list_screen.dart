@@ -4,6 +4,7 @@ import 'package:cinemanow_desktop/providers/screening_provider.dart';
 import 'package:cinemanow_desktop/widgets/date_picker.dart';
 import 'package:cinemanow_desktop/screens/add_screening_screen.dart';
 import 'package:cinemanow_desktop/widgets/screening_card.dart';
+import 'package:cinemanow_desktop/utilities/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +22,7 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
   final TextEditingController _ftsEditingController = TextEditingController();
   DateTime? _selectedDate;
   bool _noScreeningsAvailable = false;
+  bool _isLoading = false;
 
   @override
   void didChangeDependencies() {
@@ -35,6 +37,10 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
   }
 
   Future<void> _fetchScreenings({String? fts, DateTime? date}) async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       final provider = context.read<ScreeningProvider>();
       result = await provider.getScreenings(fts: fts, date: date);
@@ -43,6 +49,10 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
       });
     } catch (e) {
       // Handle error
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -56,7 +66,9 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
           children: [
             _buildSearch(),
             const SizedBox(height: 16),
-            _buildResultView(),
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _buildResultView(),
           ],
         ),
       ),
@@ -228,7 +240,7 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
                 viewMode:
                     result?.result[index].viewMode?.name ?? 'Unknown View Mode',
                 price: result?.result[index].price != null
-                    ? result!.result[index].price.toString()
+                    ? formatNumber(result!.result[index].price)
                     : 'Unknown Price',
                 screeningId: result?.result[index].id ?? 0,
                 onDelete: _fetchScreenings,
