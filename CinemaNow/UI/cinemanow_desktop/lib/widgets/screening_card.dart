@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
+import 'package:cinemanow_desktop/screens/edit_screening_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +14,7 @@ class ScreeningCard extends StatelessWidget {
   final String price;
   final int screeningId;
   final VoidCallback onDelete;
+  final VoidCallback onScreeningUpdated;
 
   const ScreeningCard({
     super.key,
@@ -25,6 +27,7 @@ class ScreeningCard extends StatelessWidget {
     required this.price,
     required this.screeningId,
     required this.onDelete,
+    required this.onScreeningUpdated,
   });
 
   @override
@@ -113,7 +116,17 @@ class ScreeningCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditScreeningScreen(
+                          screeningId: screeningId,
+                          onScreeningUpdated: onScreeningUpdated,
+                        ),
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey[700],
                     padding: const EdgeInsets.symmetric(

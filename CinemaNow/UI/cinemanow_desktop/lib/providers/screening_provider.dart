@@ -56,4 +56,27 @@ class ScreeningProvider extends BaseProvider<Screening> {
 
     await insert(newScreening);
   }
+
+  Future<void> updateScreening(
+    int id,
+    Movie movie,
+    Hall hall,
+    ViewMode viewMode,
+    DateTime dateTime,
+    double price,
+  ) async {
+    final updatedScreening = {
+      'movieId': movie.id,
+      'hallId': hall.id,
+      'viewModeId': viewMode.id,
+      'dateTime': dateTime.toIso8601String(),
+      'price': price,
+    };
+
+    await update(id, updatedScreening);
+  }
+
+  Future<Screening> getScreeningById(int id) async {
+    return await getById(id);
+  }
 }

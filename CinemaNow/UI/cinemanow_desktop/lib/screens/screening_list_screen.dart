@@ -60,17 +60,44 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[900],
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildSearch(),
-            const SizedBox(height: 16),
-            _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _buildResultView(),
-          ],
-        ),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                _buildSearch(),
+                const SizedBox(height: 16),
+                _isLoading
+                    ? Expanded(
+                        child: const Center(
+                            child: CircularProgressIndicator(
+                        color: Colors.red,
+                      )))
+                    : _buildResultView(),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        AddScreeningScreen(onScreeningAdded: _fetchScreenings),
+                  ),
+                );
+              },
+              backgroundColor: Colors.grey[850],
+              child: Icon(
+                Icons.add,
+                color: Colors.grey[500],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -140,32 +167,6 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
           ),
           child: Text(
             'Search',
-            style: TextStyle(color: Colors.grey[500]),
-          ),
-        ),
-        const SizedBox(width: 16),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => AddScreeningScreen(
-                  onScreeningAdded: () {
-                    _fetchScreenings();
-                  },
-                ),
-              ),
-            );
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey[850],
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            minimumSize: const Size(0, 55),
-          ),
-          child: Text(
-            'Add',
             style: TextStyle(color: Colors.grey[500]),
           ),
         ),
@@ -244,6 +245,7 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
                     : 'Unknown Price',
                 screeningId: result?.result[index].id ?? 0,
                 onDelete: _fetchScreenings,
+                onScreeningUpdated: _fetchScreenings,
               );
             },
           );

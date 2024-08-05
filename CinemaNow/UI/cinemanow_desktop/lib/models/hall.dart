@@ -11,4 +11,12 @@ class Hall {
 
   factory Hall.fromJson(Map<String, dynamic> json) => _$HallFromJson(json);
   Map<String, dynamic> toJson() => _$HallToJson(this);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Hall && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
