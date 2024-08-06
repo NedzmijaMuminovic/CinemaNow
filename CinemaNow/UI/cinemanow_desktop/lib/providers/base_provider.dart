@@ -16,6 +16,8 @@ abstract class BaseProvider<T> with ChangeNotifier {
         defaultValue: "https://localhost:7102/");
   }
 
+  String get baseUrl => _baseUrl ?? "";
+
   Future<SearchResult<T>> get({dynamic filter}) async {
     var url = "$_baseUrl$_endpoint";
 

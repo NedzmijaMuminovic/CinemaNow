@@ -21,4 +21,37 @@ class MovieProvider extends BaseProvider<Movie> {
   Future<void> deleteMovie(int id) async {
     await delete(id);
   }
+
+  Future<void> addMovie(
+    String title,
+    int duration,
+    String synopsis,
+  ) async {
+    final newMovie = {
+      'title': title,
+      'duration': duration,
+      'synopsis': synopsis,
+    };
+
+    await insert(newMovie);
+  }
+
+  Future<void> updateMovie(
+    int id,
+    String title,
+    int duration,
+    String synopsis,
+  ) async {
+    final updatedMovie = {
+      'title': title,
+      'duration': duration,
+      'synopsis': synopsis,
+    };
+
+    await update(id, updatedMovie);
+  }
+
+  Future<Movie> getMovieById(int id) async {
+    return await getById(id);
+  }
 }

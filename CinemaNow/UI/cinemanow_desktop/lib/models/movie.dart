@@ -10,7 +10,7 @@ class Movie {
   String? synopsis;
   String? imageBase64;
 
-  Movie({this.id, this.title, this.duration, this.synopsis});
+  Movie({this.id, this.title, this.duration, this.synopsis, this.imageBase64});
 
   factory Movie.fromJson(Map<String, dynamic> json) => _$MovieFromJson(json);
   Map<String, dynamic> toJson() => _$MovieToJson(this);

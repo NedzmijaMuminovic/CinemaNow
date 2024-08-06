@@ -1,12 +1,13 @@
 import 'package:cinemanow_desktop/models/movie.dart';
 import 'package:cinemanow_desktop/models/search_result.dart';
 import 'package:cinemanow_desktop/providers/movie_provider.dart';
+import 'package:cinemanow_desktop/screens/add_edit_movie_screen.dart';
 import 'package:cinemanow_desktop/widgets/movie_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class MovieListScreen extends StatefulWidget {
-  const MovieListScreen({Key? key}) : super(key: key);
+  const MovieListScreen({super.key});
 
   @override
   _MovieListScreenState createState() => _MovieListScreenState();
@@ -77,13 +78,13 @@ class _MovieListScreenState extends State<MovieListScreen> {
             right: 16,
             child: FloatingActionButton(
               onPressed: () {
-                /* Navigator.of(context).push(
+                Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => AddEditMovieScreen(
                       onMovieAdded: _fetchMovies,
                     ),
                   ),
-                ); */
+                );
               },
               backgroundColor: Colors.grey[850],
               child: Icon(
@@ -210,6 +211,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
                     result?.result[index].synopsis ?? 'No synopsis available',
                 movieId: result?.result[index].id ?? 0,
                 onDelete: _fetchMovies,
+                onMovieUpdated: _fetchMovies,
               );
             },
           );

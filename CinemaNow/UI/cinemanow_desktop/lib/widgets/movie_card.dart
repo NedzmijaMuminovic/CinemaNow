@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cinemanow_desktop/providers/movie_provider.dart';
+import 'package:cinemanow_desktop/screens/add_edit_movie_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,6 +10,7 @@ class MovieCard extends StatelessWidget {
   final String synopsis;
   final int movieId;
   final VoidCallback onDelete;
+  final VoidCallback onMovieUpdated;
 
   const MovieCard({
     super.key,
@@ -17,6 +19,7 @@ class MovieCard extends StatelessWidget {
     required this.synopsis,
     required this.movieId,
     required this.onDelete,
+    required this.onMovieUpdated,
   });
 
   @override
@@ -92,7 +95,7 @@ class MovieCard extends StatelessWidget {
                     children: [
                       ElevatedButton.icon(
                         onPressed: () {
-                          /* Navigator.push(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => AddEditMovieScreen(
@@ -100,7 +103,7 @@ class MovieCard extends StatelessWidget {
                                 onMovieUpdated: onMovieUpdated,
                               ),
                             ),
-                          ); */
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey[700],
