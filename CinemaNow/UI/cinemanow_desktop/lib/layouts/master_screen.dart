@@ -1,3 +1,4 @@
+import 'package:cinemanow_desktop/screens/screening_list_screen.dart';
 import 'package:flutter/material.dart';
 
 class MasterScreen extends StatefulWidget {
@@ -54,6 +55,16 @@ class MasterScreenState extends State<MasterScreen> {
                   style: TextStyle(color: Colors.white, fontSize: 18)),
               onTap: () {
                 Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MasterScreen(
+                      Scaffold(
+                        body: ScreeningListScreen(),
+                      ),
+                    ),
+                  ),
+                );
               },
             ),
             ListTile(

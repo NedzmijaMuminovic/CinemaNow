@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
-import 'package:cinemanow_desktop/screens/edit_screening_screen.dart';
+import 'package:cinemanow_desktop/screens/add_edit_screening_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -120,7 +120,7 @@ class ScreeningCard extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => EditScreeningScreen(
+                        builder: (context) => AddEditScreeningScreen(
                           screeningId: screeningId,
                           onScreeningUpdated: onScreeningUpdated,
                         ),

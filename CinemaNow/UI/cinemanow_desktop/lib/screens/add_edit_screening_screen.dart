@@ -13,21 +13,23 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class EditScreeningScreen extends StatefulWidget {
-  final int screeningId;
+class AddEditScreeningScreen extends StatefulWidget {
+  final int? screeningId;
+  final VoidCallback? onScreeningAdded;
   final VoidCallback? onScreeningUpdated;
 
-  const EditScreeningScreen({
+  const AddEditScreeningScreen({
     super.key,
-    required this.screeningId,
+    this.screeningId,
+    this.onScreeningAdded,
     this.onScreeningUpdated,
   });
 
   @override
-  _EditScreeningScreenState createState() => _EditScreeningScreenState();
+  _AddEditScreeningScreenState createState() => _AddEditScreeningScreenState();
 }
 
-class _EditScreeningScreenState extends State<EditScreeningScreen> {
+class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
@@ -38,22 +40,17 @@ class _EditScreeningScreenState extends State<EditScreeningScreen> {
   Hall? _selectedHall;
   ViewMode? _selectedViewMode;
   bool _isLoading = true;
+  bool _isEditing = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchDataAndDetails();
-  }
-
-  Future<void> _fetchDataAndDetails() async {
-    await Future.wait([
-      _fetchData(),
-      _fetchScreeningDetails(),
-    ]);
-
-    setState(() {
-      _isLoading = false;
-    });
+    if (widget.screeningId != null) {
+      _isEditing = true;
+      _fetchDataAndDetails();
+    } else {
+      _fetchData();
+    }
   }
 
   Future<void> _fetchData() async {
@@ -70,6 +67,18 @@ class _EditScreeningScreenState extends State<EditScreeningScreen> {
       _movies = movies.result;
       _halls = halls.result;
       _viewModes = viewModes.result;
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _fetchDataAndDetails() async {
+    await Future.wait([
+      _fetchData(),
+      _fetchScreeningDetails(),
+    ]);
+
+    setState(() {
+      _isLoading = false;
     });
   }
 
@@ -78,21 +87,21 @@ class _EditScreeningScreenState extends State<EditScreeningScreen> {
         Provider.of<ScreeningProvider>(context, listen: false);
 
     final screening =
-        await screeningProvider.getScreeningById(widget.screeningId);
+        await screeningProvider.getScreeningById(widget.screeningId!);
 
     setState(() {
       _selectedMovie = screening.movie;
       _selectedHall = screening.hall;
       _selectedViewMode = screening.viewMode;
       _dateController.text =
-          DateFormat('MM/dd/yyyy').format(screening.dateTime!);
+          DateFormat('dd/MM/yyyy').format(screening.dateTime!);
       _timeController.text =
           TimeOfDay.fromDateTime(screening.dateTime!).format(context);
       _priceController.text = formatNumber(screening.price);
     });
   }
 
-  Future<void> _updateScreening() async {
+  Future<void> _submitScreening() async {
     if (_selectedMovie == null ||
         _selectedHall == null ||
         _selectedViewMode == null ||
@@ -109,7 +118,7 @@ class _EditScreeningScreenState extends State<EditScreeningScreen> {
 
     try {
       final DateTime date =
-          DateFormat('MM/dd/yyyy').parseStrict(_dateController.text);
+          DateFormat('dd/MM/yyyy').parseStrict(_dateController.text);
       final TimeOfDay? time = parseTimeOfDay(_timeController.text);
 
       if (time == null) {
@@ -129,48 +138,59 @@ class _EditScreeningScreenState extends State<EditScreeningScreen> {
         time.minute,
       );
 
-      if (_dateController.text.isNotEmpty &&
-          _timeController.text.isNotEmpty &&
-          _priceController.text.isNotEmpty) {
-        final screeningProvider =
-            Provider.of<ScreeningProvider>(context, listen: false);
+      final priceText = _priceController.text.replaceAll(',', '.');
+      final price = double.tryParse(priceText);
 
-        final priceText = _priceController.text.replaceAll(',', '.');
-        final price = double.tryParse(priceText);
+      if (price == null || price <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Price must be a positive number.'),
+          ),
+        );
+        return;
+      }
 
-        if (price == null || price <= 0) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Price must be a positive number.'),
-            ),
-          );
-          return;
-        }
+      final screeningProvider =
+          Provider.of<ScreeningProvider>(context, listen: false);
 
+      if (_isEditing) {
         await screeningProvider.updateScreening(
-          widget.screeningId,
+          widget.screeningId!,
           _selectedMovie!,
           _selectedHall!,
           _selectedViewMode!,
           dateTime,
           price,
         );
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Screening successfully updated!'),
           ),
         );
-
-        if (widget.onScreeningUpdated != null) {
-          widget.onScreeningUpdated!();
-        }
-        Navigator.of(context).pop();
+      } else {
+        await screeningProvider.addScreening(
+          _selectedMovie!,
+          _selectedHall!,
+          _selectedViewMode!,
+          dateTime,
+          price,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Screening successfully added!'),
+          ),
+        );
       }
+
+      widget.onScreeningAdded?.call();
+      widget.onScreeningUpdated?.call();
+      Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to update screening'),
+        SnackBar(
+          content: Text(_isEditing
+              ? 'Failed to edit screening'
+              : 'Failed to add screening'),
         ),
       );
     }
@@ -184,17 +204,18 @@ class _EditScreeningScreenState extends State<EditScreeningScreen> {
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
             child: _isLoading
-                ? Center(
+                ? const Center(
                     child: CircularProgressIndicator(
-                    color: Colors.red,
-                  ))
+                      color: Colors.red,
+                    ),
+                  )
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Edit Screening',
-                        style: TextStyle(
+                      Text(
+                        _isEditing ? 'Edit Screening' : 'Add a New Screening',
+                        style: const TextStyle(
                           fontSize: 24,
                           color: Colors.white,
                         ),
@@ -236,7 +257,7 @@ class _EditScreeningScreenState extends State<EditScreeningScreen> {
                           if (pickedDate != null) {
                             setState(() {
                               _dateController.text =
-                                  DateFormat('MM/dd/yyyy').format(pickedDate);
+                                  DateFormat('dd/MM/yyyy').format(pickedDate);
                             });
                           }
                         },
@@ -293,8 +314,12 @@ class _EditScreeningScreenState extends State<EditScreeningScreen> {
                         placeholder: 'Select view mode',
                       ),
                       buildInputField(
-                          context, 'Price', 'Enter price', Icons.attach_money,
-                          controller: _priceController),
+                        context,
+                        'Price',
+                        'Enter price',
+                        Icons.attach_money,
+                        controller: _priceController,
+                      ),
                       const SizedBox(height: 20),
                       Center(
                         child: Row(
@@ -319,7 +344,7 @@ class _EditScreeningScreenState extends State<EditScreeningScreen> {
                             ),
                             const SizedBox(width: 10),
                             ElevatedButton(
-                              onPressed: _updateScreening,
+                              onPressed: _submitScreening,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red,
                                 padding: const EdgeInsets.symmetric(
@@ -328,10 +353,8 @@ class _EditScreeningScreenState extends State<EditScreeningScreen> {
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
                               ),
-                              child: const Text(
-                                'Update',
-                                style: TextStyle(color: Colors.white),
-                              ),
+                              child: const Text('Save',
+                                  style: TextStyle(color: Colors.white)),
                             ),
                           ],
                         ),

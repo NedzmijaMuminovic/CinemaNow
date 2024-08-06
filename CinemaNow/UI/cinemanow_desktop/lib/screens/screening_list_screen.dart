@@ -1,8 +1,8 @@
 import 'package:cinemanow_desktop/models/screening.dart';
 import 'package:cinemanow_desktop/models/search_result.dart';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
+import 'package:cinemanow_desktop/screens/add_edit_screening_screen.dart';
 import 'package:cinemanow_desktop/widgets/date_picker.dart';
-import 'package:cinemanow_desktop/screens/add_screening_screen.dart';
 import 'package:cinemanow_desktop/widgets/screening_card.dart';
 import 'package:cinemanow_desktop/utilities/utils.dart';
 import 'package:flutter/material.dart';
@@ -69,8 +69,8 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
                 _buildSearch(),
                 const SizedBox(height: 16),
                 _isLoading
-                    ? Expanded(
-                        child: const Center(
+                    ? const Expanded(
+                        child: Center(
                             child: CircularProgressIndicator(
                         color: Colors.red,
                       )))
@@ -85,8 +85,8 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) =>
-                        AddScreeningScreen(onScreeningAdded: _fetchScreenings),
+                    builder: (context) => AddEditScreeningScreen(
+                        onScreeningAdded: _fetchScreenings),
                   ),
                 );
               },
