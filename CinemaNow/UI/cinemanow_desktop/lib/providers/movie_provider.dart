@@ -10,7 +10,11 @@ class MovieProvider extends BaseProvider<Movie> {
     return Movie.fromJson(data);
   }
 
-  Future<SearchResult<Movie>> getMovies({dynamic filter}) async {
+  Future<SearchResult<Movie>> getMovies({String? fts}) async {
+    final filter = <String, dynamic>{};
+    if (fts != null && fts.isNotEmpty) {
+      filter['fts'] = fts;
+    }
     return await get(filter: filter);
   }
 
