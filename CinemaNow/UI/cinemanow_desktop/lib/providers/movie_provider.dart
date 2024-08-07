@@ -26,11 +26,13 @@ class MovieProvider extends BaseProvider<Movie> {
     String title,
     int duration,
     String synopsis,
+    String? imageBase64,
   ) async {
     final newMovie = {
       'title': title,
       'duration': duration,
       'synopsis': synopsis,
+      'imageBase64': imageBase64,
     };
 
     await insert(newMovie);
@@ -41,11 +43,13 @@ class MovieProvider extends BaseProvider<Movie> {
     String title,
     int duration,
     String synopsis,
+    String? imageBase64,
   ) async {
     final updatedMovie = {
       'title': title,
       'duration': duration,
       'synopsis': synopsis,
+      'imageBase64': imageBase64,
     };
 
     await update(id, updatedMovie);

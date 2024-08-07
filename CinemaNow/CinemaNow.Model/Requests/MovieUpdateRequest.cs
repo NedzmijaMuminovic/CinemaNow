@@ -12,6 +12,7 @@ namespace CinemaNow.Models.Requests
         public int? Duration { get; set; }
 
         public string? Synopsis { get; set; }
+        public string? ImageBase64 { get; set; }
     }
 
 }

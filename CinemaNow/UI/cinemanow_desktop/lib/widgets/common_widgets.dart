@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 Widget buildInputField(
     BuildContext context, String label, String placeholder, IconData icon,
-    {TextEditingController? controller}) {
+    {TextEditingController? controller,
+    bool readOnly = false,
+    VoidCallback? onTap}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0),
     child: Row(
@@ -18,8 +20,10 @@ Widget buildInputField(
           ),
         ),
         Expanded(
-          child: TextField(
+          child: TextFormField(
             controller: controller,
+            readOnly: readOnly,
+            onTap: onTap,
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.grey[800],

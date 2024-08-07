@@ -74,5 +74,21 @@ namespace CinemaNow.Services
             }
         }
 
+        public override void BeforeInsert(MovieInsertRequest request, Database.Movie entity)
+        {
+            if (!string.IsNullOrEmpty(request.ImageBase64))
+            {
+                entity.Image = Convert.FromBase64String(request.ImageBase64);
+            }
+        }
+
+        public override void BeforeUpdate(MovieUpdateRequest request, Database.Movie entity)
+        {
+            if (!string.IsNullOrEmpty(request.ImageBase64))
+            {
+                entity.Image = Convert.FromBase64String(request.ImageBase64);
+            }
+        }
+
     }
 }

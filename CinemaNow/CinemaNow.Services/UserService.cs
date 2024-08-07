@@ -59,8 +59,6 @@ namespace CinemaNow.Services
 
         public override void BeforeInsert(UserInsertRequest request, Database.User entity)
         {
-            _logger.LogInformation($"Adding user: {entity.Username}");
-
             if (request.Password != request.PasswordConfirmation)
                 throw new Exception("Password and PasswordConfirmation must be the same values.");
 

@@ -1,3 +1,7 @@
+import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cinemanow_desktop/layouts/master_screen.dart';
 import 'package:cinemanow_desktop/providers/movie_provider.dart';
 import 'package:cinemanow_desktop/widgets/common_widgets.dart';
@@ -26,6 +30,8 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
   final TextEditingController _synopsisController = TextEditingController();
   bool _isLoading = true;
   bool _isEditing = false;
+  File? _selectedImage;
+  String? _imageBase64;
 
   @override
   void initState() {
@@ -40,6 +46,17 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
     }
   }
 
+  Future<void> _pickImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+        _imageBase64 = base64Encode(_selectedImage!.readAsBytesSync());
+      });
+    }
+  }
+
   Future<void> _fetchMovieDetails() async {
     final movieProvider = Provider.of<MovieProvider>(context, listen: false);
 
@@ -49,6 +66,7 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
       _titleController.text = movie.title ?? '';
       _durationController.text = movie.duration?.toString() ?? '';
       _synopsisController.text = movie.synopsis ?? '';
+      _imageBase64 = movie.imageBase64 ?? '';
       _isLoading = false;
     });
   }
@@ -88,6 +106,7 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
           _titleController.text,
           duration,
           _synopsisController.text,
+          _imageBase64,
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -101,6 +120,7 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
           _titleController.text,
           duration,
           _synopsisController.text,
+          _imageBase64,
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -169,6 +189,28 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
                         Icons.description,
                         controller: _synopsisController,
                       ),
+                      buildInputField(
+                        context,
+                        'Image',
+                        'Select image',
+                        Icons.image,
+                        readOnly: true,
+                        onTap: _pickImage,
+                      ),
+                      if (_selectedImage != null) ...[
+                        const SizedBox(height: 20),
+                        Center(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12.0),
+                            child: Image.file(
+                              _selectedImage!,
+                              width: 150,
+                              height: 150,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 20),
                       Center(
                         child: Row(
