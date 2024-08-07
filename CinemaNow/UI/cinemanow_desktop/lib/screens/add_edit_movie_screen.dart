@@ -189,23 +189,26 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
                         Icons.description,
                         controller: _synopsisController,
                       ),
-                      buildInputField(
-                        context,
-                        'Image',
-                        'Select image',
-                        Icons.image,
-                        readOnly: true,
+                      GestureDetector(
                         onTap: _pickImage,
+                        child: buildInputField(
+                          context,
+                          'Image',
+                          'Select image',
+                          Icons.image,
+                          readOnly: true,
+                          cursor: SystemMouseCursors.click,
+                        ),
                       ),
-                      if (_selectedImage != null) ...[
+                      if (_imageBase64 != null && _imageBase64!.isNotEmpty) ...[
                         const SizedBox(height: 20),
                         Center(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12.0),
-                            child: Image.file(
-                              _selectedImage!,
-                              width: 150,
-                              height: 150,
+                            child: Image.memory(
+                              base64Decode(_imageBase64!),
+                              width: 200,
+                              height: 200,
                               fit: BoxFit.cover,
                             ),
                           ),

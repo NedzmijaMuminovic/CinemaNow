@@ -4,7 +4,8 @@ Widget buildInputField(
     BuildContext context, String label, String placeholder, IconData icon,
     {TextEditingController? controller,
     bool readOnly = false,
-    VoidCallback? onTap}) {
+    VoidCallback? onTap,
+    MouseCursor? cursor}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0),
     child: Row(
@@ -20,22 +21,30 @@ Widget buildInputField(
           ),
         ),
         Expanded(
-          child: TextFormField(
-            controller: controller,
-            readOnly: readOnly,
-            onTap: onTap,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.grey[800],
-              hintText: placeholder,
-              hintStyle: const TextStyle(color: Colors.white70),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-                borderSide: BorderSide.none,
+          child: MouseRegion(
+            cursor: cursor ?? SystemMouseCursors.text,
+            child: GestureDetector(
+              onTap: onTap,
+              child: AbsorbPointer(
+                absorbing: readOnly,
+                child: TextFormField(
+                  controller: controller,
+                  readOnly: readOnly,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey[800],
+                    hintText: placeholder,
+                    hintStyle: const TextStyle(color: Colors.white70),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    prefixIcon: Icon(icon, color: Colors.white),
+                  ),
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
-              prefixIcon: Icon(icon, color: Colors.white),
             ),
-            style: const TextStyle(color: Colors.white),
           ),
         ),
       ],
@@ -65,22 +74,30 @@ Widget buildDateTimeField(
           ),
         ),
         Expanded(
-          child: TextField(
-            controller: controller,
-            readOnly: true,
-            onTap: onTap,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.grey[800],
-              hintText: placeholder,
-              hintStyle: const TextStyle(color: Colors.white70),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-                borderSide: BorderSide.none,
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: onTap,
+              child: AbsorbPointer(
+                child: TextField(
+                  controller: controller,
+                  readOnly: true,
+                  onTap: onTap,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.grey[800],
+                    hintText: placeholder,
+                    hintStyle: const TextStyle(color: Colors.white70),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    prefixIcon: Icon(icon, color: Colors.white),
+                  ),
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
-              prefixIcon: Icon(icon, color: Colors.white),
             ),
-            style: const TextStyle(color: Colors.white),
           ),
         ),
       ],
