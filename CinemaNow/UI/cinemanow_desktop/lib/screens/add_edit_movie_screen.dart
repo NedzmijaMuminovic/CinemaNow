@@ -1,6 +1,9 @@
+import 'package:cinemanow_desktop/models/actor.dart';
+import 'package:cinemanow_desktop/providers/actor_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:io';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 import 'package:cinemanow_desktop/layouts/master_screen.dart';
 import 'package:cinemanow_desktop/providers/movie_provider.dart';
@@ -32,10 +35,13 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
   bool _isEditing = false;
   File? _selectedImage;
   String? _imageBase64;
+  List<Actor> _allActors = [];
+  List<Actor> _selectedActors = [];
 
   @override
   void initState() {
     super.initState();
+    _fetchAllActors();
     if (widget.movieId != null) {
       _isEditing = true;
       _fetchMovieDetails();
@@ -43,6 +49,18 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _fetchAllActors() async {
+    final actorProvider = Provider.of<ActorProvider>(context, listen: false);
+    try {
+      final searchResult = await actorProvider.getActors();
+      setState(() {
+        _allActors = searchResult.result;
+      });
+    } catch (e) {
+      // Handle error
     }
   }
 
@@ -67,6 +85,11 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
       _durationController.text = movie.duration?.toString() ?? '';
       _synopsisController.text = movie.synopsis ?? '';
       _imageBase64 = movie.imageBase64 ?? '';
+
+      if (movie.actors != null) {
+        _selectedActors = movie.actors!.toList();
+      }
+
       _isLoading = false;
     });
   }
@@ -97,6 +120,9 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
 
       final movieProvider = Provider.of<MovieProvider>(context, listen: false);
 
+      final selectedActorIds =
+          _selectedActors.map((actor) => actor.id).toList();
+
       if (_isEditing) {
         if (widget.movieId == null) {
           throw Exception('Movie ID is null');
@@ -107,6 +133,7 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
           duration,
           _synopsisController.text,
           _imageBase64,
+          _selectedActors,
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -121,6 +148,7 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
           duration,
           _synopsisController.text,
           _imageBase64,
+          _selectedActors,
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -200,6 +228,8 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
                           cursor: SystemMouseCursors.click,
                         ),
                       ),
+                      const SizedBox(height: 10),
+                      _buildActorSelection(),
                       if (_imageBase64 != null && _imageBase64!.isNotEmpty) ...[
                         const SizedBox(height: 20),
                         Center(
@@ -258,6 +288,79 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildActorSelection() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(
+          height: 16.0,
+        ),
+        const SizedBox(
+          width: 120,
+          child: Text(
+            'Actors',
+            style: TextStyle(fontSize: 18, color: Colors.white),
+          ),
+        ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              MultiSelectDialogField<Actor>(
+                items: _allActors
+                    .map((actor) => MultiSelectItem<Actor>(
+                          actor,
+                          '${actor.name} ${actor.surname}',
+                        ))
+                    .toList(),
+                initialValue: _selectedActors,
+                title: const Text(
+                  "Select Actors",
+                  style: TextStyle(color: Colors.white),
+                ),
+                selectedColor: Colors.red,
+                selectedItemsTextStyle: const TextStyle(color: Colors.white),
+                backgroundColor: Colors.grey[850],
+                buttonText: const Text(
+                  "Choose Actors",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+                onConfirm: (selected) {
+                  setState(() {
+                    _selectedActors = selected;
+                  });
+                },
+                chipDisplay: MultiSelectChipDisplay(
+                  chipColor: Colors.grey[800],
+                  textStyle: const TextStyle(color: Colors.white),
+                  items: _selectedActors
+                      .map((actor) => MultiSelectItem<Actor>(
+                          actor, '${actor.name} ${actor.surname}'))
+                      .toList(),
+                  onTap: (actor) {
+                    setState(() {
+                      _selectedActors.remove(actor);
+                    });
+                  },
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.grey[800],
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                itemsTextStyle: const TextStyle(color: Colors.white),
+                listType: MultiSelectListType.LIST,
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

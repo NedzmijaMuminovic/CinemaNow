@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Linq.Dynamic.Core;
 using CinemaNow.Models.Requests;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace CinemaNow.Services
 {
@@ -18,12 +19,15 @@ namespace CinemaNow.Services
         public MovieService(Ib200033Context context, IMapper mapper) : base(context, mapper) { 
         }
 
-        public override IQueryable<Database.Movie> AddFilter(MovieSearchObject search, IQueryable<Database.Movie> query)
+        public override IQueryable<Database.Movie> AddFilter(MovieSearchObject searchObject, IQueryable<Database.Movie> query)
         {
-            var filteredQuery = base.AddFilter(search, query);
+            var filteredQuery = base.AddFilter(searchObject, query);
 
-            if (!string.IsNullOrWhiteSpace(search?.FTS))
-                filteredQuery = filteredQuery.Where(x => x.Title.Contains(search.FTS));
+            if (!string.IsNullOrWhiteSpace(searchObject?.FTS))
+                filteredQuery = filteredQuery.Where(x => x.Title.Contains(searchObject.FTS));
+
+            if (searchObject?.IsActorIncluded == true)
+                filteredQuery = filteredQuery.Include(x => x.Actors);
 
             return filteredQuery;
         }
@@ -45,11 +49,9 @@ namespace CinemaNow.Services
             return pagedData;
         }
 
-
-
         public override Models.Movie GetByID(int id)
         {
-            var entity = Context.Set<Database.Movie>().Find(id);
+            var entity = Context.Movies.Include(m => m.Actors).FirstOrDefault(m => m.Id == id);
 
             if (entity != null)
             {
@@ -80,6 +82,20 @@ namespace CinemaNow.Services
             {
                 entity.Image = Convert.FromBase64String(request.ImageBase64);
             }
+
+            if (request.ActorIds != null)
+            {
+                foreach (var actorId in request.ActorIds)
+                {
+                    var actor = Context.Actors.FirstOrDefault(a => a.Id == actorId);
+                    if (actor == null)
+                        throw new Exception($"Actor with ID {actorId} not found");
+
+                    entity.Actors.Add(actor);
+                }
+            }
+
+            base.BeforeInsert(request, entity);
         }
 
         public override void BeforeUpdate(MovieUpdateRequest request, Database.Movie entity)
@@ -88,6 +104,26 @@ namespace CinemaNow.Services
             {
                 entity.Image = Convert.FromBase64String(request.ImageBase64);
             }
+
+            Context.Entry(entity).Collection(e => e.Actors).Load();
+
+            entity.Actors.Clear();
+            Context.SaveChanges();
+
+            foreach (var actorId in request.ActorIds)
+            {
+                var actor = Context.Actors.FirstOrDefault(a => a.Id == actorId);
+                if (actor == null)
+                    throw new Exception($"Actor with ID {actorId} not found");
+
+                if (!entity.Actors.Any(a => a.Id == actorId))
+                {
+                    entity.Actors.Add(actor);
+                }
+            }
+
+            base.BeforeUpdate(request, entity);
+
         }
 
     }

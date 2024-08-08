@@ -27,15 +27,12 @@ namespace CinemaNow.Services
             if (!string.IsNullOrWhiteSpace(searchObject?.SurnameGTE))
                 query = query.Where(x => x.Surname.StartsWith(searchObject.SurnameGTE));
 
-            if (searchObject?.IsMovieIncluded == true)
-                query = query.Include(x => x.Movies);
-
             return query;
         }
 
         public override Models.Actor GetByID(int id)
         {
-            var entity = Context.Actors.Include(u => u.Movies).FirstOrDefault(m => m.Id == id);
+            var entity = Context.Set<Database.Actor>().Find(id);
 
             if (entity != null)
                 return Mapper.Map<Models.Actor>(entity);
@@ -43,32 +40,5 @@ namespace CinemaNow.Services
                 return null;
         }
 
-        public override void BeforeInsert(ActorUpsertRequest request, Actor entity)
-        {
-            foreach (var movieId in request.MovieIds)
-            {
-                var movie = Context.Movies.FirstOrDefault(m => m.Id == movieId);
-                if (movie == null)
-                    throw new Exception($"Movie with ID {movieId} not found");
-
-                entity.Movies.Add(movie);
-            }
-
-            base.BeforeInsert(request, entity);
-        }
-
-        public override void BeforeUpdate(ActorUpsertRequest request, Actor entity)
-        {
-            base.BeforeUpdate(request, entity);
-
-            foreach (var movieId in request.MovieIds)
-            {
-                var movie = Context.Movies.FirstOrDefault(m => m.Id == movieId);
-                if (movie == null)
-                    throw new Exception($"Movie with ID {movieId} not found");
-
-                entity.Movies.Add(movie);
-            }
-        }
     }
 }

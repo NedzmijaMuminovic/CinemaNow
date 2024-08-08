@@ -8,6 +8,5 @@ namespace CinemaNow.Models.SearchObjects
     {
         public string? NameGTE { get; set; }
         public string? SurnameGTE { get; set; }
-        public bool? IsMovieIncluded { get; set; }
     }
 }

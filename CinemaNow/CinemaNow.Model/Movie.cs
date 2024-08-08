@@ -13,5 +13,6 @@ namespace CinemaNow.Models
         public string? Synopsis { get; set; }
         public string? ImageBase64 { get; set; }
         public string? ImageThumbBase64 { get; set; }
+        public virtual ICollection<Actor> Actors { get; set; } = new List<Actor>();
     }
 }

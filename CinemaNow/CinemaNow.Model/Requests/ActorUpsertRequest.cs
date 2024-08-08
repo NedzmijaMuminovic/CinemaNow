@@ -9,6 +9,5 @@ namespace CinemaNow.Models.Requests
         public string? Name { get; set; }
 
         public string? Surname { get; set; }
-        public List<int>? MovieIds { get; set; }
     }
 }
