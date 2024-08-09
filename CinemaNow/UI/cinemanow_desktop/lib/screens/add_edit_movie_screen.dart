@@ -1,9 +1,11 @@
 import 'package:cinemanow_desktop/models/actor.dart';
+import 'package:cinemanow_desktop/models/genre.dart';
 import 'package:cinemanow_desktop/providers/actor_provider.dart';
+import 'package:cinemanow_desktop/providers/genre_provider.dart';
+import 'package:cinemanow_desktop/widgets/multi_select_section.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:io';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 import 'package:cinemanow_desktop/layouts/master_screen.dart';
 import 'package:cinemanow_desktop/providers/movie_provider.dart';
@@ -37,11 +39,14 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
   String? _imageBase64;
   List<Actor> _allActors = [];
   List<Actor> _selectedActors = [];
+  List<Genre> _allGenres = [];
+  List<Genre> _selectedGenres = [];
 
   @override
   void initState() {
     super.initState();
     _fetchAllActors();
+    _fetchAllGenres();
     if (widget.movieId != null) {
       _isEditing = true;
       _fetchMovieDetails();
@@ -58,6 +63,18 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
       final searchResult = await actorProvider.getActors();
       setState(() {
         _allActors = searchResult.result;
+      });
+    } catch (e) {
+      // Handle error
+    }
+  }
+
+  Future<void> _fetchAllGenres() async {
+    final genreProvider = Provider.of<GenreProvider>(context, listen: false);
+    try {
+      final searchResult = await genreProvider.getGenres();
+      setState(() {
+        _allGenres = searchResult.result;
       });
     } catch (e) {
       // Handle error
@@ -88,6 +105,10 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
 
       if (movie.actors != null) {
         _selectedActors = movie.actors!.toList();
+      }
+
+      if (movie.genres != null) {
+        _selectedGenres = movie.genres!.toList();
       }
 
       _isLoading = false;
@@ -123,18 +144,21 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
       final selectedActorIds =
           _selectedActors.map((actor) => actor.id).toList();
 
+      final selectedGenreIds =
+          _selectedGenres.map((genre) => genre.id).toList();
+
       if (_isEditing) {
         if (widget.movieId == null) {
           throw Exception('Movie ID is null');
         }
         await movieProvider.updateMovie(
-          widget.movieId!,
-          _titleController.text,
-          duration,
-          _synopsisController.text,
-          _imageBase64,
-          _selectedActors,
-        );
+            widget.movieId!,
+            _titleController.text,
+            duration,
+            _synopsisController.text,
+            _imageBase64,
+            _selectedActors,
+            _selectedGenres);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -144,12 +168,12 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
         widget.onMovieUpdated?.call();
       } else {
         final movieId = await movieProvider.addMovie(
-          _titleController.text,
-          duration,
-          _synopsisController.text,
-          _imageBase64,
-          _selectedActors,
-        );
+            _titleController.text,
+            duration,
+            _synopsisController.text,
+            _imageBase64,
+            _selectedActors,
+            _selectedGenres);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -230,6 +254,8 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
                       ),
                       const SizedBox(height: 10),
                       _buildActorSelection(),
+                      const SizedBox(height: 10),
+                      _buildGenreSelection(),
                       if (_imageBase64 != null && _imageBase64!.isNotEmpty) ...[
                         const SizedBox(height: 20),
                         Center(
@@ -292,75 +318,42 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
   }
 
   Widget _buildActorSelection() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(
-          height: 16.0,
-        ),
-        const SizedBox(
-          width: 120,
-          child: Text(
-            'Actors',
-            style: TextStyle(fontSize: 18, color: Colors.white),
-          ),
-        ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              MultiSelectDialogField<Actor>(
-                items: _allActors
-                    .map((actor) => MultiSelectItem<Actor>(
-                          actor,
-                          '${actor.name} ${actor.surname}',
-                        ))
-                    .toList(),
-                initialValue: _selectedActors,
-                title: const Text(
-                  "Select Actors",
-                  style: TextStyle(color: Colors.white),
-                ),
-                selectedColor: Colors.red,
-                selectedItemsTextStyle: const TextStyle(color: Colors.white),
-                backgroundColor: Colors.grey[850],
-                buttonText: const Text(
-                  "Choose Actors",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
-                ),
-                onConfirm: (selected) {
-                  setState(() {
-                    _selectedActors = selected;
-                  });
-                },
-                chipDisplay: MultiSelectChipDisplay(
-                  chipColor: Colors.grey[800],
-                  textStyle: const TextStyle(color: Colors.white),
-                  items: _selectedActors
-                      .map((actor) => MultiSelectItem<Actor>(
-                          actor, '${actor.name} ${actor.surname}'))
-                      .toList(),
-                  onTap: (actor) {
-                    setState(() {
-                      _selectedActors.remove(actor);
-                    });
-                  },
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.grey[800],
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                itemsTextStyle: const TextStyle(color: Colors.white),
-                listType: MultiSelectListType.LIST,
-              ),
-              const SizedBox(height: 10),
-            ],
-          ),
-        ),
-      ],
+    return MultiSelectSection<Actor>(
+      allItems: _allActors,
+      selectedItems: _selectedActors,
+      title: 'Select Actors',
+      buttonText: 'Choose Actors',
+      onConfirm: (selected) {
+        setState(() {
+          _selectedActors = selected;
+        });
+      },
+      itemLabel: (actor) => '${actor.name} ${actor.surname}',
+      onItemTap: (actor) {
+        setState(() {
+          _selectedActors.remove(actor);
+        });
+      },
+    );
+  }
+
+  Widget _buildGenreSelection() {
+    return MultiSelectSection<Genre>(
+      allItems: _allGenres,
+      selectedItems: _selectedGenres,
+      title: 'Select Genres',
+      buttonText: 'Choose Genres',
+      onConfirm: (selected) {
+        setState(() {
+          _selectedGenres = selected;
+        });
+      },
+      itemLabel: (genre) => '${genre.name}',
+      onItemTap: (genre) {
+        setState(() {
+          _selectedGenres.remove(genre);
+        });
+      },
     );
   }
 }

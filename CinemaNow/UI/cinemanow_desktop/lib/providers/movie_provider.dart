@@ -1,4 +1,5 @@
 import 'package:cinemanow_desktop/models/actor.dart';
+import 'package:cinemanow_desktop/models/genre.dart';
 import 'package:cinemanow_desktop/models/movie.dart';
 import 'package:cinemanow_desktop/models/search_result.dart';
 import 'package:cinemanow_desktop/providers/base_provider.dart';
@@ -29,6 +30,7 @@ class MovieProvider extends BaseProvider<Movie> {
     String synopsis,
     String? imageBase64,
     List<Actor>? actors,
+    List<Genre>? genres,
   ) async {
     final newMovie = {
       'title': title,
@@ -36,6 +38,7 @@ class MovieProvider extends BaseProvider<Movie> {
       'synopsis': synopsis,
       'imageBase64': imageBase64,
       'actorIds': actors?.map((actor) => actor.id).toList() ?? [],
+      'genreIds': genres?.map((genre) => genre.id).toList() ?? [],
     };
 
     await insert(newMovie);
@@ -48,6 +51,7 @@ class MovieProvider extends BaseProvider<Movie> {
     String synopsis,
     String? imageBase64,
     List<Actor>? actors,
+    List<Genre>? genres,
   ) async {
     final updatedMovie = {
       'title': title,
@@ -55,6 +59,7 @@ class MovieProvider extends BaseProvider<Movie> {
       'synopsis': synopsis,
       'imageBase64': imageBase64,
       'actorIds': actors?.map((actor) => actor.id).toList() ?? [],
+      'genreIds': genres?.map((genre) => genre.id).toList() ?? [],
     };
 
     await update(id, updatedMovie);

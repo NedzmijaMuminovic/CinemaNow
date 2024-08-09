@@ -8,5 +8,6 @@ namespace CinemaNow.Models.SearchObjects
     {
         public string? FTS { get; set; } //full text search
         public bool? IsActorIncluded { get; set; }
+        public bool? IsGenreIncluded { get; set; }
     }
 }

@@ -27,7 +27,10 @@ namespace CinemaNow.Services
                 filteredQuery = filteredQuery.Where(x => x.Title.Contains(searchObject.FTS));
 
             if (searchObject?.IsActorIncluded == true)
-                filteredQuery = filteredQuery.Include(x => x.Actors);
+                filteredQuery = filteredQuery.Include(x => x.Actors).AsSplitQuery();
+
+            if (searchObject?.IsGenreIncluded == true)
+                filteredQuery = filteredQuery.Include(x => x.Genres).AsSplitQuery();
 
             return filteredQuery;
         }
@@ -51,7 +54,7 @@ namespace CinemaNow.Services
 
         public override Models.Movie GetByID(int id)
         {
-            var entity = Context.Movies.Include(m => m.Actors).FirstOrDefault(m => m.Id == id);
+            var entity = Context.Movies.Include(m => m.Actors).Include(m => m.Genres).AsSplitQuery().FirstOrDefault(m => m.Id == id);
 
             if (entity != null)
             {
@@ -95,6 +98,18 @@ namespace CinemaNow.Services
                 }
             }
 
+            if (request.GenreIds != null)
+            {
+                foreach (var genreId in request.GenreIds)
+                {
+                    var genre = Context.Genres.FirstOrDefault(g => g.Id == genreId);
+                    if (genre == null)
+                        throw new Exception($"Genre with ID {genreId} not found");
+
+                    entity.Genres.Add(genre);
+                }
+            }
+
             base.BeforeInsert(request, entity);
         }
 
@@ -106,8 +121,10 @@ namespace CinemaNow.Services
             }
 
             Context.Entry(entity).Collection(e => e.Actors).Load();
+            Context.Entry(entity).Collection(e => e.Genres).Load();
 
             entity.Actors.Clear();
+            entity.Genres.Clear();
             Context.SaveChanges();
 
             foreach (var actorId in request.ActorIds)
@@ -119,6 +136,18 @@ namespace CinemaNow.Services
                 if (!entity.Actors.Any(a => a.Id == actorId))
                 {
                     entity.Actors.Add(actor);
+                }
+            }
+
+            foreach (var genreId in request.GenreIds)
+            {
+                var genre = Context.Genres.FirstOrDefault(g => g.Id == genreId);
+                if (genre == null)
+                    throw new Exception($"Genre with ID {genreId} not found");
+
+                if (!entity.Genres.Any(g => g.Id == genreId))
+                {
+                    entity.Genres.Add(genre);
                 }
             }
 

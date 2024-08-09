@@ -1,4 +1,5 @@
 import 'package:cinemanow_desktop/models/actor.dart';
+import 'package:cinemanow_desktop/models/genre.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'movie.g.dart';
@@ -11,6 +12,7 @@ class Movie {
   String? synopsis;
   String? imageBase64;
   List<Actor>? actors;
+  List<Genre>? genres;
 
   Movie(
       {this.id,
@@ -18,7 +20,8 @@ class Movie {
       this.duration,
       this.synopsis,
       this.imageBase64,
-      this.actors});
+      this.actors,
+      this.genres});
 
   factory Movie.fromJson(Map<String, dynamic> json) => _$MovieFromJson(json);
   Map<String, dynamic> toJson() => _$MovieToJson(this);

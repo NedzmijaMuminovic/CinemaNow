@@ -14,7 +14,7 @@ class ActorProvider extends BaseProvider<Actor> {
     return await get(filter: filter);
   }
 
-  Future<void> deleteHall(int id) async {
+  Future<void> deleteActor(int id) async {
     await delete(id);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:cinemanow_desktop/providers/actor_provider.dart';
+import 'package:cinemanow_desktop/providers/genre_provider.dart';
 import 'package:cinemanow_desktop/providers/hall_provider.dart';
 import 'package:cinemanow_desktop/providers/movie_provider.dart';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
@@ -15,6 +16,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => HallProvider()),
         ChangeNotifierProvider(create: (_) => ViewModeProvider()),
         ChangeNotifierProvider(create: (_) => ActorProvider()),
+        ChangeNotifierProvider(create: (_) => GenreProvider()),
         ChangeNotifierProvider(create: (_) => ScreeningProvider()),
       ],
       child: const MyApp(),
