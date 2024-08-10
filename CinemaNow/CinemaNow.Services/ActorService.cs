@@ -21,6 +21,27 @@ namespace CinemaNow.Services
         {
             query = base.AddFilter(searchObject, query);
 
+            if (!string.IsNullOrWhiteSpace(searchObject?.Query))
+            {
+                var parts = searchObject.Query.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                if (parts.Length == 1)
+                {
+                    // Single word: search in both Name and Surname
+                    query = query.Where(x => x.Name.StartsWith(parts[0]) || x.Surname.StartsWith(parts[0]));
+                }
+                else if (parts.Length >= 2)
+                {
+                    // Two or more words: search in both orders (name + surname or surname + name)
+                    var first = parts[0];
+                    var second = string.Join(" ", parts.Skip(1));
+                    query = query.Where(x =>
+                        (x.Name.StartsWith(first) && x.Surname.StartsWith(second)) ||
+                        (x.Name.StartsWith(second) && x.Surname.StartsWith(first))
+                    );
+                }
+            }
+
             if (!string.IsNullOrWhiteSpace(searchObject?.NameGTE))
                 query = query.Where(x => x.Name.StartsWith(searchObject.NameGTE));
 

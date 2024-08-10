@@ -1,6 +1,6 @@
 import 'package:cinemanow_desktop/providers/actor_provider.dart';
 import 'package:cinemanow_desktop/screens/add_edit_actor_screen.dart';
-import 'package:cinemanow_desktop/widgets/card_base.dart';
+import 'package:cinemanow_desktop/widgets/base_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +24,7 @@ class ActorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CardBase(
+    return BaseCard(
       imageUrl: imageUrl,
       imageHeight: 280,
       content: [

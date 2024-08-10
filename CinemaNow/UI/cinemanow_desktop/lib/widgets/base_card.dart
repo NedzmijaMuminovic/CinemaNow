@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 
-class CardBase extends StatelessWidget {
+class BaseCard extends StatelessWidget {
   final String imageUrl;
   final List<Widget> content;
   final List<Widget> actions;
   final double imageHeight;
 
-  const CardBase({
+  const BaseCard({
     super.key,
     required this.imageUrl,
     required this.content,

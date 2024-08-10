@@ -1,6 +1,6 @@
 import 'package:cinemanow_desktop/providers/movie_provider.dart';
 import 'package:cinemanow_desktop/screens/add_edit_movie_screen.dart';
-import 'package:cinemanow_desktop/widgets/card_base.dart';
+import 'package:cinemanow_desktop/widgets/base_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +24,7 @@ class MovieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CardBase(
+    return BaseCard(
       imageUrl: imageUrl,
       content: [
         Align(

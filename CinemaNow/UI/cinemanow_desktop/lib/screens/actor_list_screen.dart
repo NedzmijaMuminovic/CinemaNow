@@ -16,10 +16,7 @@ class ActorListScreen extends StatefulWidget {
 class _ActorListScreenState extends State<ActorListScreen> {
   late ActorProvider provider;
   SearchResult<Actor>? result;
-  final TextEditingController _nameGTEEditingController =
-      TextEditingController();
-  final TextEditingController _surnameGTEEditingController =
-      TextEditingController();
+  final TextEditingController _queryEditingController = TextEditingController();
   bool _isLoading = false;
 
   @override
@@ -34,15 +31,14 @@ class _ActorListScreenState extends State<ActorListScreen> {
     _fetchActors();
   }
 
-  Future<void> _fetchActors({String? nameGTE, String? surnameGTE}) async {
+  Future<void> _fetchActors({String? query}) async {
     setState(() {
       _isLoading = true;
     });
 
     try {
       final provider = context.read<ActorProvider>();
-      result =
-          await provider.getActors(nameGTE: nameGTE, surnameGTE: surnameGTE);
+      result = await provider.getActors(query: query);
       setState(() {});
     } catch (e) {
       // Handle error
@@ -119,7 +115,7 @@ class _ActorListScreenState extends State<ActorListScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
-                    controller: _nameGTEEditingController,
+                    controller: _queryEditingController,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: 'Search',
@@ -135,10 +131,8 @@ class _ActorListScreenState extends State<ActorListScreen> {
         const SizedBox(width: 16),
         ElevatedButton(
           onPressed: () async {
-            await _fetchActors(
-              nameGTE: _nameGTEEditingController.text,
-              surnameGTE: _surnameGTEEditingController.text,
-            );
+            final query = _queryEditingController.text;
+            await _fetchActors(query: query);
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.grey[850],

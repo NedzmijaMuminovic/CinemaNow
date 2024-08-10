@@ -10,15 +10,10 @@ class ActorProvider extends BaseProvider<Actor> {
     return Actor.fromJson(data);
   }
 
-  Future<SearchResult<Actor>> getActors(
-      {String? nameGTE, String? surnameGTE}) async {
+  Future<SearchResult<Actor>> getActors({String? query}) async {
     final filter = <String, dynamic>{};
-    if (nameGTE != null && nameGTE.isNotEmpty) {
-      filter['namegte'] = nameGTE;
-    }
-
-    if (surnameGTE != null && surnameGTE.isNotEmpty) {
-      filter['surnamegte'] = surnameGTE;
+    if (query != null && query.isNotEmpty) {
+      filter['query'] = query;
     }
     return await get(filter: filter);
   }
