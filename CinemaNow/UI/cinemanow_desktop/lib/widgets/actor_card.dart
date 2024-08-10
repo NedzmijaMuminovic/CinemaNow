@@ -1,53 +1,39 @@
-import 'package:cinemanow_desktop/providers/movie_provider.dart';
-import 'package:cinemanow_desktop/screens/add_edit_movie_screen.dart';
+import 'package:cinemanow_desktop/providers/actor_provider.dart';
+import 'package:cinemanow_desktop/screens/add_edit_actor_screen.dart';
 import 'package:cinemanow_desktop/widgets/card_base.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class MovieCard extends StatelessWidget {
+class ActorCard extends StatelessWidget {
   final String imageUrl;
-  final String title;
-  final String synopsis;
-  final int movieId;
+  final String name;
+  final String surname;
+  final int actorId;
   final VoidCallback onDelete;
-  final VoidCallback onMovieUpdated;
+  final VoidCallback onActorUpdated;
 
-  const MovieCard({
+  const ActorCard({
     super.key,
     required this.imageUrl,
-    required this.title,
-    required this.synopsis,
-    required this.movieId,
+    required this.name,
+    required this.surname,
+    required this.actorId,
     required this.onDelete,
-    required this.onMovieUpdated,
+    required this.onActorUpdated,
   });
 
   @override
   Widget build(BuildContext context) {
     return CardBase(
       imageUrl: imageUrl,
+      imageHeight: 280,
       content: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Text(
-              synopsis,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-              ),
-            ),
+        Text(
+          '$name $surname',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],
@@ -57,9 +43,9 @@ class MovieCard extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => AddEditMovieScreen(
-                  movieId: movieId,
-                  onMovieUpdated: onMovieUpdated,
+                builder: (context) => AddEditActorScreen(
+                  actorId: actorId,
+                  onActorUpdated: onActorUpdated,
                 ),
               ),
             );
@@ -86,7 +72,7 @@ class MovieCard extends StatelessWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                   content: const Text(
-                    'Are you sure you want to delete this movie?',
+                    'Are you sure you want to delete this actor?',
                     style: TextStyle(color: Colors.white),
                   ),
                   backgroundColor: Colors.grey[900],
@@ -109,15 +95,15 @@ class MovieCard extends StatelessWidget {
             if (shouldDelete == true) {
               try {
                 final provider =
-                    Provider.of<MovieProvider>(context, listen: false);
-                await provider.deleteMovie(movieId);
+                    Provider.of<ActorProvider>(context, listen: false);
+                await provider.deleteActor(actorId);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Movie successfully deleted!')),
+                  const SnackBar(content: Text('Actor successfully deleted!')),
                 );
                 onDelete();
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Failed to delete movie')),
+                  const SnackBar(content: Text('Failed to delete actor')),
                 );
               }
             }

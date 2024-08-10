@@ -1,3 +1,4 @@
+import 'package:cinemanow_desktop/screens/actor_list_screen.dart';
 import 'package:cinemanow_desktop/screens/movie_list_screen.dart';
 import 'package:cinemanow_desktop/screens/screening_list_screen.dart';
 import 'package:flutter/material.dart';
@@ -11,21 +12,6 @@ class MasterScreen extends StatefulWidget {
 }
 
 class MasterScreenState extends State<MasterScreen> {
-  int _selectedIndex = 0;
-
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text('Home'),
-    Text('Movies'),
-    Text('Reports'),
-    Text('Admin'),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,6 +70,28 @@ class MasterScreenState extends State<MasterScreen> {
                     builder: (context) => const MasterScreen(
                       Scaffold(
                         body: MovieListScreen(),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.recent_actors,
+                color: Colors.white,
+                size: 32,
+              ),
+              title: const Text('Actors',
+                  style: TextStyle(color: Colors.white, fontSize: 18)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MasterScreen(
+                      Scaffold(
+                        body: ActorListScreen(),
                       ),
                     ),
                   ),

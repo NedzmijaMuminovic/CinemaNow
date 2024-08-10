@@ -9,5 +9,6 @@ namespace CinemaNow.Models.Requests
         public string? Name { get; set; }
 
         public string? Surname { get; set; }
+        public string? ImageBase64 { get; set; }
     }
 }

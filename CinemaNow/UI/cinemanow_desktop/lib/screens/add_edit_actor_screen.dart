@@ -1,55 +1,43 @@
-import 'package:cinemanow_desktop/models/actor.dart';
-import 'package:cinemanow_desktop/models/genre.dart';
 import 'package:cinemanow_desktop/providers/actor_provider.dart';
-import 'package:cinemanow_desktop/providers/genre_provider.dart';
-import 'package:cinemanow_desktop/widgets/multi_select_section.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:cinemanow_desktop/layouts/master_screen.dart';
-import 'package:cinemanow_desktop/providers/movie_provider.dart';
 import 'package:cinemanow_desktop/widgets/common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class AddEditMovieScreen extends StatefulWidget {
-  final int? movieId;
-  final VoidCallback? onMovieAdded;
-  final VoidCallback? onMovieUpdated;
+class AddEditActorScreen extends StatefulWidget {
+  final int? actorId;
+  final VoidCallback? onActorAdded;
+  final VoidCallback? onActorUpdated;
 
-  const AddEditMovieScreen({
+  const AddEditActorScreen({
     super.key,
-    this.movieId,
-    this.onMovieAdded,
-    this.onMovieUpdated,
+    this.actorId,
+    this.onActorAdded,
+    this.onActorUpdated,
   });
 
   @override
-  _AddEditMovieScreenState createState() => _AddEditMovieScreenState();
+  _AddEditActorScreenState createState() => _AddEditActorScreenState();
 }
 
-class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _durationController = TextEditingController();
-  final TextEditingController _synopsisController = TextEditingController();
+class _AddEditActorScreenState extends State<AddEditActorScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _surnameController = TextEditingController();
   bool _isLoading = true;
   bool _isEditing = false;
   File? _selectedImage;
   String? _imageBase64;
-  List<Actor> _allActors = [];
-  List<Actor> _selectedActors = [];
-  List<Genre> _allGenres = [];
-  List<Genre> _selectedGenres = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchAllActors();
-    _fetchAllGenres();
-    if (widget.movieId != null) {
+    if (widget.actorId != null) {
       _isEditing = true;
-      _fetchMovieDetails();
+      _fetchActorDetails();
     } else {
       setState(() {
         _isLoading = false;
@@ -57,28 +45,18 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
     }
   }
 
-  Future<void> _fetchAllActors() async {
+  Future<void> _fetchActorDetails() async {
     final actorProvider = Provider.of<ActorProvider>(context, listen: false);
-    try {
-      final searchResult = await actorProvider.getActors();
-      setState(() {
-        _allActors = searchResult.result;
-      });
-    } catch (e) {
-      // Handle error
-    }
-  }
 
-  Future<void> _fetchAllGenres() async {
-    final genreProvider = Provider.of<GenreProvider>(context, listen: false);
-    try {
-      final searchResult = await genreProvider.getGenres();
-      setState(() {
-        _allGenres = searchResult.result;
-      });
-    } catch (e) {
-      // Handle error
-    }
+    final actor = await actorProvider.getActorById(widget.actorId!);
+
+    setState(() {
+      _nameController.text = actor.name ?? '';
+      _surnameController.text = actor.surname ?? '';
+      _imageBase64 = actor.imageBase64 ?? '';
+
+      _isLoading = false;
+    });
   }
 
   Future<void> _pickImage() async {
@@ -92,33 +70,8 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
     }
   }
 
-  Future<void> _fetchMovieDetails() async {
-    final movieProvider = Provider.of<MovieProvider>(context, listen: false);
-
-    final movie = await movieProvider.getMovieById(widget.movieId!);
-
-    setState(() {
-      _titleController.text = movie.title ?? '';
-      _durationController.text = movie.duration?.toString() ?? '';
-      _synopsisController.text = movie.synopsis ?? '';
-      _imageBase64 = movie.imageBase64 ?? '';
-
-      if (movie.actors != null) {
-        _selectedActors = movie.actors!.toList();
-      }
-
-      if (movie.genres != null) {
-        _selectedGenres = movie.genres!.toList();
-      }
-
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _submitMovie() async {
-    if (_titleController.text.isEmpty ||
-        _durationController.text.isEmpty ||
-        _synopsisController.text.isEmpty) {
+  Future<void> _submitActor() async {
+    if (_nameController.text.isEmpty || _surnameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill in all fields.'),
@@ -128,53 +81,38 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
     }
 
     try {
-      final duration = int.tryParse(_durationController.text);
-
-      if (duration == null || duration <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Duration must be a positive number.'),
-          ),
-        );
-        return;
-      }
-
-      final movieProvider = Provider.of<MovieProvider>(context, listen: false);
+      final actorProvider = Provider.of<ActorProvider>(context, listen: false);
 
       if (_isEditing) {
-        if (widget.movieId == null) {
-          throw Exception('Movie ID is null');
+        if (widget.actorId == null) {
+          throw Exception('Actor ID is null');
         }
-        await movieProvider.updateMovie(
-            widget.movieId!,
-            _titleController.text,
-            duration,
-            _synopsisController.text,
-            _imageBase64,
-            _selectedActors,
-            _selectedGenres);
+        await actorProvider.updateActor(
+          widget.actorId!,
+          _nameController.text,
+          _surnameController.text,
+          _imageBase64,
+        );
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Movie successfully updated!'),
+            content: Text('Actor successfully updated!'),
           ),
         );
-        widget.onMovieUpdated?.call();
+        widget.onActorUpdated?.call();
       } else {
-        await movieProvider.addMovie(
-            _titleController.text,
-            duration,
-            _synopsisController.text,
-            _imageBase64,
-            _selectedActors,
-            _selectedGenres);
+        await actorProvider.addActor(
+          _nameController.text,
+          _surnameController.text,
+          _imageBase64,
+        );
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Movie successfully added!'),
+            content: Text('Actor successfully added!'),
           ),
         );
-        widget.onMovieAdded?.call();
+        widget.onActorAdded?.call();
       }
 
       Navigator.of(context).pop();
@@ -182,8 +120,8 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(_isEditing
-              ? 'Failed to edit movie: $e'
-              : 'Failed to add movie: $e'),
+              ? 'Failed to edit actor: $e'
+              : 'Failed to add actor: $e'),
         ),
       );
     }
@@ -207,7 +145,7 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _isEditing ? 'Edit Movie' : 'Add a New Movie',
+                        _isEditing ? 'Edit Actor' : 'Add a New Actor',
                         style: const TextStyle(
                           fontSize: 24,
                           color: Colors.white,
@@ -216,24 +154,17 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
                       const SizedBox(height: 20),
                       buildInputField(
                         context,
-                        'Title',
-                        'Enter title',
-                        Icons.movie,
-                        controller: _titleController,
+                        'Name',
+                        'Enter name',
+                        Icons.person,
+                        controller: _nameController,
                       ),
                       buildInputField(
                         context,
-                        'Duration',
-                        'Enter duration in minutes',
-                        Icons.timer,
-                        controller: _durationController,
-                      ),
-                      buildInputField(
-                        context,
-                        'Synopsis',
-                        'Enter synopsis',
-                        Icons.description,
-                        controller: _synopsisController,
+                        'Surname',
+                        'Enter surname',
+                        Icons.person_outline,
+                        controller: _surnameController,
                       ),
                       GestureDetector(
                         onTap: _pickImage,
@@ -246,12 +177,8 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
                           cursor: SystemMouseCursors.click,
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      _buildActorSelection(),
-                      const SizedBox(height: 10),
-                      _buildGenreSelection(),
+                      const SizedBox(height: 20),
                       if (_imageBase64 != null && _imageBase64!.isNotEmpty) ...[
-                        const SizedBox(height: 20),
                         Center(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12.0),
@@ -288,7 +215,7 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
                             ),
                             const SizedBox(width: 10),
                             ElevatedButton(
-                              onPressed: _submitMovie,
+                              onPressed: _submitActor,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red,
                                 padding: const EdgeInsets.symmetric(
@@ -308,46 +235,6 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildActorSelection() {
-    return MultiSelectSection<Actor>(
-      allItems: _allActors,
-      selectedItems: _selectedActors,
-      title: 'Select Actors',
-      buttonText: 'Choose Actors',
-      onConfirm: (selected) {
-        setState(() {
-          _selectedActors = selected;
-        });
-      },
-      itemLabel: (actor) => '${actor.name} ${actor.surname}',
-      onItemTap: (actor) {
-        setState(() {
-          _selectedActors.remove(actor);
-        });
-      },
-    );
-  }
-
-  Widget _buildGenreSelection() {
-    return MultiSelectSection<Genre>(
-      allItems: _allGenres,
-      selectedItems: _selectedGenres,
-      title: 'Select Genres',
-      buttonText: 'Choose Genres',
-      onConfirm: (selected) {
-        setState(() {
-          _selectedGenres = selected;
-        });
-      },
-      itemLabel: (genre) => '${genre.name}',
-      onItemTap: (genre) {
-        setState(() {
-          _selectedGenres.remove(genre);
-        });
-      },
     );
   }
 }
