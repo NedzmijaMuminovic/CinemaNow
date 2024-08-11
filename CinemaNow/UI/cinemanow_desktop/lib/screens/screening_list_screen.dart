@@ -16,13 +16,15 @@ class ScreeningListScreen extends StatefulWidget {
   _ScreeningListScreenState createState() => _ScreeningListScreenState();
 }
 
-class _ScreeningListScreenState extends State<ScreeningListScreen> {
+class _ScreeningListScreenState extends State<ScreeningListScreen>
+    with SingleTickerProviderStateMixin {
   late ScreeningProvider provider;
   SearchResult<Screening>? result;
   final TextEditingController _ftsEditingController = TextEditingController();
   DateTime? _selectedDate;
   bool _noScreeningsAvailable = false;
   bool _isLoading = false;
+  late TabController _tabController;
 
   @override
   void didChangeDependencies() {
@@ -33,7 +35,14 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
     _fetchScreenings();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchScreenings({String? fts, DateTime? date}) async {
@@ -68,6 +77,8 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
               children: [
                 _buildSearch(),
                 const SizedBox(height: 16),
+                _buildTabBar(),
+                const SizedBox(height: 16),
                 _isLoading
                     ? const Expanded(
                         child: Center(
@@ -99,6 +110,25 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTabBar() {
+    return TabBar(
+      controller: _tabController,
+      indicatorColor: Colors.red,
+      labelColor: Colors.white,
+      unselectedLabelColor: Colors.grey[500],
+      tabs: const [
+        Tab(text: 'Active'),
+        Tab(text: 'Hidden'),
+        Tab(text: 'Draft'),
+      ],
+      onTap: (index) {
+        setState(() {
+          // Trigger a rebuild to show the relevant screenings
+        });
+      },
     );
   }
 
@@ -176,32 +206,23 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
 
   Widget _buildResultView() {
     if (_noScreeningsAvailable) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.movie, color: Colors.red, size: 60),
-            const SizedBox(height: 16),
-            Text(
-              'No Screenings Available',
-              style: TextStyle(
-                color: Colors.grey[500],
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Try selecting a different date or search term.',
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      );
+      return _buildNoScreeningsView();
     }
+
+    final List<Screening> filteredScreenings =
+        result?.result.where((screening) {
+              switch (_tabController.index) {
+                case 0:
+                  return screening.stateMachine == 'active';
+                case 1:
+                  return screening.stateMachine == 'hidden';
+                case 2:
+                  return screening.stateMachine == 'draft';
+                default:
+                  return false;
+              }
+            }).toList() ??
+            [];
 
     return Expanded(
       child: LayoutBuilder(
@@ -221,35 +242,62 @@ class _ScreeningListScreenState extends State<ScreeningListScreen> {
               mainAxisSpacing: 16.0,
               childAspectRatio: 1,
             ),
-            itemCount: result?.result.length,
+            itemCount: filteredScreenings.length,
             itemBuilder: (context, index) {
-              String? imageUrl = result?.result[index].movie?.imageBase64;
+              final screening = filteredScreenings[index];
+              String? imageUrl = screening.movie?.imageBase64;
               return ScreeningCard(
                 imageUrl: imageUrl != null
                     ? 'data:image/jpeg;base64,$imageUrl'
                     : 'assets/images/default.jpg',
-                title: result?.result[index].movie?.title ?? 'Unknown Title',
-                date: result?.result[index].dateTime != null
-                    ? DateFormat('dd/MM/yyyy')
-                        .format(result!.result[index].dateTime!)
+                title: screening.movie?.title ?? 'Unknown Title',
+                date: screening.dateTime != null
+                    ? DateFormat('dd/MM/yyyy').format(screening.dateTime!)
                     : 'Unknown Date',
-                time: result?.result[index].dateTime != null
-                    ? DateFormat('HH:mm')
-                        .format(result!.result[index].dateTime!)
+                time: screening.dateTime != null
+                    ? DateFormat('HH:mm').format(screening.dateTime!)
                     : 'Unknown Time',
-                hall: result?.result[index].hall?.name ?? 'Unknown Hall',
-                viewMode:
-                    result?.result[index].viewMode?.name ?? 'Unknown View Mode',
-                price: result?.result[index].price != null
-                    ? formatNumber(result!.result[index].price)
+                hall: screening.hall?.name ?? 'Unknown Hall',
+                viewMode: screening.viewMode?.name ?? 'Unknown View Mode',
+                price: screening.price != null
+                    ? formatNumber(screening.price)
                     : 'Unknown Price',
-                screeningId: result?.result[index].id ?? 0,
+                screeningId: screening.id ?? 0,
                 onDelete: _fetchScreenings,
                 onScreeningUpdated: _fetchScreenings,
+                stateMachine: screening.stateMachine ?? 'unknown',
               );
             },
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildNoScreeningsView() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.movie, color: Colors.red, size: 60),
+          const SizedBox(height: 16),
+          Text(
+            'No Screenings Available',
+            style: TextStyle(
+              color: Colors.grey[500],
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Try selecting a different date or search term.',
+            style: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 16,
+            ),
+          ),
+        ],
       ),
     );
   }

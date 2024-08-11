@@ -15,6 +15,7 @@ class ScreeningCard extends StatelessWidget {
   final int screeningId;
   final VoidCallback onDelete;
   final VoidCallback onScreeningUpdated;
+  final String stateMachine;
 
   const ScreeningCard({
     super.key,
@@ -28,6 +29,7 @@ class ScreeningCard extends StatelessWidget {
     required this.screeningId,
     required this.onDelete,
     required this.onScreeningUpdated,
+    required this.stateMachine,
   });
 
   @override
@@ -59,90 +61,184 @@ class ScreeningCard extends StatelessWidget {
           ),
         ),
       ],
-      actions: [
-        ElevatedButton.icon(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddEditScreeningScreen(
-                  screeningId: screeningId,
-                  onScreeningUpdated: onScreeningUpdated,
-                ),
-              ),
-            );
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey[700],
-            padding:
-                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-          ),
-          icon: const Icon(Icons.edit, color: Colors.white),
-          label: const Text('Edit', style: TextStyle(color: Colors.white)),
-        ),
-        ElevatedButton.icon(
-          onPressed: () async {
-            final shouldDelete = await showDialog<bool>(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text(
-                    'Confirm Deletion',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  content: const Text(
-                    'Are you sure you want to delete this screening?',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  backgroundColor: Colors.grey[900],
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child:
-                          const Text('No', style: TextStyle(color: Colors.red)),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text('Yes',
-                          style: TextStyle(color: Colors.red)),
-                    ),
-                  ],
-                );
-              },
-            );
+      actions: _buildActions(context),
+    );
+  }
 
-            if (shouldDelete == true) {
-              try {
-                final provider =
-                    Provider.of<ScreeningProvider>(context, listen: false);
-                await provider.deleteScreening(screeningId);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Screening successfully deleted!')),
-                );
-                onDelete();
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Failed to delete screening')),
-                );
-              }
+  List<Widget> _buildActions(BuildContext context) {
+    List<Widget> actions = [];
+
+    if (stateMachine == 'active') {
+      actions.add(_buildButton(
+        context: context,
+        label: 'Hide',
+        icon: Icons.visibility_off,
+        color: Colors.orange[700]!,
+        onPressed: () async {
+          try {
+            final provider =
+                Provider.of<ScreeningProvider>(context, listen: false);
+            await provider.hideScreening(screeningId);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Screening successfully hidden!')),
+            );
+            onScreeningUpdated();
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Failed to hide screening')),
+            );
+          }
+        },
+      ));
+    } else if (stateMachine == 'hidden' || stateMachine == 'draft') {
+      actions.add(_buildButton(
+        context: context,
+        label: 'Activate',
+        icon: Icons.visibility,
+        color: Colors.green[800]!,
+        onPressed: () async {
+          try {
+            final provider =
+                Provider.of<ScreeningProvider>(context, listen: false);
+            await provider.activateScreening(screeningId);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text('Screening successfully activated!')),
+            );
+            onScreeningUpdated();
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Failed to activate screening')),
+            );
+          }
+        },
+      ));
+
+      if (stateMachine == 'draft') {
+        actions.add(_buildButton(
+          context: context,
+          label: 'Hide',
+          icon: Icons.visibility_off,
+          color: Colors.orange[700]!,
+          onPressed: () async {
+            try {
+              final provider =
+                  Provider.of<ScreeningProvider>(context, listen: false);
+              await provider.hideScreening(screeningId);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Screening successfully hidden!')),
+              );
+              onScreeningUpdated();
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Failed to hide screening')),
+              );
             }
           },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
-            padding:
-                const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
+        ));
+      }
+    }
+
+    if (stateMachine != 'active') {
+      actions.add(_buildButton(
+        context: context,
+        label: 'Edit',
+        icon: Icons.edit,
+        color: Colors.grey[700]!,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddEditScreeningScreen(
+                screeningId: screeningId,
+                onScreeningUpdated: onScreeningUpdated,
+              ),
             ),
+          );
+        },
+      ));
+      actions.add(_buildButton(
+        context: context,
+        label: 'Delete',
+        icon: Icons.delete,
+        color: Colors.red,
+        onPressed: () async {
+          final shouldDelete = await showDialog<bool>(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text(
+                  'Confirm Deletion',
+                  style: TextStyle(color: Colors.white),
+                ),
+                content: const Text(
+                  'Are you sure you want to delete this screening?',
+                  style: TextStyle(color: Colors.white),
+                ),
+                backgroundColor: Colors.grey[900],
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child:
+                        const Text('No', style: TextStyle(color: Colors.red)),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child:
+                        const Text('Yes', style: TextStyle(color: Colors.red)),
+                  ),
+                ],
+              );
+            },
+          );
+
+          if (shouldDelete == true) {
+            try {
+              final provider =
+                  Provider.of<ScreeningProvider>(context, listen: false);
+              await provider.deleteScreening(screeningId);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('Screening successfully deleted!')),
+              );
+              onDelete();
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Failed to delete screening')),
+              );
+            }
+          }
+        },
+      ));
+    }
+
+    return actions;
+  }
+
+  Widget _buildButton({
+    required BuildContext context,
+    required String label,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return Flexible(
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
           ),
-          icon: const Icon(Icons.delete, color: Colors.white),
-          label: const Text('Delete', style: TextStyle(color: Colors.white)),
         ),
-      ],
+        icon: Icon(icon, color: Colors.white),
+        label: Text(
+          label,
+          style: const TextStyle(color: Colors.white),
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
     );
   }
 }

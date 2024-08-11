@@ -17,6 +17,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
   }
 
   String get baseUrl => _baseUrl ?? "";
+  String get endpoint => _endpoint;
 
   Future<SearchResult<T>> get({dynamic filter}) async {
     var url = "$_baseUrl$_endpoint";
@@ -87,7 +88,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
   }
 
   bool isValidResponse(Response response) {
-    if (response.statusCode < 299) {
+    if (response.statusCode >= 200 && response.statusCode < 300) {
       return true;
     } else if (response.statusCode == 401) {
       throw Exception("Unauthorized");

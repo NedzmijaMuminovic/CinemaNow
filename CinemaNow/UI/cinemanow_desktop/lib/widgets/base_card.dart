@@ -74,7 +74,9 @@ class BaseCard extends StatelessWidget {
                   const BorderRadius.vertical(bottom: Radius.circular(16.0)),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: actions.length == 1
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.spaceBetween,
               children: actions,
             ),
           ),

@@ -1,4 +1,5 @@
-﻿using CinemaNow.Services.Database;
+﻿using CinemaNow.Models.Requests;
+using CinemaNow.Services.Database;
 using MapsterMapper;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,15 @@ namespace CinemaNow.Services.ScreeningStateMachine
             var set = Context.Set<Screening>();
             var entity = set.Find(id);
             entity.StateMachine = "active";
+            Context.SaveChanges();
+            return Mapper.Map<Models.Screening>(entity);
+        }
+
+        public override Models.Screening Update(int id, ScreeningUpdateRequest request)
+        {
+            var set = Context.Set<Screening>();
+            var entity = set.Find(id);
+            Mapper.Map(request, entity);
             Context.SaveChanges();
             return Mapper.Map<Models.Screening>(entity);
         }

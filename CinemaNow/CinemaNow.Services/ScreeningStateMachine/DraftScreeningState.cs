@@ -38,7 +38,7 @@ namespace CinemaNow.Services.ScreeningStateMachine
 
             var mappedEntity = Mapper.Map<Models.Screening>(entity);
             ScreeningActivated message = new ScreeningActivated { Screening = mappedEntity };
-            bus.PubSub.Publish(message);
+            //bus.PubSub.Publish(message);
 
             return mappedEntity;
         }

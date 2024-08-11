@@ -5,6 +5,7 @@ import 'package:cinemanow_desktop/models/search_result.dart';
 import 'package:cinemanow_desktop/models/view_mode.dart';
 import 'package:cinemanow_desktop/providers/base_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 class ScreeningProvider extends BaseProvider<Screening> {
   ScreeningProvider() : super("Screening");
@@ -78,5 +79,35 @@ class ScreeningProvider extends BaseProvider<Screening> {
 
   Future<Screening> getScreeningById(int id) async {
     return await getById(id);
+  }
+
+  Future<void> hideScreening(int id) async {
+    var url = "$baseUrl$endpoint/$id/hide";
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+
+    var response = await http.put(uri, headers: headers);
+
+    if (isValidResponse(response)) {
+      notifyListeners();
+    } else {
+      throw Exception("Failed to hide screening");
+    }
+  }
+
+  Future<void> activateScreening(int id) async {
+    var url = "$baseUrl$endpoint/$id/activate";
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+
+    var response = await http.put(uri, headers: headers);
+
+    if (isValidResponse(response)) {
+      notifyListeners();
+    } else {
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      throw Exception("Failed to activate screening");
+    }
   }
 }
