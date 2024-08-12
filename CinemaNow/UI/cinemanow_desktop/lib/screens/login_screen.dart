@@ -1,4 +1,5 @@
 import 'package:cinemanow_desktop/layouts/master_screen.dart';
+import 'package:cinemanow_desktop/providers/user_provider.dart';
 import 'package:cinemanow_desktop/screens/register_screen.dart';
 import 'package:cinemanow_desktop/providers/auth_provider.dart';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
@@ -50,7 +51,13 @@ class _LoginPageState extends State<LoginPage> {
     AuthProvider.password = _passwordController.text;
 
     try {
-      await provider.get();
+      final userProvider = UserProvider();
+      final user = await userProvider.getUsers(filter: {'username': username});
+      if (user.result.isNotEmpty) {
+        AuthProvider.setUser(user.result.first);
+      }
+
+      //await provider.get();
       Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => const MasterScreen(ScreeningListScreen())));
     } on Exception catch (e) {
