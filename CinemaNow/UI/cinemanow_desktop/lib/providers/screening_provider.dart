@@ -105,8 +105,6 @@ class ScreeningProvider extends BaseProvider<Screening> {
     if (isValidResponse(response)) {
       notifyListeners();
     } else {
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
       throw Exception("Failed to activate screening");
     }
   }

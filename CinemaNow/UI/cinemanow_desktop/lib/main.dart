@@ -3,6 +3,7 @@ import 'package:cinemanow_desktop/providers/genre_provider.dart';
 import 'package:cinemanow_desktop/providers/hall_provider.dart';
 import 'package:cinemanow_desktop/providers/movie_provider.dart';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
+import 'package:cinemanow_desktop/providers/user_provider.dart';
 import 'package:cinemanow_desktop/providers/view_mode_provider.dart';
 import 'package:cinemanow_desktop/screens/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => ViewModeProvider()),
         ChangeNotifierProvider(create: (_) => ActorProvider()),
         ChangeNotifierProvider(create: (_) => GenreProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => ScreeningProvider()),
       ],
       child: const MyApp(),
