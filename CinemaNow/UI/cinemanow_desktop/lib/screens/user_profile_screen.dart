@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cinemanow_desktop/providers/auth_provider.dart';
 import 'package:cinemanow_desktop/screens/login_screen.dart';
+import 'package:cinemanow_desktop/utilities/validator.dart';
 import 'package:flutter/material.dart';
 import 'package:cinemanow_desktop/providers/user_provider.dart';
 import 'package:cinemanow_desktop/models/user.dart';
+import 'package:image_picker/image_picker.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -23,6 +28,54 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final ValueNotifier<bool> _isEditingEmail = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _isEditingUsername = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _isEditingPassword = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> _isImageSelected = ValueNotifier<bool>(false);
+  File? _selectedImage;
+  String? _imageBase64;
+  String? _nameError;
+  String? _surnameError;
+  String? _emailError;
+  String? _usernameError;
+  String? _passwordError;
+  String? _passwordConfirmationError;
+
+  void _validateName(String text) {
+    setState(() {
+      _nameError = Validator.validateName(text);
+    });
+  }
+
+  void _validateSurname(String text) {
+    setState(() {
+      _surnameError = Validator.validateSurname(text);
+    });
+  }
+
+  void _validateEmail(String text) {
+    setState(() {
+      _emailError = Validator.validateEmail(text);
+    });
+  }
+
+  void _validateUsername(String text) {
+    setState(() {
+      _usernameError = Validator.validateUsername(text);
+    });
+  }
+
+  void _validatePassword(String text) {
+    setState(() {
+      _passwordError = Validator.validatePassword(text);
+    });
+  }
+
+  void _validatePasswordConfirmation(String text) {
+    setState(() {
+      _passwordConfirmationError = Validator.validatePasswordConfirmation(
+        _passwordController.text,
+        text,
+      );
+    });
+  }
 
   Future<User?> _getUserData(BuildContext context) async {
     if (AuthProvider.userId != null) {
@@ -30,6 +83,25 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       return await userProvider.getUserById(AuthProvider.userId!);
     }
     return null;
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+        _imageBase64 = base64Encode(_selectedImage!.readAsBytesSync());
+        _isImageSelected.value = true;
+      });
+    }
+  }
+
+  Future<void> _saveImage() async {
+    if (_selectedImage != null) {
+      await _updateUser(context);
+      _isImageSelected.value = false;
+    }
   }
 
   @override
@@ -81,6 +153,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           _surnameController.text = user.surname!;
           _emailController.text = user.email!;
           _usernameController.text = user.username!;
+          if (_selectedImage == null) {
+            _imageBase64 = user.imageBase64 ?? '';
+          }
 
           return SingleChildScrollView(
             child: Padding(
@@ -89,10 +164,45 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 40),
-                  const CircleAvatar(
-                    radius: 100,
-                    backgroundImage: AssetImage('assets/images/default.jpg'),
-                    backgroundColor: Colors.white,
+                  Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 100,
+                        backgroundImage:
+                            _selectedImage != null
+                                ? FileImage(_selectedImage!)
+                                : (user.imageBase64 != null
+                                        ? MemoryImage(
+                                            base64Decode(user.imageBase64!))
+                                        : const AssetImage(
+                                            'assets/images/default.jpg'))
+                                    as ImageProvider,
+                        backgroundColor: Colors.white,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: ValueListenableBuilder<bool>(
+                          valueListenable: _isImageSelected,
+                          builder: (context, isImageSelected, child) {
+                            return GestureDetector(
+                              onTap: isImageSelected ? _saveImage : _pickImage,
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: CircleAvatar(
+                                  radius: 30,
+                                  backgroundColor: Colors.red,
+                                  child: Icon(
+                                    isImageSelected ? Icons.save : Icons.edit,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 10),
                   RichText(
@@ -349,6 +459,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           _passwordConfirmationController.text.isNotEmpty
               ? _passwordConfirmationController.text
               : null,
+          _imageBase64,
           [2],
         );
 

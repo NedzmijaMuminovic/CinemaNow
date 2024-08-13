@@ -47,14 +47,48 @@ namespace CinemaNow.Services
             return query;
         }
 
+        public override Models.PagedResult<Models.User> GetPaged(UserSearchObject search)
+        {
+            var pagedData = base.GetPaged(search);
+
+            foreach (var user in pagedData.ResultList)
+            {
+                var dbUser = Context.Set<Database.User>().Find(user.Id);
+                if (dbUser != null)
+                {
+                    user.ImageBase64 = dbUser.Image != null ? Convert.ToBase64String(dbUser.Image) : null;
+                }
+            }
+
+            return pagedData;
+        }
+
         public override Models.User GetByID(int id)
         {
             var entity = Context.Users.Include(u => u.Roles).FirstOrDefault(u => u.Id == id);
 
             if (entity != null)
-                return Mapper.Map<Models.User>(entity);
+            {
+                var model = Mapper.Map<Models.User>(entity);
+
+                model.ImageBase64 = entity.Image != null
+                    ? Convert.ToBase64String(entity.Image)
+                    : null;
+
+                return model;
+            }
             else
                 return null;
+        }
+
+        public async Task UpdateUserImage(int id, byte[] imageBytes)
+        {
+            var user = Context.Set<Database.User>().Find(id);
+            if (user != null)
+            {
+                user.Image = imageBytes;
+                await Context.SaveChangesAsync();
+            }
         }
 
         public override void BeforeInsert(UserInsertRequest request, Database.User entity)
@@ -72,6 +106,11 @@ namespace CinemaNow.Services
                     throw new Exception($"Role with ID {roleId} not found");
 
                 entity.Roles.Add(role);
+            }
+
+            if (!string.IsNullOrEmpty(request.ImageBase64))
+            {
+                entity.Image = Convert.FromBase64String(request.ImageBase64);
             }
 
             base.BeforeInsert(request, entity);
@@ -121,6 +160,11 @@ namespace CinemaNow.Services
 
                     entity.Roles.Add(role);
                 }
+            }
+
+            if (!string.IsNullOrEmpty(request.ImageBase64))
+            {
+                entity.Image = Convert.FromBase64String(request.ImageBase64);
             }
         }
 

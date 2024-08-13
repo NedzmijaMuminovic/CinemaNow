@@ -26,6 +26,7 @@ class UserProvider extends BaseProvider<User> {
     String username,
     String? password,
     String? passwordConfirmation,
+    String? imageBase64,
     List<int> roleIds,
   ) async {
     final updatedUser = {
@@ -35,6 +36,7 @@ class UserProvider extends BaseProvider<User> {
       'username': username,
       'password': password,
       'passwordConfirmation': passwordConfirmation,
+      'imageBase64': imageBase64,
       'roleIds': roleIds,
     };
 

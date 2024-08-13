@@ -12,7 +12,7 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       surname: json['surname'] as String?,
       email: json['email'] as String?,
       username: json['username'] as String?,
-    );
+    )..imageBase64 = json['imageBase64'] as String?;
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'id': instance.id,
@@ -20,4 +20,5 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'surname': instance.surname,
       'email': instance.email,
       'username': instance.username,
+      'imageBase64': instance.imageBase64,
     };

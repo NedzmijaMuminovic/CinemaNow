@@ -1,4 +1,5 @@
 import 'package:cinemanow_desktop/providers/registration_provider.dart';
+import 'package:cinemanow_desktop/utilities/validator.dart';
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -29,54 +30,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isLoading = false;
 
   void _validateName(String text) {
-    final nameRegExp = RegExp(r'^[A-Z][a-zA-Z]*$');
     setState(() {
-      _nameError = nameRegExp.hasMatch(text)
-          ? null
-          : 'Name must start with a capital letter and contain only letters.';
+      _nameError = Validator.validateName(text);
     });
   }
 
   void _validateSurname(String text) {
-    final surnameRegExp = RegExp(r'^[A-Z][a-zA-Z]*$');
     setState(() {
-      _surnameError = surnameRegExp.hasMatch(text)
-          ? null
-          : 'Surname must start with a capital letter and contain only letters.';
+      _surnameError = Validator.validateSurname(text);
     });
   }
 
   void _validateEmail(String text) {
-    final emailRegExp = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
     setState(() {
-      _emailError =
-          emailRegExp.hasMatch(text) ? null : 'Enter a valid email address.';
+      _emailError = Validator.validateEmail(text);
     });
   }
 
   void _validateUsername(String text) {
-    final usernameRegExp = RegExp(r'^[a-zA-Z0-9_]{3,}$');
     setState(() {
-      _usernameError = usernameRegExp.hasMatch(text)
-          ? null
-          : 'Username must be at least 3 characters long and contain only letters, numbers, or underscores.';
+      _usernameError = Validator.validateUsername(text);
     });
   }
 
   void _validatePassword(String text) {
-    final passwordRegExp =
-        RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
     setState(() {
-      _passwordError = passwordRegExp.hasMatch(text)
-          ? null
-          : 'Password must be at least 8 characters long and include at least one letter, one number, and one special character.';
+      _passwordError = Validator.validatePassword(text);
     });
   }
 
   void _validatePasswordConfirmation(String text) {
     setState(() {
-      _passwordConfirmationError =
-          text == _passwordController.text ? null : 'Passwords do not match.';
+      _passwordConfirmationError = Validator.validatePasswordConfirmation(
+        _passwordController.text,
+        text,
+      );
     });
   }
 

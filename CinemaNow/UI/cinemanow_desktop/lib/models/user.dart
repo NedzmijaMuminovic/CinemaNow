@@ -9,6 +9,7 @@ class User {
   String? surname;
   String? email;
   String? username;
+  String? imageBase64;
 
   User({
     this.id,

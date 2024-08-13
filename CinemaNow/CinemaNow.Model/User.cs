@@ -15,6 +15,7 @@ namespace CinemaNow.Models
         public string? Email { get; set; }
 
         public string? Username { get; set; }
+        public string? ImageBase64 { get; set; }
         public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
     }
 }
