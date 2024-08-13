@@ -111,13 +111,16 @@ namespace CinemaNow.Services
                 entity.PasswordHash = GenerateHash(entity.PasswordSalt, request.Password);
             }
 
-            foreach (var roleId in request.RoleIds)
+            if (request.RoleIds != null)
             {
-                var role = Context.Roles.FirstOrDefault(r => r.Id == roleId);
-                if (role == null)
-                    throw new Exception($"Role with ID {roleId} not found");
+                foreach (var roleId in request.RoleIds)
+                {
+                    var role = Context.Roles.FirstOrDefault(r => r.Id == roleId);
+                    if (role == null)
+                        throw new Exception($"Role with ID {roleId} not found");
 
-                entity.Roles.Add(role);
+                    entity.Roles.Add(role);
+                }
             }
         }
 

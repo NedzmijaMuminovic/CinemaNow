@@ -24,12 +24,18 @@ class UserProvider extends BaseProvider<User> {
     String surname,
     String email,
     String username,
+    String? password,
+    String? passwordConfirmation,
+    List<int> roleIds,
   ) async {
     final updatedUser = {
       'name': name,
       'surname': surname,
       'email': email,
       'username': username,
+      'password': password,
+      'passwordConfirmation': passwordConfirmation,
+      'roleIds': roleIds,
     };
 
     await update(id, updatedUser);
