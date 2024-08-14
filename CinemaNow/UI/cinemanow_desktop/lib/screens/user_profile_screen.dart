@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:cinemanow_desktop/providers/auth_provider.dart';
 import 'package:cinemanow_desktop/screens/login_screen.dart';
-import 'package:cinemanow_desktop/utilities/validator.dart';
 import 'package:flutter/material.dart';
 import 'package:cinemanow_desktop/providers/user_provider.dart';
 import 'package:cinemanow_desktop/models/user.dart';
@@ -31,51 +30,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final ValueNotifier<bool> _isImageSelected = ValueNotifier<bool>(false);
   File? _selectedImage;
   String? _imageBase64;
-  String? _nameError;
-  String? _surnameError;
-  String? _emailError;
-  String? _usernameError;
-  String? _passwordError;
-  String? _passwordConfirmationError;
-
-  void _validateName(String text) {
-    setState(() {
-      _nameError = Validator.validateName(text);
-    });
-  }
-
-  void _validateSurname(String text) {
-    setState(() {
-      _surnameError = Validator.validateSurname(text);
-    });
-  }
-
-  void _validateEmail(String text) {
-    setState(() {
-      _emailError = Validator.validateEmail(text);
-    });
-  }
-
-  void _validateUsername(String text) {
-    setState(() {
-      _usernameError = Validator.validateUsername(text);
-    });
-  }
-
-  void _validatePassword(String text) {
-    setState(() {
-      _passwordError = Validator.validatePassword(text);
-    });
-  }
-
-  void _validatePasswordConfirmation(String text) {
-    setState(() {
-      _passwordConfirmationError = Validator.validatePasswordConfirmation(
-        _passwordController.text,
-        text,
-      );
-    });
-  }
 
   Future<User?> _getUserData(BuildContext context) async {
     if (AuthProvider.userId != null) {
@@ -102,6 +56,40 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       await _updateUser(context);
       _isImageSelected.value = false;
     }
+  }
+
+  void _showLogoutConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: const Text('Confirm Logout',
+              style: TextStyle(color: Colors.white)),
+          content: const Text('Are you sure you want to log out?',
+              style: TextStyle(color: Colors.white)),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Logout', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                AuthProvider.userId = null;
+                AuthProvider.username = null;
+
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -292,7 +280,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   const SizedBox(height: 20),
                   Center(
                     child: ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        _showLogoutConfirmationDialog(context);
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         minimumSize: const Size(200, 50),

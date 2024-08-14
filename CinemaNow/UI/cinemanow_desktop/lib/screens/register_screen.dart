@@ -260,6 +260,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(height: 20.0),
                       ElevatedButton(
                         onPressed: () async {
+                          _validateName(_nameController.text);
+                          _validateSurname(_surnameController.text);
+                          _validateEmail(_emailController.text);
+                          _validateUsername(_usernameController.text);
+                          _validatePassword(_passwordController.text);
+                          _validatePasswordConfirmation(
+                              _passwordConfirmationController.text);
+
+                          if (_nameError != null ||
+                              _surnameError != null ||
+                              _emailError != null ||
+                              _usernameError != null ||
+                              _passwordError != null ||
+                              _passwordConfirmationError != null) {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                backgroundColor: Colors.grey[900],
+                                title: const Text("Error",
+                                    style: TextStyle(color: Colors.white)),
+                                content: const Text(
+                                    "Please fix the errors in the form.",
+                                    style: TextStyle(color: Colors.white)),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text("OK",
+                                        style: TextStyle(color: Colors.red)),
+                                  ),
+                                ],
+                              ),
+                            );
+                            return;
+                          }
+
                           if (_nameController.text.isEmpty ||
                               _surnameController.text.isEmpty ||
                               _emailController.text.isEmpty ||
