@@ -22,7 +22,6 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
   SearchResult<Screening>? result;
   final TextEditingController _ftsEditingController = TextEditingController();
   DateTime? _selectedDate;
-  bool _noScreeningsAvailable = false;
   bool _isLoading = false;
   late TabController _tabController;
 
@@ -53,9 +52,6 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
     try {
       final provider = context.read<ScreeningProvider>();
       result = await provider.getScreenings(fts: fts, date: date);
-      setState(() {
-        _noScreeningsAvailable = result?.result.isEmpty ?? true;
-      });
     } catch (e) {
       // Handle error
     } finally {
@@ -125,9 +121,7 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
         Tab(text: 'Draft'),
       ],
       onTap: (index) {
-        setState(() {
-          // Trigger a rebuild to show the relevant screenings
-        });
+        setState(() {});
       },
     );
   }
@@ -205,10 +199,6 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
   }
 
   Widget _buildResultView() {
-    if (_noScreeningsAvailable) {
-      return _buildNoScreeningsView();
-    }
-
     final List<Screening> filteredScreenings =
         result?.result.where((screening) {
               switch (_tabController.index) {
@@ -223,6 +213,10 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
               }
             }).toList() ??
             [];
+
+    if (filteredScreenings.isEmpty) {
+      return _buildNoScreeningsView();
+    }
 
     return Expanded(
       child: LayoutBuilder(

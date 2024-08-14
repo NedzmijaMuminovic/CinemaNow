@@ -459,7 +459,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Profile updated. Please log in again.'),
+              content:
+                  Text('Profile updated successfully! Please log in again.'),
             ),
           );
 
@@ -475,7 +476,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         setState(() {});
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User profile updated successfully')),
+          const SnackBar(content: Text('Profile updated successfully!')),
         );
       } on Exception catch (e) {
         if (e.toString().contains('Unauthorized')) {

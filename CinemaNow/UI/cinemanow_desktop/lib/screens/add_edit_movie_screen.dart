@@ -317,6 +317,7 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
       selectedItems: _selectedActors,
       title: 'Select Actors',
       buttonText: 'Choose Actors',
+      labelText: 'Actors',
       onConfirm: (selected) {
         setState(() {
           _selectedActors = selected;
@@ -337,6 +338,7 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
       selectedItems: _selectedGenres,
       title: 'Select Genres',
       buttonText: 'Choose Genres',
+      labelText: 'Genres',
       onConfirm: (selected) {
         setState(() {
           _selectedGenres = selected;

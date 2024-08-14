@@ -6,6 +6,7 @@ class MultiSelectSection<T> extends StatelessWidget {
   final List<T> selectedItems;
   final String title;
   final String buttonText;
+  final String labelText;
   final ValueChanged<List<T>> onConfirm;
   final String Function(T) itemLabel;
   final ValueChanged<T> onItemTap;
@@ -16,6 +17,7 @@ class MultiSelectSection<T> extends StatelessWidget {
     required this.selectedItems,
     required this.title,
     required this.buttonText,
+    required this.labelText,
     required this.onConfirm,
     required this.itemLabel,
     required this.onItemTap,
@@ -26,15 +28,15 @@ class MultiSelectSection<T> extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(
+        SizedBox(
           width: 120,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text(
-                'Label', // Placeholder, to be overridden
-                style: TextStyle(fontSize: 18, color: Colors.white),
+                labelText,
+                style: const TextStyle(fontSize: 18, color: Colors.white),
               ),
             ],
           ),

@@ -260,6 +260,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(height: 20.0),
                       ElevatedButton(
                         onPressed: () async {
+                          if (_nameController.text.isEmpty ||
+                              _surnameController.text.isEmpty ||
+                              _emailController.text.isEmpty ||
+                              _usernameController.text.isEmpty ||
+                              _passwordController.text.isEmpty ||
+                              _passwordConfirmationController.text.isEmpty) {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                backgroundColor: Colors.grey[900],
+                                title: const Text("Error",
+                                    style: TextStyle(color: Colors.white)),
+                                content: const Text(
+                                    "Please fill in all fields.",
+                                    style: TextStyle(color: Colors.white)),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text("OK",
+                                        style: TextStyle(color: Colors.red)),
+                                  ),
+                                ],
+                              ),
+                            );
+                            return;
+                          }
+
                           _validateName(_nameController.text);
                           _validateSurname(_surnameController.text);
                           _validateEmail(_emailController.text);
@@ -295,33 +322,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return;
                           }
 
-                          if (_nameController.text.isEmpty ||
-                              _surnameController.text.isEmpty ||
-                              _emailController.text.isEmpty ||
-                              _usernameController.text.isEmpty ||
-                              _passwordController.text.isEmpty ||
-                              _passwordConfirmationController.text.isEmpty) {
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                backgroundColor: Colors.grey[900],
-                                title: const Text("Error",
-                                    style: TextStyle(color: Colors.white)),
-                                content: const Text(
-                                    "Please fill in all fields.",
-                                    style: TextStyle(color: Colors.white)),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text("OK",
-                                        style: TextStyle(color: Colors.red)),
-                                  ),
-                                ],
-                              ),
-                            );
-                            return;
-                          }
-
                           setState(() {
                             _isLoading = true;
                           });
@@ -344,13 +344,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           if (success) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                  content: Text('Registration successful')),
+                                  content: Text(
+                                      'Registration successful! Your account has been created.')),
                             );
                             Navigator.of(context).pop();
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                  content: Text('Registration failed')),
+                                  content: Text(
+                                      'Registration failed, please try again.')),
                             );
                           }
                         },
