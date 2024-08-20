@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cinemanow_desktop/providers/auth_provider.dart';
+import 'package:cinemanow_desktop/providers/role_provider.dart';
 import 'package:cinemanow_desktop/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cinemanow_desktop/providers/user_provider.dart';
@@ -424,80 +425,106 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Future<void> _updateUser(BuildContext context) async {
+    if (AuthProvider.userId == null) return;
+
+    try {
+      if (!_validatePasswords(context)) return;
+
+      final roleIds = await _getRoleIds(context);
+      if (roleIds == null) return;
+
+      await _updateUserProfile(roleIds);
+
+      _handlePostUpdate(context);
+    } on Exception catch (e) {
+      _handleUpdateError(context, e);
+    }
+  }
+
+  bool _validatePasswords(BuildContext context) {
+    if (_passwordController.text.isNotEmpty &&
+        _passwordController.text != _passwordConfirmationController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match.')),
+      );
+      return false;
+    }
+    return true;
+  }
+
+  Future<List<int>?> _getRoleIds(BuildContext context) async {
+    final roleProvider = RoleProvider();
+    final role = await roleProvider.fetchRoleByName("Admin");
+    if (role.id == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Role not found.')),
+      );
+      return null;
+    }
+    return [role.id!];
+  }
+
+  Future<void> _updateUserProfile(List<int> roleIds) async {
     final userProvider = UserProvider();
-    if (AuthProvider.userId != null) {
-      try {
-        if (_passwordController.text.isNotEmpty) {
-          if (_passwordController.text !=
-              _passwordConfirmationController.text) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Passwords do not match.'),
-              ),
-            );
-            return;
-          }
-        }
 
-        await userProvider.updateUser(
-          AuthProvider.userId!,
-          _nameController.text,
-          _surnameController.text,
-          _emailController.text,
-          _usernameController.text,
-          _passwordController.text.isNotEmpty ? _passwordController.text : null,
-          _passwordConfirmationController.text.isNotEmpty
-              ? _passwordConfirmationController.text
-              : null,
-          _imageBase64,
-          [2],
+    await userProvider.updateUser(
+      AuthProvider.userId!,
+      _nameController.text,
+      _surnameController.text,
+      _emailController.text,
+      _usernameController.text,
+      _passwordController.text.isNotEmpty ? _passwordController.text : null,
+      _passwordConfirmationController.text.isNotEmpty
+          ? _passwordConfirmationController.text
+          : null,
+      _imageBase64,
+      roleIds,
+    );
+  }
+
+  void _handlePostUpdate(BuildContext context) {
+    if (_usernameController.text != AuthProvider.username ||
+        _passwordController.text.isNotEmpty) {
+      AuthProvider.username = _usernameController.text;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+                Text('Profile updated successfully! Please log in again.')),
+      );
+
+      Future.delayed(const Duration(milliseconds: 300), () {
+        AuthProvider.userId = null;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const LoginPage()),
         );
+      });
+    } else {
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile updated successfully!')),
+      );
+    }
+  }
 
-        if (_usernameController.text != AuthProvider.username ||
-            _passwordController.text.isNotEmpty) {
-          AuthProvider.username = _usernameController.text;
+  void _handleUpdateError(BuildContext context, Exception e) {
+    if (e.toString().contains('Unauthorized')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unauthorized access. Please log in again.'),
+        ),
+      );
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content:
-                  Text('Profile updated successfully! Please log in again.'),
-            ),
-          );
-
-          Future.delayed(const Duration(milliseconds: 300), () {
-            AuthProvider.userId = null;
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const LoginPage()),
-            );
-          });
-          return;
-        }
-
-        setState(() {});
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully!')),
+      Future.delayed(const Duration(milliseconds: 300), () {
+        AuthProvider.userId = null;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const LoginPage()),
         );
-      } on Exception catch (e) {
-        if (e.toString().contains('Unauthorized')) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Unauthorized access. Please log in again.'),
-            ),
-          );
-
-          Future.delayed(const Duration(milliseconds: 300), () {
-            AuthProvider.userId = null;
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const LoginPage()),
-            );
-          });
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${e.toString()}')),
-          );
-        }
-      }
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
     }
   }
 }
