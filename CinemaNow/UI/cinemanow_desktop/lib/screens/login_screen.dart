@@ -1,4 +1,5 @@
 import 'package:cinemanow_desktop/layouts/master_screen.dart';
+import 'package:cinemanow_desktop/models/user.dart';
 import 'package:cinemanow_desktop/providers/user_provider.dart';
 import 'package:cinemanow_desktop/screens/register_screen.dart';
 import 'package:cinemanow_desktop/providers/auth_provider.dart';
@@ -23,21 +24,7 @@ class _LoginPageState extends State<LoginPage> {
     String password = _passwordController.text.trim();
 
     if (username.isEmpty || password.isEmpty) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: Colors.grey[900],
-          title: const Text("Error", style: TextStyle(color: Colors.white)),
-          content: const Text("Username and password cannot be empty.",
-              style: TextStyle(color: Colors.white)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("OK", style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        ),
-      );
+      _showErrorDialog("Username and password cannot be empty.");
       return;
     }
 
@@ -45,42 +32,58 @@ class _LoginPageState extends State<LoginPage> {
       _isLoading = true;
     });
 
-    AuthProvider.username = _usernameController.text;
-    AuthProvider.password = _passwordController.text;
+    AuthProvider.username = username;
+    AuthProvider.password = password;
 
     try {
-      final userProvider = UserProvider();
-      final user = await userProvider.getUsers(filter: {'username': username});
-      if (user.result.isNotEmpty) {
-        AuthProvider.setUser(user.result.first);
+      final user = await _fetchUser(username);
+      if (user != null) {
+        AuthProvider.setUser(user);
+        if (_isAdmin(user)) {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const MasterScreen(ScreeningListScreen())));
+        } else {
+          _showErrorDialog("You do not have permission to access this area.");
+        }
       }
-
-      Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const MasterScreen(ScreeningListScreen())));
     } on Exception catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: Colors.grey[900],
-          title: const Text("Error", style: TextStyle(color: Colors.white)),
-          content: Text(
-              e.toString().contains("Unauthorized")
-                  ? "Wrong username or password."
-                  : e.toString(),
-              style: const TextStyle(color: Colors.white)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("OK", style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        ),
-      );
+      _showErrorDialog(e.toString().contains("Unauthorized")
+          ? "Wrong username or password."
+          : e.toString());
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
+  }
+
+  Future<User?> _fetchUser(String username) async {
+    final userProvider = UserProvider();
+    final userResponse =
+        await userProvider.getUsers(filter: {'username': username});
+    return userResponse.result.isNotEmpty ? userResponse.result.first : null;
+  }
+
+  bool _isAdmin(User user) {
+    final roles = user.roles;
+    return roles != null && roles.any((role) => role.name == 'Admin');
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: const Text("Error", style: TextStyle(color: Colors.white)),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

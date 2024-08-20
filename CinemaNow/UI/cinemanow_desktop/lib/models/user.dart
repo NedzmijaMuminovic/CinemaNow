@@ -1,3 +1,4 @@
+import 'package:cinemanow_desktop/models/role.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user.g.dart';
@@ -10,6 +11,7 @@ class User {
   String? email;
   String? username;
   String? imageBase64;
+  List<Role>? roles;
 
   User({
     this.id,
@@ -17,6 +19,8 @@ class User {
     this.surname,
     this.email,
     this.username,
+    this.imageBase64,
+    this.roles,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
