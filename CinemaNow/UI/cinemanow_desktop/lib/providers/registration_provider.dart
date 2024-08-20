@@ -1,7 +1,21 @@
+import 'package:cinemanow_desktop/models/role.dart';
+import 'package:cinemanow_desktop/providers/role_provider.dart';
+
 import 'base_provider.dart';
 
 class RegistrationProvider extends BaseProvider {
+  final RoleProvider _roleProvider = RoleProvider();
+
   RegistrationProvider() : super("User");
+
+  Future<int?> getAdminRoleId() async {
+    try {
+      Role adminRole = await _roleProvider.fetchRoleByName("Admin");
+      return adminRole.id;
+    } catch (e) {
+      return null;
+    }
+  }
 
   Future<bool> registerUser({
     required String name,
@@ -11,15 +25,22 @@ class RegistrationProvider extends BaseProvider {
     required String password,
     required String passwordConfirmation,
   }) async {
-    final response = await insert({
+    final adminRoleId = await getAdminRoleId();
+    if (adminRoleId == null) {
+      return false;
+    }
+
+    final userPayload = {
       'name': name,
       'surname': surname,
       'email': email,
       'username': username,
       'password': password,
       'passwordConfirmation': passwordConfirmation,
-      'roleIds': [2],
-    });
+      'roleIds': [adminRoleId],
+    };
+
+    final response = await insert(userPayload);
 
     return response != null;
   }

@@ -21,6 +21,7 @@ namespace CinemaNow.API.Controllers
             return base.Insert(request);
         }
 
+        [AllowAnonymous]
         public override PagedResult<Role> GetList([FromQuery] RoleSearchObject searchObject)
         {
             return base.GetList(searchObject);
