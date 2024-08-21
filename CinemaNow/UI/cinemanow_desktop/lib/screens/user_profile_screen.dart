@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cinemanow_desktop/providers/auth_provider.dart';
 import 'package:cinemanow_desktop/providers/role_provider.dart';
 import 'package:cinemanow_desktop/screens/login_screen.dart';
+import 'package:cinemanow_desktop/utilities/validator.dart';
 import 'package:flutter/material.dart';
 import 'package:cinemanow_desktop/providers/user_provider.dart';
 import 'package:cinemanow_desktop/models/user.dart';
@@ -31,6 +32,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final ValueNotifier<bool> _isImageSelected = ValueNotifier<bool>(false);
   File? _selectedImage;
   String? _imageBase64;
+  String? originalName;
+  String? originalSurname;
+  String? originalEmail;
+  String? originalUsername;
+  String _originalPassword = '';
 
   Future<User?> _getUserData(BuildContext context) async {
     if (AuthProvider.userId != null) {
@@ -102,6 +108,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _usernameController = TextEditingController();
     _passwordController = TextEditingController();
     _passwordConfirmationController = TextEditingController();
+    _originalPassword = '';
   }
 
   @override
@@ -138,6 +145,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           }
 
           final user = snapshot.data!;
+
+          originalName = user.name!;
+          originalSurname = user.surname!;
+          originalEmail = user.email!;
+          originalUsername = user.username!;
+
           _nameController.text = user.name!;
           _surnameController.text = user.surname!;
           _emailController.text = user.email!;
@@ -433,9 +446,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       final roleIds = await _getRoleIds(context);
       if (roleIds == null) return;
 
-      await _updateUserProfile(roleIds);
+      final wasSuccessful = await _updateUserProfile(roleIds);
 
-      _handlePostUpdate(context);
+      _handlePostUpdate(context, wasSuccessful);
     } on Exception catch (e) {
       _handleUpdateError(context, e);
     }
@@ -444,6 +457,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   bool _validatePasswords(BuildContext context) {
     if (_passwordController.text.isNotEmpty &&
         _passwordController.text != _passwordConfirmationController.text) {
+      setState(() {
+        _passwordController.text = _originalPassword;
+        _passwordConfirmationController.text = _originalPassword;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Passwords do not match.')),
       );
@@ -464,7 +481,59 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     return [role.id!];
   }
 
-  Future<void> _updateUserProfile(List<int> roleIds) async {
+  List<String> _validateProfileFields() {
+    final errors = <String>[];
+
+    final nameError = Validator.validateName(_nameController.text);
+    if (nameError != null) errors.add(nameError);
+
+    final surnameError = Validator.validateSurname(_surnameController.text);
+    if (surnameError != null) errors.add(surnameError);
+
+    final emailError = Validator.validateEmail(_emailController.text);
+    if (emailError != null) errors.add(emailError);
+
+    final usernameError = Validator.validateUsername(_usernameController.text);
+    if (usernameError != null) errors.add(usernameError);
+
+    if (_passwordController.text.isNotEmpty) {
+      final passwordError =
+          Validator.validatePassword(_passwordController.text);
+      if (passwordError != null) {
+        setState(() {
+          _passwordController.text = _originalPassword;
+          _passwordConfirmationController.text = _originalPassword;
+        });
+        errors.add(passwordError);
+      }
+
+      final passwordConfirmationError = Validator.validatePasswordConfirmation(
+        _passwordController.text,
+        _passwordConfirmationController.text,
+      );
+      if (passwordConfirmationError != null) {
+        errors.add(passwordConfirmationError);
+      }
+    }
+
+    return errors;
+  }
+
+  Future<bool> _updateUserProfile(List<int> roleIds) async {
+    final validationErrors = _validateProfileFields();
+    if (validationErrors.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(validationErrors.join('\n'))),
+      );
+      setState(() {
+        _nameController.text = originalName!;
+        _surnameController.text = originalSurname!;
+        _emailController.text = originalEmail!;
+        _usernameController.text = originalUsername!;
+      });
+      return false;
+    }
+
     final userProvider = UserProvider();
 
     await userProvider.updateUser(
@@ -480,9 +549,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       _imageBase64,
       roleIds,
     );
+
+    return true;
   }
 
-  void _handlePostUpdate(BuildContext context) {
+  void _handlePostUpdate(BuildContext context, bool wasSuccessful) {
+    if (!wasSuccessful) return;
+
     if (_usernameController.text != AuthProvider.username ||
         _passwordController.text.isNotEmpty) {
       AuthProvider.username = _usernameController.text;
