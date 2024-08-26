@@ -37,6 +37,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   String? originalEmail;
   String? originalUsername;
   String _originalPassword = '';
+  final ValueNotifier<String?> _originalImageBase64 =
+      ValueNotifier<String?>(null);
 
   Future<User?> _getUserData(BuildContext context) async {
     if (AuthProvider.userId != null) {
@@ -47,6 +49,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Future<void> _pickImage() async {
+    _originalImageBase64.value = _imageBase64;
+
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -170,15 +174,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     children: [
                       CircleAvatar(
                         radius: 100,
-                        backgroundImage:
-                            _selectedImage != null
-                                ? FileImage(_selectedImage!)
-                                : (user.imageBase64 != null
-                                        ? MemoryImage(
-                                            base64Decode(user.imageBase64!))
-                                        : const AssetImage(
-                                            'assets/images/default.jpg'))
-                                    as ImageProvider,
+                        backgroundImage: _selectedImage != null
+                            ? FileImage(_selectedImage!)
+                            : (user.imageBase64 != null
+                                ? MemoryImage(base64Decode(user.imageBase64!))
+                                : const AssetImage(
+                                    'assets/images/user.png')) as ImageProvider,
                         backgroundColor: Colors.white,
                       ),
                       Positioned(
@@ -187,19 +188,50 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         child: ValueListenableBuilder<bool>(
                           valueListenable: _isImageSelected,
                           builder: (context, isImageSelected, child) {
-                            return GestureDetector(
-                              onTap: isImageSelected ? _saveImage : _pickImage,
-                              child: MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: CircleAvatar(
-                                  radius: 30,
-                                  backgroundColor: Colors.red,
-                                  child: Icon(
-                                    isImageSelected ? Icons.save : Icons.edit,
-                                    color: Colors.white,
+                            return Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (isImageSelected)
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedImage = null;
+                                        _imageBase64 =
+                                            _originalImageBase64.value;
+                                        _isImageSelected.value = false;
+                                      });
+                                    },
+                                    child: MouseRegion(
+                                      cursor: SystemMouseCursors.click,
+                                      child: CircleAvatar(
+                                        radius: 30,
+                                        backgroundColor: Colors.grey[700],
+                                        child: const Icon(
+                                          Icons.cancel,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                const SizedBox(width: 80),
+                                GestureDetector(
+                                  onTap:
+                                      isImageSelected ? _saveImage : _pickImage,
+                                  child: MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: CircleAvatar(
+                                      radius: 30,
+                                      backgroundColor: Colors.red,
+                                      child: Icon(
+                                        isImageSelected
+                                            ? Icons.save
+                                            : Icons.edit,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
+                              ],
                             );
                           },
                         ),
@@ -407,6 +439,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                       BorderSide(color: Colors.red, width: 2.0),
                                 ),
                               ),
+                              cursorColor: Colors.red,
                             ))
                       : (icon == Icons.lock
                           ? const Text(
@@ -424,6 +457,34 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               ),
                             )),
                 ),
+                if (isEditing)
+                  IconButton(
+                    icon: const Icon(Icons.cancel, color: Colors.white),
+                    onPressed: () {
+                      isEditingNotifier.value = false;
+                      // Reset fields to original values
+                      switch (icon) {
+                        case Icons.person:
+                          if (controller == _nameController) {
+                            _nameController.text = originalName!;
+                          } else if (controller == _surnameController) {
+                            _surnameController.text = originalSurname!;
+                          }
+                          break;
+                        case Icons.email:
+                          _emailController.text = originalEmail!;
+                          break;
+                        case Icons.account_circle:
+                          _usernameController.text = originalUsername!;
+                          break;
+                        case Icons.lock:
+                          _passwordController.text = _originalPassword;
+                          _passwordConfirmationController.text =
+                              _originalPassword;
+                          break;
+                      }
+                    },
+                  ),
                 IconButton(
                   icon: Icon(isEditing ? Icons.save : Icons.edit,
                       color: Colors.white),

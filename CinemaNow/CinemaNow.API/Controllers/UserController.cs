@@ -27,5 +27,12 @@ namespace CinemaNow.API.Controllers
         {
             return base.Insert(request);
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public override PagedResult<User> GetList([FromQuery] UserSearchObject searchObject)
+        {
+            return base.GetList(searchObject);
+        }
     }
 }

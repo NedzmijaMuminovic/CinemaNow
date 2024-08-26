@@ -150,6 +150,7 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
                       hintStyle: TextStyle(color: Colors.grey[500]),
                       border: InputBorder.none,
                     ),
+                    cursorColor: Colors.red,
                   ),
                 ),
               ],

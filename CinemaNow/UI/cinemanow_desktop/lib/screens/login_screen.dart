@@ -121,6 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                         prefixIcon:
                             const Icon(Icons.person, color: Colors.white70),
                       ),
+                      cursorColor: Colors.red,
                     ),
                     const SizedBox(height: 20.0),
                     TextField(
@@ -139,6 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                         prefixIcon:
                             const Icon(Icons.lock, color: Colors.white70),
                       ),
+                      cursorColor: Colors.red,
                     ),
                     const SizedBox(height: 20.0),
                     ElevatedButton(

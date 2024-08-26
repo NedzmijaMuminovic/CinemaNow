@@ -122,6 +122,7 @@ class _ActorListScreenState extends State<ActorListScreen> {
                       hintStyle: TextStyle(color: Colors.grey[500]),
                       border: InputBorder.none,
                     ),
+                    cursorColor: Colors.red,
                   ),
                 ),
               ],

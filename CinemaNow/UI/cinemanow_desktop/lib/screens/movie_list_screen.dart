@@ -122,6 +122,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
                       hintStyle: TextStyle(color: Colors.grey[500]),
                       border: InputBorder.none,
                     ),
+                    cursorColor: Colors.red,
                   ),
                 ),
               ],

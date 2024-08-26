@@ -107,6 +107,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               prefixIcon: const Icon(Icons.person,
                                   color: Colors.white70),
                             ),
+                            cursorColor: Colors.red,
                             onChanged: _validateName,
                           ),
                           if (_nameError != null)
@@ -134,6 +135,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               prefixIcon: const Icon(Icons.person,
                                   color: Colors.white70),
                             ),
+                            cursorColor: Colors.red,
                             onChanged: _validateSurname,
                           ),
                           if (_surnameError != null)
@@ -161,6 +163,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               prefixIcon: const Icon(Icons.email,
                                   color: Colors.white70),
                             ),
+                            cursorColor: Colors.red,
                             onChanged: _validateEmail,
                           ),
                           if (_emailError != null)
@@ -188,6 +191,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               prefixIcon: const Icon(Icons.account_circle,
                                   color: Colors.white70),
                             ),
+                            cursorColor: Colors.red,
                             onChanged: _validateUsername,
                           ),
                           if (_usernameError != null)
@@ -216,6 +220,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               prefixIcon:
                                   const Icon(Icons.lock, color: Colors.white70),
                             ),
+                            cursorColor: Colors.red,
                             onChanged: _validatePassword,
                           ),
                           if (_passwordError != null)
@@ -244,6 +249,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               prefixIcon:
                                   const Icon(Icons.lock, color: Colors.white70),
                             ),
+                            cursorColor: Colors.red,
                             onChanged: _validatePasswordConfirmation,
                           ),
                           if (_passwordConfirmationError != null)
@@ -341,13 +347,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             _isLoading = false;
                           });
 
+                          final userExists = await _registrationProvider
+                              .isUsernameTaken(_usernameController.text);
+
                           if (success) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content: Text(
-                                      'Registration successful! Your account has been created.')),
+                                      'Registration successful! Your account has been created. Please log in with your username and password.')),
                             );
                             Navigator.of(context).pop();
+                          } else if (userExists) {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                backgroundColor: Colors.grey[900],
+                                title: const Text("Error",
+                                    style: TextStyle(color: Colors.white)),
+                                content: const Text(
+                                    "Username already exists. Please choose a different one.",
+                                    style: TextStyle(color: Colors.white)),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text("OK",
+                                        style: TextStyle(color: Colors.red)),
+                                  ),
+                                ],
+                              ),
+                            );
+                            return;
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

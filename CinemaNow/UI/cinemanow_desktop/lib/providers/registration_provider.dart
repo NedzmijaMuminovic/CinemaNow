@@ -1,5 +1,6 @@
 import 'package:cinemanow_desktop/models/role.dart';
 import 'package:cinemanow_desktop/providers/role_provider.dart';
+import 'package:cinemanow_desktop/providers/user_provider.dart';
 
 import 'base_provider.dart';
 
@@ -17,6 +18,12 @@ class RegistrationProvider extends BaseProvider {
     }
   }
 
+  Future<bool> isUsernameTaken(String username) async {
+    final userProvider = UserProvider();
+    final users = await userProvider.getUsers();
+    return users.result.any((user) => user.username == username);
+  }
+
   Future<bool> registerUser({
     required String name,
     required String surname,
@@ -25,6 +32,10 @@ class RegistrationProvider extends BaseProvider {
     required String password,
     required String passwordConfirmation,
   }) async {
+    if (await isUsernameTaken(username)) {
+      return false;
+    }
+
     final adminRoleId = await getAdminRoleId();
     if (adminRoleId == null) {
       return false;

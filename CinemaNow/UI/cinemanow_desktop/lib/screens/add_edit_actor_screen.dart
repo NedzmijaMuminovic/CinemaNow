@@ -1,4 +1,5 @@
 import 'package:cinemanow_desktop/providers/actor_provider.dart';
+import 'package:cinemanow_desktop/utilities/validator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -71,10 +72,22 @@ class _AddEditActorScreenState extends State<AddEditActorScreen> {
   }
 
   Future<void> _submitActor() async {
+    final nameError = Validator.validateName(_nameController.text);
+    final surnameError = Validator.validateSurname(_surnameController.text);
+
     if (_nameController.text.isEmpty || _surnameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill in all fields.'),
+        ),
+      );
+      return;
+    }
+
+    if (nameError != null || surnameError != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(nameError ?? surnameError!),
         ),
       );
       return;

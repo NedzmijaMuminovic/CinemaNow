@@ -41,6 +41,7 @@ Widget buildInputField(
                     ),
                     prefixIcon: Icon(icon, color: Colors.white),
                   ),
+                  cursorColor: Colors.red,
                   style: const TextStyle(color: Colors.white),
                 ),
               ),
