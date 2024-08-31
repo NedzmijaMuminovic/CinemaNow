@@ -92,23 +92,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TextFormField(
-                            controller: _nameController,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: const Color(0xFF2C2C2E),
-                              hintText: 'Name',
-                              hintStyle: const TextStyle(color: Colors.white70),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide.none,
-                              ),
-                              prefixIcon: const Icon(Icons.person,
-                                  color: Colors.white70),
+                          TextSelectionTheme(
+                            data: const TextSelectionThemeData(
+                              selectionColor: Colors.red,
                             ),
-                            cursorColor: Colors.red,
-                            onChanged: _validateName,
+                            child: TextFormField(
+                              controller: _nameController,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: const Color(0xFF2C2C2E),
+                                hintText: 'Name',
+                                hintStyle:
+                                    const TextStyle(color: Colors.white70),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                                prefixIcon: const Icon(Icons.person,
+                                    color: Colors.white70),
+                              ),
+                              cursorColor: Colors.red,
+                              onChanged: _validateName,
+                            ),
                           ),
                           if (_nameError != null)
                             Padding(
@@ -120,23 +126,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                             ),
                           const SizedBox(height: 20.0),
-                          TextFormField(
-                            controller: _surnameController,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: const Color(0xFF2C2C2E),
-                              hintText: 'Surname',
-                              hintStyle: const TextStyle(color: Colors.white70),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide.none,
-                              ),
-                              prefixIcon: const Icon(Icons.person,
-                                  color: Colors.white70),
+                          TextSelectionTheme(
+                            data: const TextSelectionThemeData(
+                              selectionColor: Colors.red,
                             ),
-                            cursorColor: Colors.red,
-                            onChanged: _validateSurname,
+                            child: TextFormField(
+                              controller: _surnameController,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: const Color(0xFF2C2C2E),
+                                hintText: 'Surname',
+                                hintStyle:
+                                    const TextStyle(color: Colors.white70),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                                prefixIcon: const Icon(Icons.person,
+                                    color: Colors.white70),
+                              ),
+                              cursorColor: Colors.red,
+                              onChanged: _validateSurname,
+                            ),
                           ),
                           if (_surnameError != null)
                             Padding(
@@ -148,23 +160,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                             ),
                           const SizedBox(height: 20.0),
-                          TextFormField(
-                            controller: _emailController,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: const Color(0xFF2C2C2E),
-                              hintText: 'Email',
-                              hintStyle: const TextStyle(color: Colors.white70),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide.none,
-                              ),
-                              prefixIcon: const Icon(Icons.email,
-                                  color: Colors.white70),
+                          TextSelectionTheme(
+                            data: const TextSelectionThemeData(
+                              selectionColor: Colors.red,
                             ),
-                            cursorColor: Colors.red,
-                            onChanged: _validateEmail,
+                            child: TextFormField(
+                              controller: _emailController,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: const Color(0xFF2C2C2E),
+                                hintText: 'Email',
+                                hintStyle:
+                                    const TextStyle(color: Colors.white70),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                                prefixIcon: const Icon(Icons.email,
+                                    color: Colors.white70),
+                              ),
+                              cursorColor: Colors.red,
+                              onChanged: _validateEmail,
+                            ),
                           ),
                           if (_emailError != null)
                             Padding(
@@ -176,23 +194,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                             ),
                           const SizedBox(height: 20.0),
-                          TextField(
-                            controller: _usernameController,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: const Color(0xFF2C2C2E),
-                              hintText: 'Username',
-                              hintStyle: const TextStyle(color: Colors.white70),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide.none,
-                              ),
-                              prefixIcon: const Icon(Icons.account_circle,
-                                  color: Colors.white70),
+                          TextSelectionTheme(
+                            data: const TextSelectionThemeData(
+                              selectionColor: Colors.red,
                             ),
-                            cursorColor: Colors.red,
-                            onChanged: _validateUsername,
+                            child: TextField(
+                              controller: _usernameController,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: const Color(0xFF2C2C2E),
+                                hintText: 'Username',
+                                hintStyle:
+                                    const TextStyle(color: Colors.white70),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                                prefixIcon: const Icon(Icons.account_circle,
+                                    color: Colors.white70),
+                              ),
+                              cursorColor: Colors.red,
+                              onChanged: _validateUsername,
+                            ),
                           ),
                           if (_usernameError != null)
                             Padding(
@@ -204,24 +228,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                             ),
                           const SizedBox(height: 20.0),
-                          TextField(
-                            controller: _passwordController,
-                            style: const TextStyle(color: Colors.white),
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: const Color(0xFF2C2C2E),
-                              hintText: 'Password',
-                              hintStyle: const TextStyle(color: Colors.white70),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide.none,
-                              ),
-                              prefixIcon:
-                                  const Icon(Icons.lock, color: Colors.white70),
+                          TextSelectionTheme(
+                            data: const TextSelectionThemeData(
+                              selectionColor: Colors.red,
                             ),
-                            cursorColor: Colors.red,
-                            onChanged: _validatePassword,
+                            child: TextField(
+                              controller: _passwordController,
+                              style: const TextStyle(color: Colors.white),
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: const Color(0xFF2C2C2E),
+                                hintText: 'Password',
+                                hintStyle:
+                                    const TextStyle(color: Colors.white70),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                                prefixIcon: const Icon(Icons.lock,
+                                    color: Colors.white70),
+                              ),
+                              cursorColor: Colors.red,
+                              onChanged: _validatePassword,
+                            ),
                           ),
                           if (_passwordError != null)
                             Padding(
@@ -233,24 +263,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                             ),
                           const SizedBox(height: 20.0),
-                          TextFormField(
-                            controller: _passwordConfirmationController,
-                            style: const TextStyle(color: Colors.white),
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: const Color(0xFF2C2C2E),
-                              hintText: 'Confirm Password',
-                              hintStyle: const TextStyle(color: Colors.white70),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide.none,
-                              ),
-                              prefixIcon:
-                                  const Icon(Icons.lock, color: Colors.white70),
+                          TextSelectionTheme(
+                            data: const TextSelectionThemeData(
+                              selectionColor: Colors.red,
                             ),
-                            cursorColor: Colors.red,
-                            onChanged: _validatePasswordConfirmation,
+                            child: TextFormField(
+                              controller: _passwordConfirmationController,
+                              style: const TextStyle(color: Colors.white),
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: const Color(0xFF2C2C2E),
+                                hintText: 'Confirm Password',
+                                hintStyle:
+                                    const TextStyle(color: Colors.white70),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                                prefixIcon: const Icon(Icons.lock,
+                                    color: Colors.white70),
+                              ),
+                              cursorColor: Colors.red,
+                              onChanged: _validatePasswordConfirmation,
+                            ),
                           ),
                           if (_passwordConfirmationError != null)
                             Padding(

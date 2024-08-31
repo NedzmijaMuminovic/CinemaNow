@@ -27,22 +27,27 @@ Widget buildInputField(
               onTap: onTap,
               child: AbsorbPointer(
                 absorbing: readOnly,
-                child: TextFormField(
-                  controller: controller,
-                  readOnly: readOnly,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.grey[800],
-                    hintText: placeholder,
-                    hintStyle: const TextStyle(color: Colors.white70),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    prefixIcon: Icon(icon, color: Colors.white),
+                child: TextSelectionTheme(
+                  data: const TextSelectionThemeData(
+                    selectionColor: Colors.red,
                   ),
-                  cursorColor: Colors.red,
-                  style: const TextStyle(color: Colors.white),
+                  child: TextFormField(
+                    controller: controller,
+                    readOnly: readOnly,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[800],
+                      hintText: placeholder,
+                      hintStyle: const TextStyle(color: Colors.white70),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      prefixIcon: Icon(icon, color: Colors.white),
+                    ),
+                    cursorColor: Colors.red,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ),

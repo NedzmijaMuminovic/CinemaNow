@@ -114,15 +114,20 @@ class _MovieListScreenState extends State<MovieListScreen> {
                 Icon(Icons.search, color: Colors.grey[500]),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: TextField(
-                    controller: _ftsEditingController,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: 'Search',
-                      hintStyle: TextStyle(color: Colors.grey[500]),
-                      border: InputBorder.none,
+                  child: TextSelectionTheme(
+                    data: const TextSelectionThemeData(
+                      selectionColor: Colors.red,
                     ),
-                    cursorColor: Colors.red,
+                    child: TextField(
+                      controller: _ftsEditingController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Search',
+                        hintStyle: TextStyle(color: Colors.grey[500]),
+                        border: InputBorder.none,
+                      ),
+                      cursorColor: Colors.red,
+                    ),
                   ),
                 ),
               ],

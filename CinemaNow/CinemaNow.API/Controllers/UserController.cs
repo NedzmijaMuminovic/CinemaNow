@@ -16,9 +16,14 @@ namespace CinemaNow.API.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public Models.User Login(string username, string password)
+        public ActionResult<Models.User> Login([FromBody] LoginRequest loginRequest)
         {
-            return (_service as IUserService).Login(username, password);
+            var user = (_service as IUserService).Login(loginRequest.Username, loginRequest.Password);
+            if (user == null)
+            {
+                return Unauthorized("Wrong username or password.");
+            }
+            return Ok(user);
         }
 
         [HttpPost]

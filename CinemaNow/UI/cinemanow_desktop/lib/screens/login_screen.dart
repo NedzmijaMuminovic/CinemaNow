@@ -1,6 +1,5 @@
 import 'package:cinemanow_desktop/layouts/master_screen.dart';
 import 'package:cinemanow_desktop/models/user.dart';
-import 'package:cinemanow_desktop/providers/user_provider.dart';
 import 'package:cinemanow_desktop/screens/register_screen.dart';
 import 'package:cinemanow_desktop/providers/auth_provider.dart';
 import 'package:cinemanow_desktop/screens/screening_list_screen.dart';
@@ -32,14 +31,19 @@ class _LoginPageState extends State<LoginPage> {
       _isLoading = true;
     });
 
-    AuthProvider.username = username;
-    AuthProvider.password = password;
-
     try {
-      final user = await _fetchUser(username);
-      if (user != null) {
-        AuthProvider.setUser(user);
-        if (_isAdmin(user)) {
+      final authProvider = AuthProvider();
+
+      final response = await authProvider.login(username, password);
+
+      if (response == null) {
+        _showErrorDialog("Wrong username or password.");
+      } else {
+        AuthProvider.username = username;
+        AuthProvider.password = password;
+        AuthProvider.setUser(response);
+
+        if (_isAdmin(response)) {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => const MasterScreen(ScreeningListScreen())));
         } else {
@@ -55,13 +59,6 @@ class _LoginPageState extends State<LoginPage> {
         _isLoading = false;
       });
     }
-  }
-
-  Future<User?> _fetchUser(String username) async {
-    final userProvider = UserProvider();
-    final userResponse =
-        await userProvider.getUsers(filter: {'username': username});
-    return userResponse.result.isNotEmpty ? userResponse.result.first : null;
   }
 
   bool _isAdmin(User user) {
@@ -106,41 +103,51 @@ class _LoginPageState extends State<LoginPage> {
                       height: 200,
                       width: 200,
                     ),
-                    TextField(
-                      controller: _usernameController,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color(0xFF2C2C2E),
-                        hintText: 'Username',
-                        hintStyle: const TextStyle(color: Colors.white70),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                          borderSide: BorderSide.none,
-                        ),
-                        prefixIcon:
-                            const Icon(Icons.person, color: Colors.white70),
+                    TextSelectionTheme(
+                      data: const TextSelectionThemeData(
+                        selectionColor: Colors.red,
                       ),
-                      cursorColor: Colors.red,
+                      child: TextField(
+                        controller: _usernameController,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFF2C2C2E),
+                          hintText: 'Username',
+                          hintStyle: const TextStyle(color: Colors.white70),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          prefixIcon:
+                              const Icon(Icons.person, color: Colors.white70),
+                        ),
+                        cursorColor: Colors.red,
+                      ),
                     ),
                     const SizedBox(height: 20.0),
-                    TextField(
-                      controller: _passwordController,
-                      style: const TextStyle(color: Colors.white),
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color(0xFF2C2C2E),
-                        hintText: 'Password',
-                        hintStyle: const TextStyle(color: Colors.white70),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                          borderSide: BorderSide.none,
-                        ),
-                        prefixIcon:
-                            const Icon(Icons.lock, color: Colors.white70),
+                    TextSelectionTheme(
+                      data: const TextSelectionThemeData(
+                        selectionColor: Colors.red,
                       ),
-                      cursorColor: Colors.red,
+                      child: TextField(
+                        controller: _passwordController,
+                        style: const TextStyle(color: Colors.white),
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFF2C2C2E),
+                          hintText: 'Password',
+                          hintStyle: const TextStyle(color: Colors.white70),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          prefixIcon:
+                              const Icon(Icons.lock, color: Colors.white70),
+                        ),
+                        cursorColor: Colors.red,
+                      ),
                     ),
                     const SizedBox(height: 20.0),
                     ElevatedButton(

@@ -385,61 +385,76 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ? (icon == Icons.lock
                           ? Column(
                               children: [
-                                TextField(
-                                  controller: controller,
-                                  obscureText: true,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
+                                TextSelectionTheme(
+                                  data: const TextSelectionThemeData(
+                                    selectionColor: Colors.red,
                                   ),
-                                  decoration: InputDecoration(
-                                    border: const UnderlineInputBorder(),
-                                    focusedBorder: const UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.red, width: 2.0),
+                                  child: TextField(
+                                    controller: controller,
+                                    obscureText: true,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
                                     ),
-                                    hintText: 'Enter new password',
-                                    hintStyle:
-                                        TextStyle(color: Colors.grey[600]),
+                                    decoration: InputDecoration(
+                                      border: const UnderlineInputBorder(),
+                                      focusedBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.red, width: 2.0),
+                                      ),
+                                      hintText: 'Enter new password',
+                                      hintStyle:
+                                          TextStyle(color: Colors.grey[600]),
+                                    ),
+                                    cursorColor: Colors.red,
                                   ),
-                                  cursorColor: Colors.red,
                                 ),
                                 const SizedBox(height: 10),
-                                TextField(
-                                  controller: confirmationController,
-                                  obscureText: true,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
+                                TextSelectionTheme(
+                                  data: const TextSelectionThemeData(
+                                    selectionColor: Colors.red,
                                   ),
-                                  decoration: InputDecoration(
-                                    border: const UnderlineInputBorder(),
-                                    focusedBorder: const UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.red, width: 2.0),
+                                  child: TextField(
+                                    controller: confirmationController,
+                                    obscureText: true,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
                                     ),
-                                    hintText: 'Confirm new password',
-                                    hintStyle:
-                                        TextStyle(color: Colors.grey[600]),
+                                    decoration: InputDecoration(
+                                      border: const UnderlineInputBorder(),
+                                      focusedBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.red, width: 2.0),
+                                      ),
+                                      hintText: 'Confirm new password',
+                                      hintStyle:
+                                          TextStyle(color: Colors.grey[600]),
+                                    ),
+                                    cursorColor: Colors.red,
                                   ),
-                                  cursorColor: Colors.red,
                                 ),
                               ],
                             )
-                          : TextField(
-                              controller: controller,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
+                          : TextSelectionTheme(
+                              data: const TextSelectionThemeData(
+                                selectionColor: Colors.red,
                               ),
-                              decoration: const InputDecoration(
-                                border: UnderlineInputBorder(),
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: Colors.red, width: 2.0),
+                              child: TextField(
+                                controller: controller,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
                                 ),
+                                decoration: const InputDecoration(
+                                  border: UnderlineInputBorder(),
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.red, width: 2.0),
+                                  ),
+                                ),
+                                cursorColor: Colors.red,
                               ),
-                              cursorColor: Colors.red,
                             ))
                       : (icon == Icons.lock
                           ? const Text(
