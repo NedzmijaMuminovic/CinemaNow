@@ -531,8 +531,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   bool _validatePasswords(BuildContext context) {
-    if (_passwordController.text.isNotEmpty &&
-        _passwordController.text != _passwordConfirmationController.text) {
+    if (_passwordController.text.isEmpty ||
+        _passwordConfirmationController.text.isEmpty) {
+      setState(() {
+        _passwordController.text = _originalPassword;
+        _passwordConfirmationController.text = _originalPassword;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password fields cannot be empty.')),
+      );
+      return false;
+    }
+
+    if (_passwordController.text != _passwordConfirmationController.text &&
+        (_passwordController.text.isNotEmpty ||
+            _passwordConfirmationController.text.isNotEmpty)) {
       setState(() {
         _passwordController.text = _originalPassword;
         _passwordConfirmationController.text = _originalPassword;
