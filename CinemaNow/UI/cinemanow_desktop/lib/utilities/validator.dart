@@ -15,7 +15,9 @@ class Validator {
 
   static String? validateEmail(String text) {
     final emailRegExp = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
-    return emailRegExp.hasMatch(text) ? null : 'Enter a valid email address.';
+    return emailRegExp.hasMatch(text)
+        ? null
+        : 'Please enter a valid email address.';
   }
 
   static String? validateUsername(String text) {

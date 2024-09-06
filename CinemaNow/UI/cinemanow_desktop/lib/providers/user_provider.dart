@@ -18,6 +18,12 @@ class UserProvider extends BaseProvider<User> {
     await delete(id);
   }
 
+  Future<bool> isUsernameTaken(int userId, String username) async {
+    final users = await getUsers();
+    return users.result
+        .any((user) => user.username == username && user.id != userId);
+  }
+
   Future<void> updateUser(
     int id,
     String name,
@@ -29,6 +35,10 @@ class UserProvider extends BaseProvider<User> {
     String? imageBase64,
     List<int> roleIds,
   ) async {
+    if (await isUsernameTaken(id, username)) {
+      throw Exception('Username is already taken by another user.');
+    }
+
     final updatedUser = {
       'name': name,
       'surname': surname,

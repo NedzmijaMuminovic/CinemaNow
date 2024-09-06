@@ -319,8 +319,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       _isEditingPassword.value = !_isEditingPassword.value;
                     },
                     onSave: () async {
+                      if (_isEditingPassword.value) {
+                        await _updateUser(context);
+                      }
                       _isEditingPassword.value = false;
-                      await _updateUser(context);
                     },
                   ),
                   const SizedBox(height: 20),
@@ -477,34 +479,33 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     icon: const Icon(Icons.cancel, color: Colors.white),
                     onPressed: () {
                       isEditingNotifier.value = false;
-                      // Reset fields to original values
-                      switch (icon) {
-                        case Icons.person:
-                          if (controller == _nameController) {
-                            _nameController.text = originalName!;
-                          } else if (controller == _surnameController) {
-                            _surnameController.text = originalSurname!;
-                          }
-                          break;
-                        case Icons.email:
-                          _emailController.text = originalEmail!;
-                          break;
-                        case Icons.account_circle:
-                          _usernameController.text = originalUsername!;
-                          break;
-                        case Icons.lock:
-                          _passwordController.text = _originalPassword;
-                          _passwordConfirmationController.text =
-                              _originalPassword;
-                          break;
+                      if (icon == Icons.lock) {
+                        _isEditingPassword.value = false;
+                      }
+                      if (icon == Icons.lock) {
+                        _passwordController.text = _originalPassword;
+                        _passwordConfirmationController.text =
+                            _originalPassword;
                       }
                     },
                   ),
                 IconButton(
                   icon: Icon(isEditing ? Icons.save : Icons.edit,
                       color: Colors.white),
-                  onPressed: isEditing ? onSave : onEditToggle,
-                )
+                  onPressed: () async {
+                    if (isEditing) {
+                      if (icon == Icons.lock) {
+                        _isEditingPassword.value = true;
+                      }
+                      await onSave();
+                    } else {
+                      onEditToggle();
+                      if (icon == Icons.lock) {
+                        _isEditingPassword.value = true;
+                      }
+                    }
+                  },
+                ),
               ],
             ),
           );
@@ -517,12 +518,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     if (AuthProvider.userId == null) return;
 
     try {
-      if (!_validatePasswords(context)) return;
+      if (_isEditingPassword.value && !_validatePasswords(context)) {
+        return;
+      }
 
       final roleIds = await _getRoleIds(context);
       if (roleIds == null) return;
 
       final wasSuccessful = await _updateUserProfile(roleIds);
+
+      _isEditingPassword.value = false;
 
       _handlePostUpdate(context, wasSuccessful);
     } on Exception catch (e) {
@@ -531,30 +536,44 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   bool _validatePasswords(BuildContext context) {
-    if (_passwordController.text.isEmpty ||
-        _passwordConfirmationController.text.isEmpty) {
-      setState(() {
-        _passwordController.text = _originalPassword;
-        _passwordConfirmationController.text = _originalPassword;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password fields cannot be empty.')),
-      );
-      return false;
+    final password = _passwordController.text;
+    final passwordConfirmation = _passwordConfirmationController.text;
+
+    if (_isEditingPassword.value) {
+      if (password.isEmpty && passwordConfirmation.isEmpty) {
+        setState(() {
+          _passwordController.text = _originalPassword;
+          _passwordConfirmationController.text = _originalPassword;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Password fields cannot be empty.')),
+        );
+        return false;
+      }
+
+      if (password.isEmpty || passwordConfirmation.isEmpty) {
+        setState(() {
+          _passwordController.text = _originalPassword;
+          _passwordConfirmationController.text = _originalPassword;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Password fields cannot be empty.')),
+        );
+        return false;
+      }
+
+      if (password != passwordConfirmation) {
+        setState(() {
+          _passwordController.text = _originalPassword;
+          _passwordConfirmationController.text = _originalPassword;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Passwords do not match.')),
+        );
+        return false;
+      }
     }
 
-    if (_passwordController.text != _passwordConfirmationController.text &&
-        (_passwordController.text.isNotEmpty ||
-            _passwordConfirmationController.text.isNotEmpty)) {
-      setState(() {
-        _passwordController.text = _originalPassword;
-        _passwordConfirmationController.text = _originalPassword;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match.')),
-      );
-      return false;
-    }
     return true;
   }
 
@@ -685,8 +704,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
+        SnackBar(
+            content:
+                Text(e.toString().replaceFirst('Exception:', '').trim())),
       );
+      setState(() {
+        _usernameController.text = originalUsername!;
+      });
     }
   }
 }
