@@ -80,8 +80,7 @@ CREATE TABLE Screening (
     MovieID INT,
 	HallID INT,
 	ViewModeID INT,
-    Date DATE,
-    Time TIME,
+    DateTime DATETIME,
     Price DECIMAL(10,2),
     StateMachine VARCHAR(50),
     FOREIGN KEY (MovieID) REFERENCES Movie(ID) ON DELETE CASCADE,
@@ -165,44 +164,127 @@ INSERT INTO Movie (Title, Duration, Synopsis, Image, ImageThumb)
 VALUES 
 ('The Shawshank Redemption', 142, 'Two imprisoned men bond over a number of years...', NULL, NULL),
 ('The Godfather', 175, 'The aging patriarch of an organized crime dynasty...', NULL, NULL),
-('The Dark Knight', 152, 'When the menace known as the Joker wreaks havoc...', NULL, NULL);
+('The Dark Knight', 152, 'When the menace known as the Joker wreaks havoc...', NULL, NULL),
+('Inception', 148, 'A thief who enters the dreams of others to steal secrets from their subconscious...', NULL, NULL),
+('The Matrix', 136, 'A computer hacker learns from mysterious rebels about the true nature of his reality...', NULL, NULL),
+('Fight Club', 139, 'An insomniac office worker and a soap salesman build a global organization to help vent male aggression...', NULL, NULL),
+('Pulp Fiction', 154, 'The lives of two mob hitmen, a boxer, a gangster’s wife, and a pair of diner bandits intertwine...', NULL, NULL),
+('Forrest Gump', 142, 'The presidencies of Kennedy and Johnson, the Vietnam War, the Watergate scandal and other historical events unfold...', NULL, NULL),
+('The Lord of the Rings: The Return of the King', 201, 'Gandalf and Aragorn lead the World of Men against Sauron''s army to end his reign over Middle-earth...', NULL, NULL),
+('The Silence of the Lambs', 118, 'A young F.B.I. cadet must confide in an incarcerated and manipulative killer to receive his help on catching another serial killer...', NULL, NULL);
 
 INSERT INTO Genre (Name)
 VALUES 
 ('Drama'),
 ('Crime'),
-('Action');
+('Action'),
+('Comedy'),
+('Thriller'),
+('Science Fiction'),
+('Fantasy'),
+('Horror'),
+('Romance'),
+('Adventure');
 
 INSERT INTO MovieGenre (MovieID, GenreID)
 VALUES 
 (1, 1),
-(1, 3),
+(1, 2),
+(2, 1),
 (2, 2),
-(3, 3);
+(3, 3),
+(4, 1),
+(4, 3),
+(5, 3),
+(5, 6),
+(6, 1),
+(6, 3),
+(7, 1),
+(7, 2),
+(7, 3),
+(8, 1),
+(8, 4),
+(9, 1),
+(9, 6),
+(10, 1),
+(10, 2),
+(10, 5);
 
 INSERT INTO Actor (Name, Surname, Image, ImageThumb)
 VALUES 
 ('Morgan', 'Freeman', NULL, NULL),
 ('Marlon', 'Brando', NULL, NULL),
-('Heath', 'Ledger', NULL, NULL);
+('Heath', 'Ledger', NULL, NULL),
+('Leonardo', 'DiCaprio', NULL, NULL),
+('Keanu', 'Reeves', NULL, NULL),
+('Brad', 'Pitt', NULL, NULL),
+('John', 'Travolta', NULL, NULL),
+('Tom', 'Hanks', NULL, NULL),
+('Elijah', 'Wood', NULL, NULL),
+('Jodie', 'Foster', NULL, NULL),
+('Christian', 'Bale', NULL, NULL),      
+('Tom', 'Hardy', NULL, NULL),           
+('Carrie-Anne', 'Moss', NULL, NULL),    
+('Helena Bonham', 'Carter', NULL, NULL),
+('Uma', 'Thurman', NULL, NULL),         
+('Gary', 'Sinise', NULL, NULL),         
+('Orlando', 'Bloom', NULL, NULL),       
+('Anthony', 'Hopkins', NULL, NULL);
 
 INSERT INTO MovieActor (MovieID, ActorID)
 VALUES 
 (1, 1),
 (2, 2),
-(3, 3);
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10),
+(3, 11),
+(4, 12),
+(5, 13),
+(6, 14),
+(7, 15),
+(8, 16),
+(9, 17),
+(10, 18);
 
 INSERT INTO Hall (Name)
-VALUES ('Hall 1'), ('Hall 2'), ('Hall 3');
+VALUES 
+('Hall 1'), 
+('Hall 2'), 
+('Hall 3'),
+('Hall 4'),
+('Hall 5'),
+('Hall 6'),
+('Hall 7'),
+('Hall 8'),
+('Hall 9'),
+('Hall 10');
 
 INSERT INTO ViewMode (Name)
-VALUES ('2D'), ('3D'), ('4DX');
+VALUES ('2D'), ('3D'), ('4DX'), ('IMAX'), ('Dolby Atmos'), ('ScreenX'), ('VR'), ('HFR');
 
-INSERT INTO Screening (MovieID, HallID, ViewModeID, Date, Time, Price, StateMachine)
+INSERT INTO Screening (MovieID, HallID, ViewModeID, DateTime, Price, StateMachine)
 VALUES 
-(1, 1, 1, '2024-04-04', '18:00:00', 10.00, NULL),
-(2, 2, 2, '2024-04-05', '19:00:00', 12.00, NULL),
-(3, 3, 3, '2024-04-06', '20:00:00', 15.00, NULL);
+(1, 1, 1, '2024-09-10 14:00:00', 10.50, 'active'),
+(2, 2, 2, '2024-09-10 16:30:00', 13.00, 'draft'),
+(3, 3, 3, '2024-09-10 19:00:00', 15.50, 'active'),
+(4, 4, 4, '2024-09-11 15:00:00', 18.00, 'active'),
+(5, 5, 5, '2024-09-11 18:30:00', 14.50, 'hidden'),
+(6, 6, 1, '2024-09-12 17:00:00', 11.00, 'active'),
+(7, 7, 2, '2024-09-12 20:00:00', 13.50, 'draft'),
+(8, 8, 3, '2024-09-13 14:30:00', 16.00, 'active'),
+(9, 9, 4, '2024-09-13 19:30:00', 19.00, 'active'),
+(10, 10, 5, '2024-09-14 16:00:00', 15.00, 'hidden'),
+(1, 2, 6, '2024-09-14 18:30:00', 14.00, 'active'),
+(2, 3, 7, '2024-09-15 15:30:00', 17.50, 'draft'),
+(3, 4, 8, '2024-09-15 19:00:00', 16.50, 'active'),
+(4, 5, 1, '2024-09-16 14:00:00', 11.50, 'active'),
+(5, 6, 2, '2024-09-16 17:30:00', 13.00, 'hidden');
 
 INSERT INTO PayPalPayment (UserID, Info)
 VALUES 
