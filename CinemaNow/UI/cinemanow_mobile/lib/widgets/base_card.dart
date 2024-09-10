@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 class BaseCard extends StatelessWidget {
   final String imageUrl;
   final List<Widget> content;
-  final List<Widget> actions;
+  final List<Widget>? actions;
   final double imageHeight;
 
   const BaseCard({
     super.key,
     required this.imageUrl,
     required this.content,
-    required this.actions,
-    this.imageHeight = 250,
+    this.actions,
+    this.imageHeight = 200,
   });
 
   @override
@@ -65,21 +65,22 @@ class BaseCard extends StatelessWidget {
               ),
             ),
           ),
-          Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            decoration: BoxDecoration(
-              color: Colors.grey[850],
-              borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(16.0)),
+          if (actions != null && actions!.isNotEmpty)
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              decoration: BoxDecoration(
+                color: Colors.grey[850],
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(16.0)),
+              ),
+              child: Row(
+                mainAxisAlignment: actions!.length == 1
+                    ? MainAxisAlignment.center
+                    : MainAxisAlignment.spaceBetween,
+                children: actions!,
+              ),
             ),
-            child: Row(
-              mainAxisAlignment: actions.length == 1
-                  ? MainAxisAlignment.center
-                  : MainAxisAlignment.spaceBetween,
-              children: actions,
-            ),
-          ),
         ],
       ),
     );

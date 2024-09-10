@@ -1,7 +1,6 @@
 import 'package:cinemanow_mobile/models/screening.dart';
 import 'package:cinemanow_mobile/models/search_result.dart';
 import 'package:cinemanow_mobile/providers/screening_provider.dart';
-import 'package:cinemanow_mobile/screens/add_edit_screening_screen.dart';
 import 'package:cinemanow_mobile/widgets/date_picker.dart';
 import 'package:cinemanow_mobile/widgets/screening_card.dart';
 import 'package:cinemanow_mobile/utilities/utils.dart';
@@ -23,7 +22,6 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
   final TextEditingController _ftsEditingController = TextEditingController();
   DateTime? _selectedDate;
   bool _isLoading = false;
-  late TabController _tabController;
 
   @override
   void didChangeDependencies() {
@@ -34,15 +32,9 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
     _fetchScreenings();
   }
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
 
   Future<void> _fetchScreenings({String? fts, DateTime? date}) async {
     setState(() {
@@ -73,8 +65,6 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
               children: [
                 _buildSearch(),
                 const SizedBox(height: 16),
-                _buildTabBar(),
-                const SizedBox(height: 16),
                 _isLoading
                     ? const Expanded(
                         child: Center(
@@ -85,44 +75,8 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
               ],
             ),
           ),
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => AddEditScreeningScreen(
-                        onScreeningAdded: _fetchScreenings),
-                  ),
-                );
-              },
-              backgroundColor: Colors.grey[850],
-              child: Icon(
-                Icons.add,
-                color: Colors.grey[500],
-              ),
-            ),
-          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildTabBar() {
-    return TabBar(
-      controller: _tabController,
-      indicatorColor: Colors.red,
-      labelColor: Colors.white,
-      unselectedLabelColor: Colors.grey[500],
-      tabs: const [
-        Tab(text: 'Active'),
-        Tab(text: 'Hidden'),
-        Tab(text: 'Draft'),
-      ],
-      onTap: (index) {
-        setState(() {});
-      },
     );
   }
 
@@ -193,7 +147,7 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),
-            minimumSize: const Size(0, 55),
+            minimumSize: const Size(0, 50),
           ),
           child: Text(
             'Search',
@@ -207,16 +161,7 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
   Widget _buildResultView() {
     final List<Screening> filteredScreenings =
         result?.result.where((screening) {
-              switch (_tabController.index) {
-                case 0:
-                  return screening.stateMachine == 'active';
-                case 1:
-                  return screening.stateMachine == 'hidden';
-                case 2:
-                  return screening.stateMachine == 'draft';
-                default:
-                  return false;
-              }
+              return screening.stateMachine == 'active';
             }).toList() ??
             [];
 

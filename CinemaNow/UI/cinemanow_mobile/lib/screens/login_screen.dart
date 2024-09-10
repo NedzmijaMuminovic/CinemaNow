@@ -2,7 +2,6 @@ import 'package:cinemanow_mobile/layouts/master_screen.dart';
 import 'package:cinemanow_mobile/models/user.dart';
 import 'package:cinemanow_mobile/screens/register_screen.dart';
 import 'package:cinemanow_mobile/providers/auth_provider.dart';
-import 'package:cinemanow_mobile/screens/screening_list_screen.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -44,8 +43,8 @@ class _LoginPageState extends State<LoginPage> {
         AuthProvider.setUser(response);
 
         if (_isAdmin(response)) {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const MasterScreen(ScreeningListScreen())));
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const MasterScreen()));
         } else {
           _showErrorDialog("You do not have permission to access this area.");
         }

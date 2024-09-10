@@ -72,7 +72,7 @@ class _DatePickerState extends State<DatePicker> {
           Text(
             widget.selectedDate != null
                 ? DateFormat('dd/MM/yyyy').format(widget.selectedDate!)
-                : 'Pick a Date',
+                : 'Date',
             style: TextStyle(color: Colors.grey[500]),
           ),
         ],
