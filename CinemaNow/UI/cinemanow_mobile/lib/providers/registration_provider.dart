@@ -9,10 +9,10 @@ class RegistrationProvider extends BaseProvider {
 
   RegistrationProvider() : super("User");
 
-  Future<int?> getAdminRoleId() async {
+  Future<int?> getUserRoleId() async {
     try {
-      Role adminRole = await _roleProvider.fetchRoleByName("Admin");
-      return adminRole.id;
+      Role userRole = await _roleProvider.fetchRoleByName("User");
+      return userRole.id;
     } catch (e) {
       return null;
     }
@@ -36,8 +36,8 @@ class RegistrationProvider extends BaseProvider {
       return false;
     }
 
-    final adminRoleId = await getAdminRoleId();
-    if (adminRoleId == null) {
+    final userRoleId = await getUserRoleId();
+    if (userRoleId == null) {
       return false;
     }
 
@@ -48,7 +48,7 @@ class RegistrationProvider extends BaseProvider {
       'username': username,
       'password': password,
       'passwordConfirmation': passwordConfirmation,
-      'roleIds': [adminRoleId],
+      'roleIds': [userRoleId],
     };
 
     final response = await insert(userPayload);

@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
         AuthProvider.password = password;
         AuthProvider.setUser(response);
 
-        if (_isAdmin(response)) {
+        if (_isUser(response)) {
           Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => const MasterScreen()));
         } else {
@@ -60,9 +60,9 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  bool _isAdmin(User user) {
+  bool _isUser(User user) {
     final roles = user.roles;
-    return roles != null && roles.any((role) => role.name == 'Admin');
+    return roles != null && roles.any((role) => role.name == 'User');
   }
 
   void _showErrorDialog(String message) {

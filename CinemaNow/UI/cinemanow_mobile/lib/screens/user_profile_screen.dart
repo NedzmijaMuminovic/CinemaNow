@@ -579,7 +579,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   Future<List<int>?> _getRoleIds(BuildContext context) async {
     final roleProvider = RoleProvider();
-    final role = await roleProvider.fetchRoleByName("Admin");
+    final role = await roleProvider.fetchRoleByName("User");
     if (role.id == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Role not found.')),

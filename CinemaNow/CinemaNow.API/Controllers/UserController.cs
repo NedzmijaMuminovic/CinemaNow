@@ -33,6 +33,14 @@ namespace CinemaNow.API.Controllers
             return base.Insert(request);
         }
 
+        [HttpPut("{id}")]
+        [AllowAnonymous]
+        public override Models.User Update(int id, UserUpdateRequest request)
+        {
+            return base.Update(id, request);
+        }
+
+
         [HttpGet]
         [AllowAnonymous]
         public override PagedResult<User> GetList([FromQuery] UserSearchObject searchObject)
