@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import 'package:cinemanow_desktop/models/user.dart';
-import 'package:cinemanow_desktop/providers/base_provider.dart';
+import 'package:cinemanow_mobile/models/user.dart';
+import 'package:cinemanow_mobile/providers/base_provider.dart';
 
 class AuthProvider extends BaseProvider<User> {
   AuthProvider() : super("User");

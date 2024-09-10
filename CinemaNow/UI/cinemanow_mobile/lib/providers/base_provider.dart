@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:cinemanow_desktop/models/search_result.dart';
-import 'package:cinemanow_desktop/providers/auth_provider.dart';
+import 'package:cinemanow_mobile/models/search_result.dart';
+import 'package:cinemanow_mobile/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -13,7 +13,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
   BaseProvider(String endpoint) {
     _endpoint = endpoint;
     _baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "http://localhost:5199/");
+        defaultValue: "http://10.0.2.2:5199/");
   }
 
   String get baseUrl => _baseUrl ?? "";
