@@ -33,18 +33,29 @@ class _DatePickerState extends State<DatePicker> {
             children: [
               Expanded(child: child!),
               Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _pickedDate = null;
-                    });
-                    widget.onDateSelected(null);
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text(
-                    'Clear Date',
-                    style: TextStyle(color: Colors.red),
+                padding: const EdgeInsets.all(16.0),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _pickedDate = null;
+                      });
+                      widget.onDateSelected(null);
+                      Navigator.of(context).pop();
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Clear Date',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
                   ),
                 ),
               ),

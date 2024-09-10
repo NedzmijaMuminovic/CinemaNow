@@ -13,7 +13,10 @@ class MovieProvider extends BaseProvider<Movie> {
   }
 
   Future<SearchResult<Movie>> getMovies({String? fts}) async {
-    final filter = <String, dynamic>{};
+    var filter = {
+      'IsGenreIncluded': 'true',
+      'IsActorIncluded': 'true',
+    };
     if (fts != null && fts.isNotEmpty) {
       filter['fts'] = fts;
     }

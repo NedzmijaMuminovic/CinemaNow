@@ -1,27 +1,31 @@
+import 'dart:convert';
+
+import 'package:cinemanow_mobile/models/movie.dart';
 import 'package:cinemanow_mobile/models/screening.dart';
 import 'package:cinemanow_mobile/models/search_result.dart';
 import 'package:cinemanow_mobile/providers/screening_provider.dart';
 import 'package:cinemanow_mobile/widgets/date_picker.dart';
-import 'package:cinemanow_mobile/widgets/screening_card.dart';
 import 'package:cinemanow_mobile/utilities/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class ScreeningListScreen extends StatefulWidget {
-  const ScreeningListScreen({super.key});
+class MovieScreeningListScreen extends StatefulWidget {
+  const MovieScreeningListScreen({super.key});
 
   @override
-  _ScreeningListScreenState createState() => _ScreeningListScreenState();
+  _MovieScreeningListScreenState createState() =>
+      _MovieScreeningListScreenState();
 }
 
-class _ScreeningListScreenState extends State<ScreeningListScreen>
+class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
     with SingleTickerProviderStateMixin {
   late ScreeningProvider provider;
   SearchResult<Screening>? result;
   final TextEditingController _ftsEditingController = TextEditingController();
   DateTime? _selectedDate;
   bool _isLoading = false;
+  Map<Movie, List<Screening>> _groupedScreenings = {};
 
   @override
   void didChangeDependencies() {
@@ -35,7 +39,6 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
     _fetchScreenings();
   }
 
-
   Future<void> _fetchScreenings({String? fts, DateTime? date}) async {
     setState(() {
       _isLoading = true;
@@ -44,6 +47,19 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
     try {
       final provider = context.read<ScreeningProvider>();
       result = await provider.getScreenings(fts: fts, date: date);
+      final List<Screening> allScreenings = result?.result ?? [];
+      final Map<Movie, List<Screening>> screeningsByMovie = {};
+      for (var screening in allScreenings) {
+        if (screening.movie != null) {
+          if (!screeningsByMovie.containsKey(screening.movie!)) {
+            screeningsByMovie[screening.movie!] = [];
+          }
+          screeningsByMovie[screening.movie!]!.add(screening);
+        }
+      }
+      setState(() {
+        _groupedScreenings = screeningsByMovie;
+      });
     } catch (e) {
       // Handle error
     } finally {
@@ -159,62 +175,138 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
   }
 
   Widget _buildResultView() {
-    final List<Screening> filteredScreenings =
-        result?.result.where((screening) {
-              return screening.stateMachine == 'active';
-            }).toList() ??
-            [];
-
-    if (filteredScreenings.isEmpty) {
+    if (_groupedScreenings.isEmpty) {
       return _buildNoScreeningsView();
     }
 
     return Expanded(
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          int crossAxisCount;
-          if (constraints.maxWidth > 1200) {
-            crossAxisCount = 3;
-          } else if (constraints.maxWidth > 800) {
-            crossAxisCount = 2;
-          } else {
-            crossAxisCount = 1;
-          }
-          return GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 16.0,
-              mainAxisSpacing: 16.0,
-              childAspectRatio: 1,
-            ),
-            itemCount: filteredScreenings.length,
-            itemBuilder: (context, index) {
-              final screening = filteredScreenings[index];
-              String? imageUrl = screening.movie?.imageBase64;
-              return ScreeningCard(
-                imageUrl: imageUrl != null
-                    ? 'data:image/jpeg;base64,$imageUrl'
-                    : 'assets/images/default.jpg',
-                title: screening.movie?.title ?? 'Unknown Title',
-                date: screening.dateTime != null
-                    ? DateFormat('dd/MM/yyyy').format(screening.dateTime!)
-                    : 'Unknown Date',
-                time: screening.dateTime != null
-                    ? DateFormat('HH:mm').format(screening.dateTime!)
-                    : 'Unknown Time',
-                hall: screening.hall?.name ?? 'Unknown Hall',
-                viewMode: screening.viewMode?.name ?? 'Unknown View Mode',
-                price: screening.price != null
-                    ? formatNumber(screening.price)
-                    : 'Unknown Price',
-                screeningId: screening.id ?? 0,
-                onDelete: _fetchScreenings,
-                onScreeningUpdated: _fetchScreenings,
-                stateMachine: screening.stateMachine ?? 'unknown',
-              );
-            },
+      child: ListView.builder(
+        itemCount: _groupedScreenings.keys.length,
+        itemBuilder: (context, index) {
+          final movie = _groupedScreenings.keys.elementAt(index);
+          final screenings = _groupedScreenings[movie]!;
+
+          return Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
+            child: _buildMovieCard(movie, screenings),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildMovieCard(Movie movie, List<Screening> screenings) {
+    return Card(
+      elevation: 8,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      color: Colors.grey[850],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            child: SizedBox(
+              width: double.infinity,
+              height: 200,
+              child: movie.imageBase64 != null
+                  ? Image.memory(
+                      base64Decode(movie.imageBase64!),
+                      width: double.infinity,
+                      height: 200,
+                      fit: BoxFit.fitWidth,
+                      alignment: Alignment.topCenter,
+                    )
+                  : Image.asset(
+                      'assets/images/default.jpg',
+                      width: double.infinity,
+                      height: 200,
+                      fit: BoxFit.fitWidth,
+                      alignment: Alignment.topCenter,
+                    ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              movie.title ?? 'Unknown Title',
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          ExpansionTile(
+            title: const Text(
+              'View Screenings',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.red,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            iconColor: Colors.red,
+            collapsedIconColor: Colors.red,
+            children: screenings
+                .map((screening) => _buildScreeningTile(screening))
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScreeningTile(Screening screening) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  DateFormat('EEEE, MMM d, yyyy').format(screening.dateTime!),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  DateFormat('HH:mm').format(screening.dateTime!),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[300],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${screening.hall?.name ?? 'Unknown Hall'} - ${screening.viewMode?.name ?? 'Unknown View Mode'}',
+                  style: TextStyle(fontSize: 16, color: Colors.grey[400]),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.red[700],
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              '\$${formatNumber(screening.price)}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
