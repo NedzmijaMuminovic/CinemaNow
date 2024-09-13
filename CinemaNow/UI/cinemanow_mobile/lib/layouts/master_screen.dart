@@ -30,9 +30,16 @@ class _MasterScreenState extends State<MasterScreen> {
       backgroundColor: Colors.grey[900],
       appBar: AppBar(
         backgroundColor: Colors.grey[850],
-        automaticallyImplyLeading: false,
+        //automaticallyImplyLeading: false,
       ),
-      body: _pages[_selectedIndex],
+      body: Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            builder: (context) =>
+                _pages[_selectedIndex], // Show the current selected page
+          );
+        },
+      ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.grey[850],
         items: const <BottomNavigationBarItem>[

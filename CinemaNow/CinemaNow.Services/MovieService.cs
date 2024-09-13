@@ -63,6 +63,11 @@ namespace CinemaNow.Services
                 model.ImageBase64 = entity.Image != null ? Convert.ToBase64String(entity.Image) : null;
                 model.ImageThumbBase64 = entity.ImageThumb != null ? Convert.ToBase64String(entity.ImageThumb) : null;
 
+                //if (entity.Actors != null)
+                //{
+                //    model.Actors.ImageBase64 = entity.Actors.ImageBase64 != null ? Convert.ToBase64String(entity.Actors.ImageBase64) : null;
+                //}
+
                 return model;
             }
             else

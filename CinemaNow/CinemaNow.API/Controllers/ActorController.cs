@@ -25,5 +25,23 @@ namespace CinemaNow.API.Controllers
         {
             return base.GetList(searchObject);
         }
+
+        [HttpPost("upload-image/{id}")]
+        public async Task<IActionResult> UploadImage(int id, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await file.CopyToAsync(memoryStream);
+                var imageBytes = memoryStream.ToArray();
+
+                var actorService = (IActorService)_service;
+                await actorService.UpdateActorImage(id, imageBytes);
+            }
+
+            return Ok();
+        }
     }
 }

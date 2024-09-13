@@ -99,5 +99,15 @@ namespace CinemaNow.Services
             }
         }
 
+        public async Task UpdateActorImage(int id, byte[] imageBytes)
+        {
+            var actor = Context.Set<Database.Actor>().Find(id);
+            if (actor != null)
+            {
+                actor.Image = imageBytes;
+                await Context.SaveChangesAsync();
+            }
+        }
+
     }
 }

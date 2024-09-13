@@ -4,6 +4,7 @@ import 'package:cinemanow_mobile/models/movie.dart';
 import 'package:cinemanow_mobile/models/screening.dart';
 import 'package:cinemanow_mobile/models/search_result.dart';
 import 'package:cinemanow_mobile/providers/screening_provider.dart';
+import 'package:cinemanow_mobile/screens/movie_details_screen.dart';
 import 'package:cinemanow_mobile/widgets/date_picker.dart';
 import 'package:cinemanow_mobile/utilities/utils.dart';
 import 'package:flutter/material.dart';
@@ -197,62 +198,103 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
   }
 
   Widget _buildMovieCard(Movie movie, List<Screening> screenings) {
-    return Card(
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      color: Colors.grey[850],
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            child: SizedBox(
-              width: double.infinity,
-              height: 200,
-              child: movie.imageBase64 != null
-                  ? Image.memory(
-                      base64Decode(movie.imageBase64!),
-                      width: double.infinity,
-                      height: 200,
-                      fit: BoxFit.fitWidth,
-                      alignment: Alignment.topCenter,
-                    )
-                  : Image.asset(
-                      'assets/images/default.jpg',
-                      width: double.infinity,
-                      height: 200,
-                      fit: BoxFit.fitWidth,
-                      alignment: Alignment.topCenter,
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => MovieDetailsScreen(
+                movie: movie), // Navigate within the inner navigator
+          ),
+        );
+      },
+      child: Card(
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        color: Colors.grey[850],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(20)),
+              child: SizedBox(
+                width: double.infinity,
+                height: 200,
+                child: movie.imageBase64 != null
+                    ? Image.memory(
+                        base64Decode(movie.imageBase64!),
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.fitWidth,
+                        alignment: Alignment.topCenter,
+                      )
+                    : Image.asset(
+                        'assets/images/default.jpg',
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.fitWidth,
+                        alignment: Alignment.topCenter,
+                      ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    movie.title ?? 'Unknown Title',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              movie.title ?? 'Unknown Title',
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(Icons.access_time,
+                          color: Colors.grey[400], size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${movie.duration ?? 0} min',
+                        style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                      ),
+                      const SizedBox(width: 16),
+                      Icon(Icons.movie, color: Colors.grey[400], size: 16),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          (movie.genres ?? [])
+                              .map((genre) => genre.name)
+                              .join(', '),
+                          style:
+                              TextStyle(color: Colors.grey[400], fontSize: 14),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ),
-          ExpansionTile(
-            title: const Text(
-              'View Screenings',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.red,
-                fontWeight: FontWeight.w600,
+            ExpansionTile(
+              title: const Text(
+                'View Screenings',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.red,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
+              iconColor: Colors.red,
+              collapsedIconColor: Colors.red,
+              children: screenings
+                  .map((screening) => _buildScreeningTile(screening))
+                  .toList(),
             ),
-            iconColor: Colors.red,
-            collapsedIconColor: Colors.red,
-            children: screenings
-                .map((screening) => _buildScreeningTile(screening))
-                .toList(),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

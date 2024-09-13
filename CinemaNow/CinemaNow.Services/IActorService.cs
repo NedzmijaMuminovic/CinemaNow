@@ -11,5 +11,6 @@ namespace CinemaNow.Services
 {
     public interface IActorService : IBaseCRUDService<Actor, ActorSearchObject, ActorUpsertRequest, ActorUpsertRequest>
     {
+        Task UpdateActorImage(int actorId, byte[] image);
     }
 }

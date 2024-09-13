@@ -18,6 +18,7 @@ class ScreeningProvider extends BaseProvider<Screening> {
   Future<SearchResult<Screening>> getScreenings({
     String? fts,
     DateTime? date,
+    bool? isGenreIncluded,
   }) async {
     var filter = {
       'IsMovieIncluded': 'true',
@@ -31,6 +32,10 @@ class ScreeningProvider extends BaseProvider<Screening> {
 
     if (date != null) {
       filter['date'] = DateFormat('yyyy-MM-dd').format(date);
+    }
+
+    if (isGenreIncluded != null) {
+      filter['IsGenreIncluded'] = isGenreIncluded.toString();
     }
 
     return await get(filter: filter);

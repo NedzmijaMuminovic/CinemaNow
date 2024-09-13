@@ -33,7 +33,10 @@ namespace CinemaNow.Services
                 filteredQuery = filteredQuery.Where(x => x.Movie.Title.Contains(search.FTS));
 
             if (search?.IsMovieIncluded == true)
-                filteredQuery = filteredQuery.Include(x => x.Movie);
+            {
+                filteredQuery = filteredQuery.Include(x => x.Movie)
+                                             .ThenInclude(movie => movie.Genres);
+            }
 
             if (search?.IsHallIncluded == true)
                 filteredQuery = filteredQuery.Include(x => x.Hall);
