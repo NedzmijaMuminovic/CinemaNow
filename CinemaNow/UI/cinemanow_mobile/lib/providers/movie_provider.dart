@@ -69,6 +69,7 @@ class MovieProvider extends BaseProvider<Movie> {
   }
 
   Future<Movie> getMovieById(int id) async {
-    return await getById(id);
+    var movie = await getById(id);
+    return movie;
   }
 }

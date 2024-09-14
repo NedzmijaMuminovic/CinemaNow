@@ -32,13 +32,9 @@ class _MasterScreenState extends State<MasterScreen> {
         backgroundColor: Colors.grey[850],
         //automaticallyImplyLeading: false,
       ),
-      body: Navigator(
-        onGenerateRoute: (RouteSettings settings) {
-          return MaterialPageRoute(
-            builder: (context) =>
-                _pages[_selectedIndex], // Show the current selected page
-          );
-        },
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.grey[850],

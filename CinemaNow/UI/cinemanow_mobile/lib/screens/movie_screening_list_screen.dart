@@ -202,8 +202,7 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => MovieDetailsScreen(
-                movie: movie), // Navigate within the inner navigator
+            builder: (context) => MovieDetailsScreen(movie: movie),
           ),
         );
       },

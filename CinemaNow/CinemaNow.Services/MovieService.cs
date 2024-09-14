@@ -46,6 +46,15 @@ namespace CinemaNow.Services
                 {
                     movie.ImageBase64 = dbMovie.Image != null ? Convert.ToBase64String(dbMovie.Image) : null;
                     movie.ImageThumbBase64 = dbMovie.ImageThumb != null ? Convert.ToBase64String(dbMovie.ImageThumb) : null;
+
+                    foreach (var actor in movie.Actors)
+                    {
+                        var dbActor = dbMovie.Actors.FirstOrDefault(a => a.Id == actor.Id);
+                        if (dbActor != null)
+                        {
+                            actor.ImageBase64 = dbActor.Image != null ? Convert.ToBase64String(dbActor.Image) : null;
+                        }
+                    }
                 }
             }
 
@@ -63,10 +72,17 @@ namespace CinemaNow.Services
                 model.ImageBase64 = entity.Image != null ? Convert.ToBase64String(entity.Image) : null;
                 model.ImageThumbBase64 = entity.ImageThumb != null ? Convert.ToBase64String(entity.ImageThumb) : null;
 
-                //if (entity.Actors != null)
-                //{
-                //    model.Actors.ImageBase64 = entity.Actors.ImageBase64 != null ? Convert.ToBase64String(entity.Actors.ImageBase64) : null;
-                //}
+                if (entity.Actors != null)
+                {
+                    foreach (var actor in model.Actors)
+                    {
+                        var dbActor = entity.Actors.FirstOrDefault(a => a.Id == actor.Id);
+                        if (dbActor != null)
+                        {
+                            actor.ImageBase64 = dbActor.Image != null ? Convert.ToBase64String(dbActor.Image) : null;
+                        }
+                    }
+                }
 
                 return model;
             }
