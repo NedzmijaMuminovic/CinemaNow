@@ -18,6 +18,7 @@ Movie _$MovieFromJson(Map<String, dynamic> json) => Movie(
       genres: (json['genres'] as List<dynamic>?)
           ?.map((e) => Genre.fromJson(e as Map<String, dynamic>))
           .toList(),
+      averageRating: (json['averageRating'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$MovieToJson(Movie instance) => <String, dynamic>{
@@ -28,4 +29,5 @@ Map<String, dynamic> _$MovieToJson(Movie instance) => <String, dynamic>{
       'imageBase64': instance.imageBase64,
       'actors': instance.actors,
       'genres': instance.genres,
+      'averageRating': instance.averageRating,
     };

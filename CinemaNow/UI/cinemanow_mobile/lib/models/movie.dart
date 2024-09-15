@@ -13,15 +13,18 @@ class Movie {
   String? imageBase64;
   List<Actor>? actors;
   List<Genre>? genres;
+  double? averageRating;
 
-  Movie(
-      {this.id,
-      this.title,
-      this.duration,
-      this.synopsis,
-      this.imageBase64,
-      this.actors,
-      this.genres});
+  Movie({
+    this.id,
+    this.title,
+    this.duration,
+    this.synopsis,
+    this.imageBase64,
+    this.actors,
+    this.genres,
+    this.averageRating,
+  });
 
   factory Movie.fromJson(Map<String, dynamic> json) => _$MovieFromJson(json);
   Map<String, dynamic> toJson() => _$MovieToJson(this);

@@ -27,7 +27,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   Future<void> _fetchFullMovieDetails() async {
     try {
       final movieProvider = context.read<MovieProvider>();
-      final fullMovie = await movieProvider.getMovieById(_movie.id!);
+      final fullMovie = await movieProvider.getById(_movie.id!);
       setState(() {
         _movie = fullMovie;
         _isLoading = false;
@@ -68,13 +68,16 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                             color: Colors.black.withOpacity(0.7),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
-                              Icon(Icons.star, color: Colors.white, size: 16),
-                              SizedBox(width: 4),
+                              const Icon(Icons.star,
+                                  color: Colors.white, size: 16),
+                              const SizedBox(width: 4),
                               Text(
-                                '6.9/10',
-                                style: TextStyle(color: Colors.white),
+                                _movie.averageRating != null
+                                    ? '${_movie.averageRating!.toStringAsFixed(1)}/10'
+                                    : 'N/A',
+                                style: const TextStyle(color: Colors.white),
                               ),
                             ],
                           ),

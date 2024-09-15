@@ -3,9 +3,12 @@ import 'package:cinemanow_mobile/models/genre.dart';
 import 'package:cinemanow_mobile/models/movie.dart';
 import 'package:cinemanow_mobile/models/search_result.dart';
 import 'package:cinemanow_mobile/providers/base_provider.dart';
+import 'package:cinemanow_mobile/providers/rating_provider.dart';
 
 class MovieProvider extends BaseProvider<Movie> {
-  MovieProvider() : super("Movie");
+  final RatingProvider _ratingProvider;
+
+  MovieProvider(this._ratingProvider) : super("Movie");
 
   @override
   Movie fromJson(data) {
@@ -68,8 +71,11 @@ class MovieProvider extends BaseProvider<Movie> {
     await update(id, updatedMovie);
   }
 
-  Future<Movie> getMovieById(int id) async {
-    var movie = await getById(id);
+  @override
+  Future<Movie> getById(int id) async {
+    Movie movie = await super.getById(id);
+    double? averageRating = await _ratingProvider.getAverageRating(id);
+    movie.averageRating = averageRating;
     return movie;
   }
 }

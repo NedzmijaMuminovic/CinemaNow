@@ -2,6 +2,7 @@ import 'package:cinemanow_mobile/providers/actor_provider.dart';
 import 'package:cinemanow_mobile/providers/genre_provider.dart';
 import 'package:cinemanow_mobile/providers/hall_provider.dart';
 import 'package:cinemanow_mobile/providers/movie_provider.dart';
+import 'package:cinemanow_mobile/providers/rating_provider.dart';
 import 'package:cinemanow_mobile/providers/screening_provider.dart';
 import 'package:cinemanow_mobile/providers/user_provider.dart';
 import 'package:cinemanow_mobile/providers/view_mode_provider.dart';
@@ -13,7 +14,12 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => MovieProvider()),
+        ChangeNotifierProvider(create: (_) => RatingProvider()),
+        ChangeNotifierProxyProvider<RatingProvider, MovieProvider>(
+          create: (context) => MovieProvider(context.read<RatingProvider>()),
+          update: (context, ratingProvider, previousMovieProvider) =>
+              MovieProvider(ratingProvider),
+        ),
         ChangeNotifierProvider(create: (_) => HallProvider()),
         ChangeNotifierProvider(create: (_) => ViewModeProvider()),
         ChangeNotifierProvider(create: (_) => ActorProvider()),
