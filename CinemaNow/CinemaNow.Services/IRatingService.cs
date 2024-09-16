@@ -12,5 +12,6 @@ namespace CinemaNow.Services
     public interface IRatingService : IBaseCRUDService<Rating, RatingSearchObject, RatingInsertRequest, RatingUpdateRequest>
     {
         double? GetAverageRating(int movieId);
+        public Task<IEnumerable<Models.Rating>> GetRatingsByMovieIdAsync(int movieId);
     }
 }

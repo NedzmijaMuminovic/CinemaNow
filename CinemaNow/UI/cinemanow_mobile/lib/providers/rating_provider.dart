@@ -11,7 +11,7 @@ class RatingProvider extends BaseProvider<Rating> {
     return Rating.fromJson(data);
   }
 
-Future<double?> getAverageRating(int movieId) async {
+  Future<double?> getAverageRating(int movieId) async {
     var url = "$baseUrl$endpoint/average/$movieId";
     var uri = Uri.parse(url);
     var headers = createHeaders();
@@ -27,12 +27,29 @@ Future<double?> getAverageRating(int movieId) async {
           return null;
         }
       } else {
-        print("Invalid response for average rating: ${response.statusCode}");
         return null;
       }
     } catch (e) {
-      print("Error fetching average rating: $e");
       return null;
+    }
+  }
+
+  Future<List<Rating>> getByMovieId(int movieId) async {
+    var url = "$baseUrl$endpoint/movie/$movieId";
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+
+    try {
+      var response = await http.get(uri, headers: headers);
+
+      if (isValidResponse(response)) {
+        var jsonResponse = jsonDecode(response.body) as List;
+        return jsonResponse.map((data) => Rating.fromJson(data)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
     }
   }
 }

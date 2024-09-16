@@ -63,5 +63,15 @@ namespace CinemaNow.Services
             return ratings.Average();
         }
 
+        public async Task<IEnumerable<Models.Rating>> GetRatingsByMovieIdAsync(int movieId)
+        {
+            return await Context.Ratings
+                .Where(r => r.MovieId == movieId)
+                .Include(r => r.User)
+                .Include(r => r.Movie)
+                .Select(r => Mapper.Map<Models.Rating>(r))
+                .ToListAsync();
+        }
+
     }
 }

@@ -147,7 +147,14 @@ INSERT INTO [User] (Name, Surname, Email, Username, PasswordSalt, PasswordHash, 
 VALUES 
 ('Emma', 'Johnson', 'emma.j@example.com', 'emma_j', 'abcdefg12345', '$2y$10$uFj8G3cSJazj5VpShYYGYODSQ8xVOlBghxOGU5iGBt7mXc/Q8qM12', NULL, NULL),
 ('Michael', 'Smith', 'michael.s@example.com', 'michael_s', 'qwerty12345', '$2y$10$jHWmzGdZdfA4oUGZ9Efjzuj8sGp0fV9YzKyZUB41VTH4v2QGw3L/q', NULL, NULL),
-('Olivia', 'Williams', 'olivia.w@example.com', 'olivia_w', '1234567890', '$2y$10$zJGeJDEYIlyuk3vm.V6EyO0RFVdoXvXy5F/SJxXTntMP0JArz5SdC', NULL, NULL);
+('Olivia', 'Williams', 'olivia.w@example.com', 'olivia_w', '1234567890', '$2y$10$zJGeJDEYIlyuk3vm.V6EyO0RFVdoXvXy5F/SJxXTntMP0JArz5SdC', NULL, NULL),
+('Ava', 'Brown', 'ava.brown@example.com', 'ava_b', 'passwordSalt1', 'passwordHash1', NULL, NULL),
+('Liam', 'Davis', 'liam.davis@example.com', 'liam_d', 'passwordSalt2', 'passwordHash2', NULL, NULL),
+('Sophia', 'Miller', 'sophia.miller@example.com', 'sophia_m', 'passwordSalt3', 'passwordHash3', NULL, NULL),
+('Noah', 'Wilson', 'noah.wilson@example.com', 'noah_w', 'passwordSalt4', 'passwordHash4', NULL, NULL),
+('Isabella', 'Moore', 'isabella.moore@example.com', 'isabella_m', 'passwordSalt5', 'passwordHash5', NULL, NULL),
+('Ethan', 'Taylor', 'ethan.taylor@example.com', 'ethan_t', 'passwordSalt6', 'passwordHash6', NULL, NULL),
+('Mia', 'Anderson', 'mia.anderson@example.com', 'mia_a', 'passwordSalt7', 'passwordHash7', NULL, NULL);
 
 INSERT INTO Role (Name)
 VALUES 
@@ -317,4 +324,11 @@ INSERT INTO Rating (UserID, MovieID, Value, Comment)
 VALUES 
 (1, 1, 5, 'Great movie!'),
 (2, 2, 4, 'Classic film.'),
-(3, 3, 5, 'One of the best superhero movies.');
+(3, 3, 5, 'One of the best superhero movies.'),
+(4, 4, 4, 'Interesting concept, but could be better.'),
+(5, 5, 5, 'Mind-blowing! A must-watch.'),
+(6, 6, 3, 'Not my favorite, but still entertaining.'),
+(7, 7, 4, 'Very engaging and well-executed.'),
+(4, 8, 5, 'Epic conclusion to the trilogy!'),
+(5, 9, 4, 'Visually stunning and gripping story.'),
+(6, 10, 3, 'Good thriller, but a bit predictable.');

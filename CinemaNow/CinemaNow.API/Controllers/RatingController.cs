@@ -46,5 +46,20 @@ namespace CinemaNow.API.Controllers
             var averageRating = _ratingService.GetAverageRating(movieId);
             return Ok(new { AverageRating = averageRating });
         }
+
+        [HttpGet("movie/{movieId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetRatingsByMovieId(int movieId)
+        {
+            try
+            {
+                var ratings = await _ratingService.GetRatingsByMovieIdAsync(movieId);
+                return Ok(ratings);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
 import 'package:cinemanow_mobile/providers/movie_provider.dart';
+import 'package:cinemanow_mobile/screens/movie_ratings_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:cinemanow_mobile/models/movie.dart';
@@ -33,7 +34,6 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      print('Error fetching movie details: $e');
       setState(() {
         _isLoading = false;
       });
@@ -62,24 +62,34 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                       Positioned(
                         top: 40,
                         right: 20,
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.star,
-                                  color: Colors.white, size: 16),
-                              const SizedBox(width: 4),
-                              Text(
-                                _movie.averageRating != null
-                                    ? '${_movie.averageRating!.toStringAsFixed(1)}/10'
-                                    : 'N/A',
-                                style: const TextStyle(color: Colors.white),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    MovieRatingsScreen(movieId: _movie.id!),
                               ),
-                            ],
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.7),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.star,
+                                    color: Colors.white, size: 16),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _movie.averageRating != null
+                                      ? '${_movie.averageRating!.toStringAsFixed(1)}/5'
+                                      : 'N/A',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
