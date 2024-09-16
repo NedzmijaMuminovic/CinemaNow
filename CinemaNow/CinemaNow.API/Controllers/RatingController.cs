@@ -41,9 +41,10 @@ namespace CinemaNow.API.Controllers
 
         [HttpGet("average/{movieId}")]
         [AllowAnonymous]
-        public ActionResult<double> GetAverageRating(int movieId)
+        public IActionResult GetAverageRating(int movieId)
         {
-            return Ok(_ratingService.GetAverageRating(movieId));
+            var averageRating = _ratingService.GetAverageRating(movieId);
+            return Ok(new { AverageRating = averageRating });
         }
     }
 }
