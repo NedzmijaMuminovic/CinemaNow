@@ -56,13 +56,17 @@ abstract class BaseProvider<T> with ChangeNotifier {
 
     var jsonRequest = jsonEncode(request);
 
-    var response = await http.post(uri, headers: headers, body: jsonRequest);
+    try {
+      var response = await http.post(uri, headers: headers, body: jsonRequest);
 
-    if (isValidResponse(response)) {
-      var data = jsonDecode(response.body);
-      return fromJson(data);
-    } else {
-      throw Exception("Unknown error");
+      if (isValidResponse(response)) {
+        var data = jsonDecode(response.body);
+        return fromJson(data);
+      } else {
+        throw Exception("Server returned status code: ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Failed to insert: $e");
     }
   }
 

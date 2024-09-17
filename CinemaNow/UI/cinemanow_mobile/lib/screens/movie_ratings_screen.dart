@@ -1,3 +1,4 @@
+import 'package:cinemanow_mobile/providers/auth_provider.dart';
 import 'package:cinemanow_mobile/providers/movie_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:cinemanow_mobile/models/rating.dart';
@@ -51,11 +52,18 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
           future: _fetchMovieTitle(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Text('Loading...');
+              return const Text('Loading...',
+                  style: TextStyle(color: Colors.white70));
             } else if (snapshot.hasError) {
-              return const Text('Error');
+              return const Text(
+                'Error',
+                style: TextStyle(color: Colors.white70),
+              );
             } else {
-              return Text(snapshot.data ?? 'Movie Ratings');
+              return Text(
+                snapshot.data ?? 'Movie Ratings',
+                style: const TextStyle(color: Colors.white70),
+              );
             }
           },
         ),
@@ -153,6 +161,15 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
                                 rating.comment!,
                                 style: const TextStyle(color: Colors.white70),
                               ),
+                            ] else ...[
+                              const SizedBox(height: 8),
+                              const Text(
+                                'User didn\'t leave a comment.',
+                                style: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.white70,
+                                ),
+                              ),
                             ],
                           ],
                         ),
@@ -164,6 +181,12 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
             );
           }
         },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showRatingDialog,
+        icon: const Icon(Icons.star, color: Colors.white),
+        label: const Text('Rate', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.red,
       ),
     );
   }
@@ -179,5 +202,109 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
         ),
       ),
     );
+  }
+
+  void _showRatingDialog() {
+    int rating = 0;
+    String comment = '';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (context, setState) {
+          return AlertDialog(
+            backgroundColor: Colors.grey[850],
+            title:
+                const Text('Rate this movie', style: TextStyle(color: Colors.white)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (index) {
+                    return IconButton(
+                      icon: Icon(
+                        index < rating ? Icons.star : Icons.star_border,
+                        color: Colors.red,
+                        size: 40,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          rating = index + 1;
+                        });
+                      },
+                    );
+                  }),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    hintText: 'Add a comment (optional)',
+                    hintStyle: TextStyle(color: Colors.white54),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red),
+                    ),
+                  ),
+                  onChanged: (value) {
+                    comment = value;
+                  },
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                child: const Text('Cancel', style: TextStyle(color: Colors.white)),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: rating > 0 ? Colors.red : Colors.grey,
+                ),
+                onPressed: rating > 0
+                    ? () async {
+                        final ratingProvider = context.read<RatingProvider>();
+                        final newRating = Rating(
+                          movieId: widget.movieId,
+                          userId: AuthProvider.userId,
+                          value: rating,
+                          comment: comment.isNotEmpty ? comment : null,
+                        );
+
+                        try {
+                          await ratingProvider.addRating(newRating);
+
+                          Navigator.of(context).pop();
+
+                          _refreshRatings();
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Rating added successfully!')),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Failed to submit rating.')),
+                          );
+                        }
+                      }
+                    : null,
+                child: const Text('Submit'),
+              ),
+            ],
+          );
+        });
+      },
+    );
+  }
+
+  void _refreshRatings() {
+    setState(() {
+      _ratingsFuture = _fetchRatings();
+    });
   }
 }

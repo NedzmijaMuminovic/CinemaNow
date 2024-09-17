@@ -52,4 +52,12 @@ class RatingProvider extends BaseProvider<Rating> {
       return [];
     }
   }
+
+  Future<Rating> addRating(Rating rating) async {
+    try {
+      return await insert(rating);
+    } catch (e) {
+      throw Exception('Failed to add rating: ${e.toString()}');
+    }
+  }
 }
