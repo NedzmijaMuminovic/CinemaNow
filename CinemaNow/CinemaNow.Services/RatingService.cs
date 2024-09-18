@@ -11,13 +11,17 @@ using System.Linq.Dynamic.Core;
 using CinemaNow.Models.Requests;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 
 namespace CinemaNow.Services
 {
     public class RatingService : BaseCRUDService<Models.Rating, RatingSearchObject, Database.Rating, RatingInsertRequest, RatingUpdateRequest>, IRatingService
     {
-        public RatingService(Ib200033Context context, IMapper mapper) : base(context, mapper)
+        private readonly IUserService _userService;
+
+        public RatingService(Ib200033Context context, IMapper mapper, IUserService userService) : base(context, mapper)
         {
+            _userService = userService;
         }
 
         public override IQueryable<Database.Rating> AddFilter(RatingSearchObject search, IQueryable<Database.Rating> query)
@@ -71,6 +75,41 @@ namespace CinemaNow.Services
                 .Include(r => r.Movie)
                 .Select(r => Mapper.Map<Models.Rating>(r))
                 .ToListAsync();
+        }
+
+        public override void Delete(int id)
+        {
+            var rating = Context.Ratings.Find(id);
+            if (rating == null)
+            {
+                throw new Exception("Rating not found");
+            }
+
+            var currentUserId = _userService.GetCurrentUserId();
+            if (rating.UserId != currentUserId)
+            {
+                throw new UnauthorizedAccessException("You can only delete your own ratings.");
+            }
+
+            Context.Ratings.Remove(rating);
+            Context.SaveChanges();
+        }
+
+        public override Models.Rating Update(int id, RatingUpdateRequest request)
+        {
+            var rating = Context.Ratings.Find(id);
+            if (rating == null)
+            {
+                throw new Exception("Rating not found");
+            }
+
+            var currentUserId = _userService.GetCurrentUserId();
+            if (rating.UserId != currentUserId)
+            {
+                throw new UnauthorizedAccessException("You can only update your own ratings.");
+            }
+
+            return base.Update(id, request);
         }
 
     }

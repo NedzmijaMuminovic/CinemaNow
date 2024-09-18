@@ -13,16 +13,20 @@ using System.Threading.Tasks;
 using System.Linq.Dynamic.Core;
 using Microsoft.Extensions.Logging;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace CinemaNow.Services
 {
     public class UserService : BaseCRUDService<Models.User, UserSearchObject, Database.User, UserInsertRequest, UserUpdateRequest>, IUserService
     {
         ILogger<UserService> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserService(Ib200033Context context, IMapper mapper, ILogger<UserService> logger) : base(context, mapper)
+        public UserService(Ib200033Context context, IMapper mapper, ILogger<UserService> logger, IHttpContextAccessor httpContextAccessor) : base(context, mapper)
         {
             _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public override IQueryable<Database.User> AddFilter(UserSearchObject searchObject, IQueryable<Database.User> query)
@@ -181,6 +185,23 @@ namespace CinemaNow.Services
                 return null;
 
             return this.Mapper.Map<Models.User>(entity);
+        }
+
+        public int GetCurrentUserId()
+        {
+            var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+
+            var user = Context.Users.FirstOrDefault(u => u.Username == username);
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException("User not found.");
+            }
+
+            return user.Id;
         }
     }
 }

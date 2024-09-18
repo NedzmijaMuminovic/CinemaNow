@@ -17,6 +17,7 @@ class MovieRatingsScreen extends StatefulWidget {
 
 class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
   late Future<List<Rating>> _ratingsFuture;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -38,9 +39,32 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
     try {
       final ratingProvider = context.read<RatingProvider>();
       final ratings = await ratingProvider.getByMovieId(widget.movieId);
-      return ratings;
+      return ratings..sort((a, b) => b.id!.compareTo(a.id!));
     } catch (e) {
       return [];
+    }
+  }
+
+  void _deleteRating(Rating rating) async {
+    if (rating.userId != AuthProvider.userId) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You can only delete your own ratings.')),
+      );
+      return;
+    }
+
+    try {
+      final ratingProvider = context.read<RatingProvider>();
+      await ratingProvider.deleteRating(rating.id!);
+      _refreshRatings();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('You have successfully deleted the rating!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to delete rating.')),
+      );
     }
   }
 
@@ -112,6 +136,7 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
           } else {
             final ratings = snapshot.data!;
             return ListView.builder(
+              controller: _scrollController,
               padding: const EdgeInsets.all(16),
               itemCount: ratings.length,
               itemBuilder: (context, index) {
@@ -142,18 +167,16 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                Text(
-                                  '${rating.user?.name ?? ''} ${rating.user?.surname ?? ''}',
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const Spacer(),
-                                _buildStarRating(rating.value ?? 0),
-                              ],
-                            ),
+                            Row(children: [
+                              Text(
+                                '${rating.user?.name ?? ''} ${rating.user?.surname ?? ''}',
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              const Spacer(),
+                              _buildStarRating(rating.value ?? 0),
+                            ]),
                             if (rating.comment != null &&
                                 rating.comment!.isNotEmpty) ...[
                               const SizedBox(height: 8),
@@ -171,6 +194,94 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
                                 ),
                               ),
                             ],
+                            if (rating.userId == AuthProvider.userId) ...[
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      icon: const Icon(Icons.edit,
+                                          color: Colors.white),
+                                      label: const Text(
+                                        'Edit',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      onPressed: () {
+                                        _showRatingDialog(
+                                          initialRating: rating.value ?? 0,
+                                          initialComment: rating.comment ?? '',
+                                          ratingId: rating.id,
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.grey[700],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      icon: const Icon(Icons.delete,
+                                          color: Colors.white),
+                                      label: const Text(
+                                        'Delete',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      onPressed: () async {
+                                        final confirmed =
+                                            await showDialog<bool>(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              title: const Text(
+                                                'Confirm Deletion',
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              content: const Text(
+                                                'Are you sure you want to delete this rating?',
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              backgroundColor: Colors.grey[900],
+                                              actions: <Widget>[
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop(false),
+                                                  child: const Text(
+                                                    'No',
+                                                    style: TextStyle(
+                                                        color: Colors.red),
+                                                  ),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop(true),
+                                                  child: const Text(
+                                                    'Yes',
+                                                    style: TextStyle(
+                                                        color: Colors.red),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+
+                                        if (confirmed == true) {
+                                          _deleteRating(rating);
+                                        }
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ]
                           ],
                         ),
                       ),
@@ -204,9 +315,10 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
     );
   }
 
-  void _showRatingDialog() {
-    int rating = 0;
-    String comment = '';
+  void _showRatingDialog(
+      {int initialRating = 0, String initialComment = '', int? ratingId}) {
+    int rating = initialRating;
+    String comment = initialComment;
 
     showDialog(
       context: context,
@@ -214,8 +326,10 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
         return StatefulBuilder(builder: (context, setState) {
           return AlertDialog(
             backgroundColor: Colors.grey[850],
-            title:
-                const Text('Rate this movie', style: TextStyle(color: Colors.white)),
+            title: Text(
+              ratingId != null ? 'Edit your rating' : 'Rate this movie',
+              style: const TextStyle(color: Colors.white),
+            ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -249,6 +363,7 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
                       borderSide: BorderSide(color: Colors.red),
                     ),
                   ),
+                  controller: TextEditingController(text: initialComment),
                   onChanged: (value) {
                     comment = value;
                   },
@@ -257,7 +372,8 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
             ),
             actions: [
               TextButton(
-                child: const Text('Cancel', style: TextStyle(color: Colors.white)),
+                child:
+                    const Text('Cancel', style: TextStyle(color: Colors.white)),
                 onPressed: () => Navigator.of(context).pop(),
               ),
               ElevatedButton(
@@ -268,7 +384,8 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
                 onPressed: rating > 0
                     ? () async {
                         final ratingProvider = context.read<RatingProvider>();
-                        final newRating = Rating(
+                        final updatedRating = Rating(
+                          id: ratingId,
                           movieId: widget.movieId,
                           userId: AuthProvider.userId,
                           value: rating,
@@ -276,24 +393,37 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
                         );
 
                         try {
-                          await ratingProvider.addRating(newRating);
+                          if (ratingId != null) {
+                            await ratingProvider.updateRating(
+                                ratingId, updatedRating);
+                          } else {
+                            await ratingProvider.addRating(updatedRating);
+                          }
 
                           Navigator.of(context).pop();
 
                           _refreshRatings();
 
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Rating added successfully!')),
+                            SnackBar(
+                              content: Text(ratingId != null
+                                  ? 'You have successfully updated the rating!'
+                                  : 'You have successfully added the rating!'),
+                            ),
                           );
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Failed to submit rating.')),
+                            const SnackBar(
+                                content: Text('Failed to submit rating.')),
                           );
                         }
                       }
                     : null,
-                child: const Text('Submit'),
+                child: Text(
+                  'Submit',
+                  style: TextStyle(
+                      color: rating > 0 ? Colors.white : Colors.transparent),
+                ),
               ),
             ],
           );
@@ -305,6 +435,15 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
   void _refreshRatings() {
     setState(() {
       _ratingsFuture = _fetchRatings();
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
     });
   }
 }

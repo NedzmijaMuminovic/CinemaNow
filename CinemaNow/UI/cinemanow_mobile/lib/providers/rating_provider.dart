@@ -60,4 +60,20 @@ class RatingProvider extends BaseProvider<Rating> {
       throw Exception('Failed to add rating: ${e.toString()}');
     }
   }
+
+  Future<void> deleteRating(int ratingId) async {
+    try {
+      await delete(ratingId);
+    } catch (e) {
+      throw Exception('Failed to delete rating: ${e.toString()}');
+    }
+  }
+
+  Future<Rating> updateRating(int ratingId, Rating updatedRating) async {
+    try {
+      return await update(ratingId, updatedRating);
+    } catch (e) {
+      throw Exception('Failed to update rating: ${e.toString()}');
+    }
+  }
 }

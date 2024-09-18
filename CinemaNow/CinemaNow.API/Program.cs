@@ -28,6 +28,8 @@ builder.Services.AddTransient<DraftScreeningState>();
 builder.Services.AddTransient<ActiveScreeningState>();
 builder.Services.AddTransient<HiddenScreeningState>();
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddControllers( x =>
 {
     x.Filters.Add<ExceptionFilter>();

@@ -12,5 +12,6 @@ namespace CinemaNow.Services
     public interface IUserService : IBaseCRUDService<User, UserSearchObject, UserInsertRequest, UserUpdateRequest>
     {
         User Login(string username, string password);
+        int GetCurrentUserId();
     }
 }
