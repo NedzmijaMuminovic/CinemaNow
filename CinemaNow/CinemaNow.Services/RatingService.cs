@@ -112,5 +112,22 @@ namespace CinemaNow.Services
             return base.Update(id, request);
         }
 
+        public bool HasUserRatedMovie(int userId, int movieId)
+        {
+            return Context.Ratings.Any(r => r.UserId == userId && r.MovieId == movieId);
+        }
+
+        public override Models.Rating Insert(RatingInsertRequest request)
+        {
+            var currentUserId = _userService.GetCurrentUserId();
+            if (HasUserRatedMovie(currentUserId, request.MovieId))
+            {
+                throw new InvalidOperationException("You have already rated this movie.");
+            }
+
+            request.UserId = currentUserId;
+            return base.Insert(request);
+        }
+
     }
 }

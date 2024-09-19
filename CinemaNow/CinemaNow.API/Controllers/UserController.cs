@@ -12,7 +12,11 @@ namespace CinemaNow.API.Controllers
     [Route("[controller]")]
     public class UserController : BaseCRUDController<Models.User, UserSearchObject, UserInsertRequest, UserUpdateRequest>
     {
-        public UserController(IUserService service) : base(service) { }
+        private readonly IUserService _userService;
+
+        public UserController(IUserService userService) : base(userService) {
+            _userService = userService;
+        }
 
         [HttpPost("login")]
         [AllowAnonymous]
@@ -47,5 +51,15 @@ namespace CinemaNow.API.Controllers
         {
             return base.GetList(searchObject);
         }
+
+        [HttpGet("check-username")]
+        [AllowAnonymous]
+
+        public async Task<IActionResult> CheckUsername(string username)
+        {
+            var isTaken = await _userService.IsUsernameTaken(username);
+            return Ok(isTaken);
+        }
+
     }
 }

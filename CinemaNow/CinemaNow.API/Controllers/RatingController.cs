@@ -61,5 +61,21 @@ namespace CinemaNow.API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpGet("hasRated/{userId}/{movieId}")]
+        [AllowAnonymous]
+        public IActionResult HasUserRatedMovie(int userId, int movieId)
+        {
+            try
+            {
+                var hasRated = _ratingService.HasUserRatedMovie(userId, movieId);
+                return Ok(new { HasRated = hasRated });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
+        }
+
     }
 }

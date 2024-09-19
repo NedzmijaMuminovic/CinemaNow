@@ -13,5 +13,6 @@ namespace CinemaNow.Services
     {
         User Login(string username, string password);
         int GetCurrentUserId();
+        public Task<bool> IsUsernameTaken(string username);
     }
 }

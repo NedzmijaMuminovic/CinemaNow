@@ -203,5 +203,11 @@ namespace CinemaNow.Services
 
             return user.Id;
         }
+
+        public async Task<bool> IsUsernameTaken(string username)
+        {
+            return await Context.Users.AnyAsync(u => u.Username == username);
+        }
+
     }
 }

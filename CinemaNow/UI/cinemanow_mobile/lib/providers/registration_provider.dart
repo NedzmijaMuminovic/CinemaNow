@@ -1,6 +1,8 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 import 'package:cinemanow_mobile/models/role.dart';
 import 'package:cinemanow_mobile/providers/role_provider.dart';
-import 'package:cinemanow_mobile/providers/user_provider.dart';
 
 import 'base_provider.dart';
 
@@ -19,9 +21,13 @@ class RegistrationProvider extends BaseProvider {
   }
 
   Future<bool> isUsernameTaken(String username) async {
-    final userProvider = UserProvider();
-    final users = await userProvider.getUsers();
-    return users.result.any((user) => user.username == username);
+    final response = await http
+        .get(Uri.parse('$baseUrl$endpoint/check-username?username=$username'));
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as bool;
+    } else {
+      throw Exception('Failed to check username');
+    }
   }
 
   Future<bool> registerUser({

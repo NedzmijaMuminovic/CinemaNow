@@ -13,5 +13,6 @@ namespace CinemaNow.Services
     {
         double? GetAverageRating(int movieId);
         public Task<IEnumerable<Models.Rating>> GetRatingsByMovieIdAsync(int movieId);
+        public bool HasUserRatedMovie(int userId, int movieId);
     }
 }

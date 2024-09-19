@@ -25,6 +25,17 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
     _ratingsFuture = _fetchRatings();
   }
 
+  Future<bool> _checkUserRating() async {
+    final userId = AuthProvider.userId;
+    if (userId == null) {
+      return false;
+    }
+
+    final ratingProvider = context.read<RatingProvider>();
+    final hasRated = await ratingProvider.hasUserRatedMovie(widget.movieId);
+    return hasRated;
+  }
+
   Future<String> _fetchMovieTitle() async {
     try {
       final movieProvider = context.read<MovieProvider>();
@@ -293,11 +304,26 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showRatingDialog,
-        icon: const Icon(Icons.star, color: Colors.white),
-        label: const Text('Rate', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.red,
+      floatingActionButton: FutureBuilder<bool>(
+        future: _checkUserRating(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SizedBox.shrink();
+          }
+
+          final bool hasRated = snapshot.data ?? false;
+
+          if (hasRated) {
+            return const SizedBox.shrink();
+          }
+
+          return FloatingActionButton.extended(
+            onPressed: _showRatingDialog,
+            icon: const Icon(Icons.star, color: Colors.white),
+            label: const Text('Rate', style: TextStyle(color: Colors.white)),
+            backgroundColor: Colors.red,
+          );
+        },
       ),
     );
   }
@@ -316,11 +342,13 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
   }
 
   void _showRatingDialog(
-      {int initialRating = 0, String initialComment = '', int? ratingId}) {
+      {int initialRating = 0,
+      String initialComment = '',
+      int? ratingId}) async {
     int rating = initialRating;
     String comment = initialComment;
 
-    showDialog(
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(builder: (context, setState) {
@@ -401,8 +429,8 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
                           }
 
                           Navigator.of(context).pop();
-
                           _refreshRatings();
+                          _refreshUserRatingStatus();
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -412,9 +440,9 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
                             ),
                           );
                         } catch (e) {
+                          Navigator.of(context).pop();
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Failed to submit rating.')),
+                            SnackBar(content: Text(e.toString())),
                           );
                         }
                       }
@@ -430,6 +458,7 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
         });
       },
     );
+    _refreshRatings();
   }
 
   void _refreshRatings() {
@@ -444,6 +473,12 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
           curve: Curves.easeOut,
         );
       }
+    });
+  }
+
+  void _refreshUserRatingStatus() {
+    setState(() {
+      _checkUserRating();
     });
   }
 }
