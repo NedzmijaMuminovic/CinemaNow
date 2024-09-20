@@ -18,6 +18,7 @@ class MovieRatingsScreen extends StatefulWidget {
 class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
   late Future<List<Rating>> _ratingsFuture;
   final ScrollController _scrollController = ScrollController();
+  bool _hasChanges = false;
 
   @override
   void initState() {
@@ -68,6 +69,9 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
       final ratingProvider = context.read<RatingProvider>();
       await ratingProvider.deleteRating(rating.id!);
       _refreshRatings();
+      setState(() {
+        _hasChanges = true;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text('You have successfully deleted the rating!')),
@@ -81,251 +85,272 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: FutureBuilder<String>(
-          future: _fetchMovieTitle(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Text('Loading...',
-                  style: TextStyle(color: Colors.white70));
-            } else if (snapshot.hasError) {
-              return const Text(
-                'Error',
-                style: TextStyle(color: Colors.white70),
-              );
-            } else {
-              return Text(
-                snapshot.data ?? 'Movie Ratings',
-                style: const TextStyle(color: Colors.white70),
-              );
-            }
-          },
-        ),
-        backgroundColor: Colors.grey[850],
-      ),
-      backgroundColor: Colors.grey[900],
-      body: FutureBuilder<List<Rating>>(
-        future: _ratingsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: Colors.red,
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Error: ${snapshot.error}',
-                style: const TextStyle(color: Colors.white),
-              ),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.sentiment_dissatisfied,
-                    color: Colors.white70,
-                    size: 50,
+    return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) {
+            return;
+          }
+          final navigator = Navigator.of(context);
+          navigator.pop(_hasChanges);
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: FutureBuilder<String>(
+              future: _fetchMovieTitle(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Text('Loading...',
+                      style: TextStyle(color: Colors.white70));
+                } else if (snapshot.hasError) {
+                  return const Text(
+                    'Error',
+                    style: TextStyle(color: Colors.white70),
+                  );
+                } else {
+                  return Text(
+                    snapshot.data ?? 'Movie Ratings',
+                    style: const TextStyle(color: Colors.white70),
+                  );
+                }
+              },
+            ),
+            backgroundColor: Colors.grey[850],
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.of(context).pop(_hasChanges);
+              },
+            ),
+          ),
+          backgroundColor: Colors.grey[900],
+          body: FutureBuilder<List<Rating>>(
+            future: _ratingsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.red,
                   ),
-                  SizedBox(height: 16),
-                  Text(
-                    'No ratings available',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 1.2,
-                    ),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text(
+                    'Error: ${snapshot.error}',
+                    style: const TextStyle(color: Colors.white),
                   ),
-                ],
-              ),
-            );
-          } else {
-            final ratings = snapshot.data!;
-            return ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              itemCount: ratings.length,
-              itemBuilder: (context, index) {
-                final rating = ratings[index];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[800],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                );
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundImage: rating.user?.imageBase64 != null
-                            ? MemoryImage(
-                                base64Decode(rating.user!.imageBase64!))
-                            : null,
-                        backgroundColor: Colors.grey[700],
-                        child: rating.user?.imageBase64 == null
-                            ? const Icon(Icons.person, color: Colors.white)
-                            : null,
+                      Icon(
+                        Icons.sentiment_dissatisfied,
+                        color: Colors.white70,
+                        size: 50,
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(children: [
-                              Text(
-                                '${rating.user?.name ?? ''} ${rating.user?.surname ?? ''}',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const Spacer(),
-                              _buildStarRating(rating.value ?? 0),
-                            ]),
-                            if (rating.comment != null &&
-                                rating.comment!.isNotEmpty) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                rating.comment!,
-                                style: const TextStyle(color: Colors.white70),
-                              ),
-                            ] else ...[
-                              const SizedBox(height: 8),
-                              const Text(
-                                'User didn\'t leave a comment.',
-                                style: TextStyle(
-                                  fontStyle: FontStyle.italic,
-                                  color: Colors.white70,
-                                ),
-                              ),
-                            ],
-                            if (rating.userId == AuthProvider.userId) ...[
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: ElevatedButton.icon(
-                                      icon: const Icon(Icons.edit,
-                                          color: Colors.white),
-                                      label: const Text(
-                                        'Edit',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      onPressed: () {
-                                        _showRatingDialog(
-                                          initialRating: rating.value ?? 0,
-                                          initialComment: rating.comment ?? '',
-                                          ratingId: rating.id,
-                                        );
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.grey[700],
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: ElevatedButton.icon(
-                                      icon: const Icon(Icons.delete,
-                                          color: Colors.white),
-                                      label: const Text(
-                                        'Delete',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      onPressed: () async {
-                                        final confirmed =
-                                            await showDialog<bool>(
-                                          context: context,
-                                          builder: (context) {
-                                            return AlertDialog(
-                                              title: const Text(
-                                                'Confirm Deletion',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              content: const Text(
-                                                'Are you sure you want to delete this rating?',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              backgroundColor: Colors.grey[900],
-                                              actions: <Widget>[
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.of(context)
-                                                          .pop(false),
-                                                  child: const Text(
-                                                    'No',
-                                                    style: TextStyle(
-                                                        color: Colors.red),
-                                                  ),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.of(context)
-                                                          .pop(true),
-                                                  child: const Text(
-                                                    'Yes',
-                                                    style: TextStyle(
-                                                        color: Colors.red),
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          },
-                                        );
-
-                                        if (confirmed == true) {
-                                          _deleteRating(rating);
-                                        }
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ]
-                          ],
+                      SizedBox(height: 16),
+                      Text(
+                        'No ratings available',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 1.2,
                         ),
                       ),
                     ],
                   ),
                 );
-              },
-            );
-          }
-        },
-      ),
-      floatingActionButton: FutureBuilder<bool>(
-        future: _checkUserRating(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SizedBox.shrink();
-          }
+              } else {
+                final ratings = snapshot.data!;
+                return ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(16),
+                  itemCount: ratings.length,
+                  itemBuilder: (context, index) {
+                    final rating = ratings[index];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[800],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage: rating.user?.imageBase64 != null
+                                ? MemoryImage(
+                                    base64Decode(rating.user!.imageBase64!))
+                                : null,
+                            backgroundColor: Colors.grey[700],
+                            child: rating.user?.imageBase64 == null
+                                ? const Icon(Icons.person, color: Colors.white)
+                                : null,
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(children: [
+                                  Text(
+                                    '${rating.user?.name ?? ''} ${rating.user?.surname ?? ''}',
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const Spacer(),
+                                  _buildStarRating(rating.value ?? 0),
+                                ]),
+                                if (rating.comment != null &&
+                                    rating.comment!.isNotEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    rating.comment!,
+                                    style:
+                                        const TextStyle(color: Colors.white70),
+                                  ),
+                                ] else ...[
+                                  const SizedBox(height: 8),
+                                  const Text(
+                                    'User didn\'t leave a comment.',
+                                    style: TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                ],
+                                if (rating.userId == AuthProvider.userId) ...[
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: ElevatedButton.icon(
+                                          icon: const Icon(Icons.edit,
+                                              color: Colors.white),
+                                          label: const Text(
+                                            'Edit',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          onPressed: () {
+                                            _showRatingDialog(
+                                              initialRating: rating.value ?? 0,
+                                              initialComment:
+                                                  rating.comment ?? '',
+                                              ratingId: rating.id,
+                                            );
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.grey[700],
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: ElevatedButton.icon(
+                                          icon: const Icon(Icons.delete,
+                                              color: Colors.white),
+                                          label: const Text(
+                                            'Delete',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          onPressed: () async {
+                                            final confirmed =
+                                                await showDialog<bool>(
+                                              context: context,
+                                              builder: (context) {
+                                                return AlertDialog(
+                                                  title: const Text(
+                                                    'Confirm Deletion',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                  content: const Text(
+                                                    'Are you sure you want to delete this rating?',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                  backgroundColor:
+                                                      Colors.grey[900],
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.of(context)
+                                                              .pop(false),
+                                                      child: const Text(
+                                                        'No',
+                                                        style: TextStyle(
+                                                            color: Colors.red),
+                                                      ),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.of(context)
+                                                              .pop(true),
+                                                      child: const Text(
+                                                        'Yes',
+                                                        style: TextStyle(
+                                                            color: Colors.red),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
 
-          final bool hasRated = snapshot.data ?? false;
+                                            if (confirmed == true) {
+                                              _deleteRating(rating);
+                                            }
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ]
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              }
+            },
+          ),
+          floatingActionButton: FutureBuilder<bool>(
+            future: _checkUserRating(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SizedBox.shrink();
+              }
 
-          if (hasRated) {
-            return const SizedBox.shrink();
-          }
+              final bool hasRated = snapshot.data ?? false;
 
-          return FloatingActionButton.extended(
-            onPressed: _showRatingDialog,
-            icon: const Icon(Icons.star, color: Colors.white),
-            label: const Text('Rate', style: TextStyle(color: Colors.white)),
-            backgroundColor: Colors.red,
-          );
-        },
-      ),
-    );
+              if (hasRated) {
+                return const SizedBox.shrink();
+              }
+
+              return FloatingActionButton.extended(
+                onPressed: _showRatingDialog,
+                icon: const Icon(Icons.star, color: Colors.white),
+                label:
+                    const Text('Rate', style: TextStyle(color: Colors.white)),
+                backgroundColor: Colors.red,
+              );
+            },
+          ),
+        ));
   }
 
   Widget _buildStarRating(int ratingValue) {
@@ -391,6 +416,7 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
                       borderSide: BorderSide(color: Colors.red),
                     ),
                   ),
+                  cursorColor: Colors.red,
                   controller: TextEditingController(text: initialComment),
                   onChanged: (value) {
                     comment = value;
@@ -431,6 +457,9 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
                           Navigator.of(context).pop();
                           _refreshRatings();
                           _refreshUserRatingStatus();
+                          setState(() {
+                            _hasChanges = true;
+                          });
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(

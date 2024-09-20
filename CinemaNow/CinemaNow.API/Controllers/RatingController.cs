@@ -20,6 +20,7 @@ namespace CinemaNow.API.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        [Authorize(Roles = "User")]
         public override Rating Insert(RatingInsertRequest request)
         {
             return _service.Insert(request);
@@ -27,6 +28,7 @@ namespace CinemaNow.API.Controllers
 
         [HttpPut("{id}")]
         [AllowAnonymous]
+        [Authorize(Roles = "User")]
         public override Rating Update(int id, RatingUpdateRequest request)
         {
             return _service.Update(id, request);
@@ -34,13 +36,13 @@ namespace CinemaNow.API.Controllers
 
         [HttpDelete("{id}")]
         [AllowAnonymous]
+        [Authorize(Roles = "User")]
         public override void Delete(int id)
         {
             _service.Delete(id);
         }
 
         [HttpGet("average/{movieId}")]
-        [AllowAnonymous]
         public IActionResult GetAverageRating(int movieId)
         {
             var averageRating = _ratingService.GetAverageRating(movieId);
@@ -48,7 +50,6 @@ namespace CinemaNow.API.Controllers
         }
 
         [HttpGet("movie/{movieId}")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetRatingsByMovieId(int movieId)
         {
             try
@@ -63,7 +64,6 @@ namespace CinemaNow.API.Controllers
         }
 
         [HttpGet("hasRated/{userId}/{movieId}")]
-        [AllowAnonymous]
         public IActionResult HasUserRatedMovie(int userId, int movieId)
         {
             try

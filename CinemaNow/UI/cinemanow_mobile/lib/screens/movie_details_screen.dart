@@ -63,13 +63,17 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                         top: 40,
                         right: 20,
                         child: GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(
+                          onTap: () async {
+                            final hasChanges =
+                                await Navigator.of(context).push<bool>(
                               MaterialPageRoute(
                                 builder: (context) =>
                                     MovieRatingsScreen(movieId: _movie.id!),
                               ),
                             );
+                            if (hasChanges == true) {
+                              _fetchFullMovieDetails();
+                            }
                           },
                           child: Container(
                             padding: const EdgeInsets.all(8),
