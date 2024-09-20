@@ -27,6 +27,7 @@ namespace CinemaNow.API.Controllers
         }
 
         [HttpPost("upload-image/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UploadImage(int id, IFormFile file)
         {
             if (file == null || file.Length == 0)

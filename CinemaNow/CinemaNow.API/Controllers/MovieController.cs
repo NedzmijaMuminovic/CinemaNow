@@ -2,6 +2,7 @@
 using CinemaNow.Models.Requests;
 using CinemaNow.Models.SearchObjects;
 using CinemaNow.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CinemaNow.API.Controllers
@@ -15,6 +16,7 @@ namespace CinemaNow.API.Controllers
         }
 
         [HttpPost("upload-image/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UploadImage(int id, IFormFile file)
         {
             if (file == null || file.Length == 0)

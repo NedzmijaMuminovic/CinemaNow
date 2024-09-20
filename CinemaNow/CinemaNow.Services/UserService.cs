@@ -97,6 +97,12 @@ namespace CinemaNow.Services
 
         public override void BeforeInsert(UserInsertRequest request, Database.User entity)
         {
+            var usernameExists = Context.Users.Any(u => u.Username == request.Username);
+            if (usernameExists)
+            {
+                throw new Exception("The username is already taken. Please choose another one.");
+            }
+
             if (request.Password != request.PasswordConfirmation)
                 throw new Exception("Password and PasswordConfirmation must be the same values.");
 
@@ -144,6 +150,12 @@ namespace CinemaNow.Services
         public override void BeforeUpdate(UserUpdateRequest request, Database.User entity)
         {
             base.BeforeUpdate(request, entity);
+
+            var usernameExists = Context.Users.Any(u => u.Username == request.Username);
+            if (usernameExists)
+            {
+                throw new Exception("The username is already taken. Please choose another one.");
+            }
 
             if (request.Password != null)
             {
