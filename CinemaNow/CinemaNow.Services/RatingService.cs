@@ -97,6 +97,11 @@ namespace CinemaNow.Services
 
         public override Models.Rating Update(int id, RatingUpdateRequest request)
         {
+            if (request.Value.HasValue && (request.Value.Value < 1 || request.Value.Value > 5))
+            {
+                throw new ArgumentOutOfRangeException(nameof(request.Value), "Rating value must be between 1 and 5.");
+            }
+
             var rating = Context.Ratings.Find(id);
             if (rating == null)
             {
@@ -119,6 +124,11 @@ namespace CinemaNow.Services
 
         public override Models.Rating Insert(RatingInsertRequest request)
         {
+            if (request.Value < 1 || request.Value > 5)
+            {
+                throw new ArgumentOutOfRangeException(nameof(request.Value), "Rating value must be between 1 and 5.");
+            }
+
             var currentUserId = _userService.GetCurrentUserId();
             if (HasUserRatedMovie(currentUserId, request.MovieId))
             {

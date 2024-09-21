@@ -39,6 +39,7 @@ namespace CinemaNow.API.Controllers
 
         [HttpPut("{id}")]
         [AllowAnonymous]
+        [Authorize]
         public override Models.User Update(int id, UserUpdateRequest request)
         {
             return base.Update(id, request);

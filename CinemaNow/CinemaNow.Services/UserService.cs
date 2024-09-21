@@ -151,7 +151,7 @@ namespace CinemaNow.Services
         {
             base.BeforeUpdate(request, entity);
 
-            var usernameExists = Context.Users.Any(u => u.Username == request.Username);
+            var usernameExists = Context.Users.Any(u => u.Username == request.Username && u.Id != entity.Id);
             if (usernameExists)
             {
                 throw new Exception("The username is already taken. Please choose another one.");
@@ -220,6 +220,19 @@ namespace CinemaNow.Services
         {
             return await Context.Users.AnyAsync(u => u.Username == username);
         }
+
+        public override Models.User Update(int id, UserUpdateRequest request)
+        {
+            var currentUserId = GetCurrentUserId();
+
+            if (id != currentUserId)
+            {
+                throw new UnauthorizedAccessException("You are not authorized to update this user's information.");
+            }
+
+            return base.Update(id, request);
+        }
+
 
     }
 }
