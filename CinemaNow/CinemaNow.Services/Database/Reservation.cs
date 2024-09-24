@@ -17,9 +17,9 @@ public partial class Reservation
 
     public decimal? TotalPrice { get; set; }
 
+    public virtual ICollection<ReservationSeat> ReservationSeats { get; set; } = new List<ReservationSeat>();
+
     public virtual Screening? Screening { get; set; }
 
     public virtual User? User { get; set; }
-
-    public virtual ICollection<Seat> Seats { get; set; } = new List<Seat>();
 }

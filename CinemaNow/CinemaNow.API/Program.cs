@@ -1,5 +1,6 @@
 using CinemaNow.API;
 using CinemaNow.API.Filters;
+using CinemaNow.Models.SearchObjects;
 using CinemaNow.Services;
 using CinemaNow.Services.Database;
 using CinemaNow.Services.ScreeningStateMachine;
@@ -21,6 +22,7 @@ builder.Services.AddTransient<ISeatService, SeatService>();
 builder.Services.AddTransient<IHallService, HallService>();
 builder.Services.AddTransient<IViewModeService, ViewModeService>();
 builder.Services.AddTransient<IRatingService, RatingService>();
+builder.Services.AddTransient<IReservationService, ReservationService>();
 
 builder.Services.AddTransient<BaseScreeningState>();
 builder.Services.AddTransient<InitialScreeningState>();

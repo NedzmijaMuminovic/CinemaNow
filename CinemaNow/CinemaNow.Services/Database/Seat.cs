@@ -9,7 +9,7 @@ public partial class Seat
 
     public string? Name { get; set; }
 
-    public virtual ICollection<ScreeningSeat> ScreeningSeats { get; set; } = new List<ScreeningSeat>();
+    public virtual ICollection<ReservationSeat> ReservationSeats { get; set; } = new List<ReservationSeat>();
 
-    public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+    public virtual ICollection<ScreeningSeat> ScreeningSeats { get; set; } = new List<ScreeningSeat>();
 }

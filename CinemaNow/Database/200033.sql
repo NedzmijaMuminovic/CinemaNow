@@ -120,6 +120,7 @@ CREATE TABLE Reservation (
 CREATE TABLE ReservationSeat (
     ReservationID INT,
     SeatID INT,
+	ReservedAt DATETIME,
     FOREIGN KEY (ReservationID) REFERENCES Reservation(ID) ON DELETE CASCADE,
     FOREIGN KEY (SeatID) REFERENCES Seat(ID) ON DELETE CASCADE,
     PRIMARY KEY (ReservationID, SeatID)
@@ -425,17 +426,20 @@ VALUES
 (8, 6, '2024-09-12 17:00:00', 3, 33.00),
 (9, 6, '2024-09-12 17:00:00', 4, 44.00);
 
-INSERT INTO ReservationSeat (ReservationID, SeatID)
+INSERT INTO ReservationSeat (ReservationID, SeatID, ReservedAt)
 VALUES 
-(1, 1), (1, 2),
-(2, 3),
-(3, 4), (3, 5), (3, 6),
-(4, 7),
-(5, 8),
-(6, 9), (6, 10), (6, 11), (6, 12), (6, 13),
-(7, 14),
-(8, 15), (8, 16), 
-(9, 17), (9, 18);
+(1, 1, GETDATE()), 
+(1, 2, GETDATE()),
+(2, 3, GETDATE()),
+(3, 4, GETDATE()), 
+(3, 5, GETDATE()), 
+(3, 6, GETDATE()),
+(4, 7, GETDATE()),
+(5, 8, GETDATE()),
+(6, 9, GETDATE()), 
+(6, 10, GETDATE()), 
+(6, 11, GETDATE()), 
+(6, 12, GETDATE());
 
 INSERT INTO Purchase (UserID, ScreeningID, DateTime, NumberOfTickets, TotalPrice, PayPalPaymentID)
 VALUES 
