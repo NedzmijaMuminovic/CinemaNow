@@ -11,19 +11,15 @@ public partial class Reservation
 
     public int? ScreeningId { get; set; }
 
-    public int? SeatId { get; set; }
-
-    public DateTime? Date { get; set; }
+    public DateTime? DateTime { get; set; }
 
     public int? NumberOfTickets { get; set; }
 
     public decimal? TotalPrice { get; set; }
 
-    public string? Status { get; set; }
+    public virtual Screening? Screening { get; set; }
 
-    public virtual Screening Screening { get; set; }
+    public virtual User? User { get; set; }
 
-    public virtual Seat Seat { get; set; }
-
-    public virtual User User { get; set; }
+    public virtual ICollection<Seat> Seats { get; set; } = new List<Seat>();
 }

@@ -24,38 +24,7 @@ namespace CinemaNow.Services
             if (!string.IsNullOrWhiteSpace(search?.FTS))
                 filteredQuery = filteredQuery.Where(x => x.Name.Contains(search.FTS));
 
-            if (search?.IsScreeningIncluded == true)
-                filteredQuery = filteredQuery.Include(x => x.Screening.Movie);
-
             return filteredQuery;
-        }
-
-        public override Models.Seat GetByID(int id)
-        {
-            var entity = Context.Seats.Include(s => s.Screening.Movie).FirstOrDefault(s => s.Id == id);
-
-            if (entity != null)
-                return Mapper.Map<Models.Seat>(entity);
-            else
-                return null;
-        }
-
-        public override void BeforeInsert(SeatUpsertRequest request, Seat entity)
-        {
-            var screening = Context.Screenings.Include(s => s.Movie).FirstOrDefault(s => s.Id == request.ScreeningId);
-            if (screening == null)
-                throw new Exception("Screening not found");
-
-            base.BeforeInsert(request, entity);
-        }
-
-        public override void BeforeUpdate(SeatUpsertRequest request, Seat entity)
-        {
-            base.BeforeUpdate(request, entity);
-
-            var screening = Context.Screenings.Include(s => s.Movie).FirstOrDefault(s => s.Id == request.ScreeningId);
-            if (screening == null)
-                throw new Exception("Screening not found");
         }
     }
 }

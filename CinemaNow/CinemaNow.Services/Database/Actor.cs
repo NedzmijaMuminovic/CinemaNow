@@ -13,7 +13,5 @@ public partial class Actor
 
     public byte[]? Image { get; set; }
 
-    public byte[]? ImageThumb { get; set; }
-
     public virtual ICollection<Movie> Movies { get; set; } = new List<Movie>();
 }

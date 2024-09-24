@@ -19,15 +19,15 @@ public partial class Screening
 
     public string? StateMachine { get; set; }
 
-    public virtual Hall Hall { get; set; }
+    public virtual Hall? Hall { get; set; }
 
-    public virtual Movie Movie { get; set; }
+    public virtual Movie? Movie { get; set; }
 
     public virtual ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
 
     public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 
-    public virtual ICollection<Seat> Seats { get; set; } = new List<Seat>();
+    public virtual ICollection<ScreeningSeat> ScreeningSeats { get; set; } = new List<ScreeningSeat>();
 
-    public virtual ViewMode ViewMode { get; set; }
+    public virtual ViewMode? ViewMode { get; set; }
 }

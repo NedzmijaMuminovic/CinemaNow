@@ -15,8 +15,6 @@ public partial class Movie
 
     public byte[]? Image { get; set; }
 
-    public byte[]? ImageThumb { get; set; }
-
     public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
 
     public virtual ICollection<Screening> Screenings { get; set; } = new List<Screening>();

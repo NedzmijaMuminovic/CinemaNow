@@ -45,7 +45,6 @@ namespace CinemaNow.Services
                 if (dbMovie != null)
                 {
                     movie.ImageBase64 = dbMovie.Image != null ? Convert.ToBase64String(dbMovie.Image) : null;
-                    movie.ImageThumbBase64 = dbMovie.ImageThumb != null ? Convert.ToBase64String(dbMovie.ImageThumb) : null;
 
                     foreach (var actor in movie.Actors)
                     {
@@ -70,7 +69,6 @@ namespace CinemaNow.Services
                 var model = Mapper.Map<Models.Movie>(entity);
 
                 model.ImageBase64 = entity.Image != null ? Convert.ToBase64String(entity.Image) : null;
-                model.ImageThumbBase64 = entity.ImageThumb != null ? Convert.ToBase64String(entity.ImageThumb) : null;
 
                 if (entity.Actors != null)
                 {

@@ -21,8 +21,6 @@ public partial class User
 
     public byte[]? Image { get; set; }
 
-    public byte[]? ImageThumb { get; set; }
-
     public virtual ICollection<PayPalPayment> PayPalPayments { get; set; } = new List<PayPalPayment>();
 
     public virtual ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();

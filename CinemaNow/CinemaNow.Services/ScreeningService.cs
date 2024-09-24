@@ -61,7 +61,6 @@ namespace CinemaNow.Services
                 if (entity.Movie != null)
                 {
                     model.Movie.ImageBase64 = entity.Movie.Image != null ? Convert.ToBase64String(entity.Movie.Image) : null;
-                    model.Movie.ImageThumbBase64 = entity.Movie.ImageThumb != null ? Convert.ToBase64String(entity.Movie.ImageThumb) : null;
                 }
 
                 return model;
@@ -81,7 +80,6 @@ namespace CinemaNow.Services
                     if (dbScreening?.Movie != null)
                     {
                         screening.Movie.ImageBase64 = dbScreening.Movie.Image != null ? Convert.ToBase64String(dbScreening.Movie.Image) : null;
-                        screening.Movie.ImageThumbBase64 = dbScreening.Movie.ImageThumb != null ? Convert.ToBase64String(dbScreening.Movie.ImageThumb) : null;
                     }
                 }
             }

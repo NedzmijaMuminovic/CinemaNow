@@ -10,8 +10,7 @@ CREATE TABLE [User] (
     Username VARCHAR(50),
     PasswordSalt NVARCHAR(128),
     PasswordHash NVARCHAR(128),
-    Image VARBINARY(MAX),
-    ImageThumb VARBINARY(MAX)
+    Image VARBINARY(MAX)
 );
 
 CREATE TABLE Role (
@@ -32,8 +31,7 @@ CREATE TABLE Movie (
     Title VARCHAR(100),
     Duration INT,
     Synopsis VARCHAR(MAX),
-    Image VARBINARY(MAX),
-    ImageThumb VARBINARY(MAX)
+    Image VARBINARY(MAX)
 );
 
 CREATE TABLE Genre (
@@ -53,8 +51,7 @@ CREATE TABLE Actor (
     ID INT PRIMARY KEY IDENTITY,
     Name VARCHAR(50),
     Surname VARCHAR(50),
-    Image VARBINARY(MAX),
-    ImageThumb VARBINARY(MAX)
+    Image VARBINARY(MAX)
 );
 
 CREATE TABLE MovieActor (
@@ -97,39 +94,47 @@ CREATE TABLE PayPalPayment (
 
 CREATE TABLE Seat (
     ID INT PRIMARY KEY IDENTITY,
-    Name VARCHAR(10),
+    Name VARCHAR(10)
+);
+
+CREATE TABLE ScreeningSeat (
     ScreeningID INT,
-    IsReserved BIT,
-    FOREIGN KEY (ScreeningID) REFERENCES Screening(ID) ON DELETE CASCADE
+    SeatID INT,
+    IsReserved BIT DEFAULT 0,
+    FOREIGN KEY (ScreeningID) REFERENCES Screening(ID) ON DELETE CASCADE,
+    FOREIGN KEY (SeatID) REFERENCES Seat(ID) ON DELETE CASCADE,
+    PRIMARY KEY (ScreeningID, SeatID)
 );
 
 CREATE TABLE Reservation (
     ID INT PRIMARY KEY IDENTITY,
     UserID INT,
     ScreeningID INT,
-    SeatID INT,
-    Date DATE,
+    DateTime DATETIME,
     NumberOfTickets INT,
     TotalPrice DECIMAL(10,2),
-    Status VARCHAR(50),
     FOREIGN KEY (UserID) REFERENCES [User](ID) ON DELETE NO ACTION,
-	FOREIGN KEY (ScreeningID) REFERENCES Screening(ID) ON DELETE NO ACTION,
-	FOREIGN KEY (SeatID) REFERENCES Seat(ID) ON DELETE NO ACTION
+    FOREIGN KEY (ScreeningID) REFERENCES Screening(ID) ON DELETE CASCADE
+);
+
+CREATE TABLE ReservationSeat (
+    ReservationID INT,
+    SeatID INT,
+    FOREIGN KEY (ReservationID) REFERENCES Reservation(ID) ON DELETE CASCADE,
+    FOREIGN KEY (SeatID) REFERENCES Seat(ID) ON DELETE CASCADE,
+    PRIMARY KEY (ReservationID, SeatID)
 );
 
 CREATE TABLE Purchase (
     ID INT PRIMARY KEY IDENTITY,
     UserID INT,
     ScreeningID INT,
-    SeatID INT,
-    Date DATE,
+    DateTime DATETIME,
     NumberOfTickets INT,
     TotalPrice DECIMAL(10,2),
-    Status VARCHAR(50),
     PayPalPaymentID INT,
     FOREIGN KEY (UserID) REFERENCES [User](ID) ON DELETE NO ACTION,
     FOREIGN KEY (ScreeningID) REFERENCES Screening(ID) ON DELETE NO ACTION,
-    FOREIGN KEY (SeatID) REFERENCES Seat(ID) ON DELETE NO ACTION,
     FOREIGN KEY (PayPalPaymentID) REFERENCES PayPalPayment(ID) ON DELETE NO ACTION
 );
 
@@ -143,18 +148,18 @@ CREATE TABLE Rating (
     FOREIGN KEY (MovieID) REFERENCES Movie(ID) ON DELETE CASCADE
 );
 
-INSERT INTO [User] (Name, Surname, Email, Username, PasswordSalt, PasswordHash, Image, ImageThumb)
+INSERT INTO [User] (Name, Surname, Email, Username, PasswordSalt, PasswordHash, Image)
 VALUES 
-('Emma', 'Johnson', 'emma.j@example.com', 'emma_j', 'abcdefg12345', '$2y$10$uFj8G3cSJazj5VpShYYGYODSQ8xVOlBghxOGU5iGBt7mXc/Q8qM12', NULL, NULL),
-('Michael', 'Smith', 'michael.s@example.com', 'michael_s', 'qwerty12345', '$2y$10$jHWmzGdZdfA4oUGZ9Efjzuj8sGp0fV9YzKyZUB41VTH4v2QGw3L/q', NULL, NULL),
-('Olivia', 'Williams', 'olivia.w@example.com', 'olivia_w', '1234567890', '$2y$10$zJGeJDEYIlyuk3vm.V6EyO0RFVdoXvXy5F/SJxXTntMP0JArz5SdC', NULL, NULL),
-('Ava', 'Brown', 'ava.brown@example.com', 'ava_b', 'passwordSalt1', 'passwordHash1', NULL, NULL),
-('Liam', 'Davis', 'liam.davis@example.com', 'liam_d', 'passwordSalt2', 'passwordHash2', NULL, NULL),
-('Sophia', 'Miller', 'sophia.miller@example.com', 'sophia_m', 'passwordSalt3', 'passwordHash3', NULL, NULL),
-('Noah', 'Wilson', 'noah.wilson@example.com', 'noah_w', 'passwordSalt4', 'passwordHash4', NULL, NULL),
-('Isabella', 'Moore', 'isabella.moore@example.com', 'isabella_m', 'passwordSalt5', 'passwordHash5', NULL, NULL),
-('Ethan', 'Taylor', 'ethan.taylor@example.com', 'ethan_t', 'passwordSalt6', 'passwordHash6', NULL, NULL),
-('Mia', 'Anderson', 'mia.anderson@example.com', 'mia_a', 'passwordSalt7', 'passwordHash7', NULL, NULL);
+('Emma', 'Johnson', 'emma.j@example.com', 'emma_j', 'abcdefg12345', '$2y$10$uFj8G3cSJazj5VpShYYGYODSQ8xVOlBghxOGU5iGBt7mXc/Q8qM12', NULL),
+('Michael', 'Smith', 'michael.s@example.com', 'michael_s', 'qwerty12345', '$2y$10$jHWmzGdZdfA4oUGZ9Efjzuj8sGp0fV9YzKyZUB41VTH4v2QGw3L/q', NULL),
+('Olivia', 'Williams', 'olivia.w@example.com', 'olivia_w', '1234567890', '$2y$10$zJGeJDEYIlyuk3vm.V6EyO0RFVdoXvXy5F/SJxXTntMP0JArz5SdC', NULL),
+('Ava', 'Brown', 'ava.brown@example.com', 'ava_b', 'passwordSalt1', 'passwordHash1', NULL),
+('Liam', 'Davis', 'liam.davis@example.com', 'liam_d', 'passwordSalt2', 'passwordHash2', NULL),
+('Sophia', 'Miller', 'sophia.miller@example.com', 'sophia_m', 'passwordSalt3', 'passwordHash3', NULL),
+('Noah', 'Wilson', 'noah.wilson@example.com', 'noah_w', 'passwordSalt4', 'passwordHash4', NULL),
+('Isabella', 'Moore', 'isabella.moore@example.com', 'isabella_m', 'passwordSalt5', 'passwordHash5', NULL),
+('Ethan', 'Taylor', 'ethan.taylor@example.com', 'ethan_t', 'passwordSalt6', 'passwordHash6', NULL),
+('Mia', 'Anderson', 'mia.anderson@example.com', 'mia_a', 'passwordSalt7', 'passwordHash7', NULL);
 
 INSERT INTO Role (Name)
 VALUES 
@@ -167,18 +172,18 @@ VALUES
 (2, 1),
 (3, 2);
 
-INSERT INTO Movie (Title, Duration, Synopsis, Image, ImageThumb)
+INSERT INTO Movie (Title, Duration, Synopsis, Image)
 VALUES 
-('The Shawshank Redemption', 142, 'Two imprisoned men bond over a number of years...', NULL, NULL),
-('The Godfather', 175, 'The aging patriarch of an organized crime dynasty...', NULL, NULL),
-('The Dark Knight', 152, 'When the menace known as the Joker wreaks havoc...', NULL, NULL),
-('Inception', 148, 'A thief who enters the dreams of others to steal secrets from their subconscious...', NULL, NULL),
-('The Matrix', 136, 'A computer hacker learns from mysterious rebels about the true nature of his reality...', NULL, NULL),
-('Fight Club', 139, 'An insomniac office worker and a soap salesman build a global organization to help vent male aggression...', NULL, NULL),
-('Pulp Fiction', 154, 'The lives of two mob hitmen, a boxer, a gangster’s wife, and a pair of diner bandits intertwine...', NULL, NULL),
-('Forrest Gump', 142, 'The presidencies of Kennedy and Johnson, the Vietnam War, the Watergate scandal and other historical events unfold...', NULL, NULL),
-('The Lord of the Rings: The Return of the King', 201, 'Gandalf and Aragorn lead the World of Men against Sauron''s army to end his reign over Middle-earth...', NULL, NULL),
-('The Silence of the Lambs', 118, 'A young F.B.I. cadet must confide in an incarcerated and manipulative killer to receive his help on catching another serial killer...', NULL, NULL);
+('The Shawshank Redemption', 142, 'Two imprisoned men bond over a number of years...', NULL),
+('The Godfather', 175, 'The aging patriarch of an organized crime dynasty...', NULL),
+('The Dark Knight', 152, 'When the menace known as the Joker wreaks havoc...', NULL),
+('Inception', 148, 'A thief who enters the dreams of others to steal secrets from their subconscious...', NULL),
+('The Matrix', 136, 'A computer hacker learns from mysterious rebels about the true nature of his reality...', NULL),
+('Fight Club', 139, 'An insomniac office worker and a soap salesman build a global organization to help vent male aggression...', NULL),
+('Pulp Fiction', 154, 'The lives of two mob hitmen, a boxer, a gangster’s wife, and a pair of diner bandits intertwine...', NULL),
+('Forrest Gump', 142, 'The presidencies of Kennedy and Johnson, the Vietnam War, the Watergate scandal and other historical events unfold...', NULL),
+('The Lord of the Rings: The Return of the King', 201, 'Gandalf and Aragorn lead the World of Men against Sauron''s army to end his reign over Middle-earth...', NULL),
+('The Silence of the Lambs', 118, 'A young F.B.I. cadet must confide in an incarcerated and manipulative killer to receive his help on catching another serial killer...', NULL);
 
 INSERT INTO Genre (Name)
 VALUES 
@@ -217,26 +222,26 @@ VALUES
 (10, 2),
 (10, 5);
 
-INSERT INTO Actor (Name, Surname, Image, ImageThumb)
+INSERT INTO Actor (Name, Surname, Image)
 VALUES 
-('Morgan', 'Freeman', NULL, NULL),
-('Marlon', 'Brando', NULL, NULL),
-('Heath', 'Ledger', NULL, NULL),
-('Leonardo', 'DiCaprio', NULL, NULL),
-('Keanu', 'Reeves', NULL, NULL),
-('Brad', 'Pitt', NULL, NULL),
-('John', 'Travolta', NULL, NULL),
-('Tom', 'Hanks', NULL, NULL),
-('Elijah', 'Wood', NULL, NULL),
-('Jodie', 'Foster', NULL, NULL),
-('Christian', 'Bale', NULL, NULL),      
-('Tom', 'Hardy', NULL, NULL),           
-('Carrie-Anne', 'Moss', NULL, NULL),    
-('Helena Bonham', 'Carter', NULL, NULL),
-('Uma', 'Thurman', NULL, NULL),         
-('Gary', 'Sinise', NULL, NULL),         
-('Orlando', 'Bloom', NULL, NULL),       
-('Anthony', 'Hopkins', NULL, NULL);
+('Morgan', 'Freeman', NULL),
+('Marlon', 'Brando', NULL),
+('Heath', 'Ledger', NULL),
+('Leonardo', 'DiCaprio', NULL),
+('Keanu', 'Reeves', NULL),
+('Brad', 'Pitt', NULL),
+('John', 'Travolta', NULL),
+('Tom', 'Hanks', NULL),
+('Elijah', 'Wood', NULL),
+('Jodie', 'Foster', NULL),
+('Christian', 'Bale', NULL),      
+('Tom', 'Hardy', NULL),           
+('Carrie-Anne', 'Moss', NULL),    
+('Helena Bonham', 'Carter', NULL),
+('Uma', 'Thurman', NULL),         
+('Gary', 'Sinise', NULL),         
+('Orlando', 'Bloom', NULL),       
+('Anthony', 'Hopkins', NULL);
 
 INSERT INTO MovieActor (MovieID, ActorID)
 VALUES 
@@ -299,26 +304,144 @@ VALUES
 (2, 'Payment information for Jane Smith'),
 (3, 'Payment information for Michael Johnson');
 
-INSERT INTO Seat (Name, ScreeningID, IsReserved)
+INSERT INTO Seat (Name)
 VALUES 
-('A1', 1, 0),
-('A2', 1, 0),
-('B1', 2, 0),
-('B2', 2, 0),
-('C1', 3, 0),
-('C2', 3, 0);
+('A1'), ('A2'), ('A3'), ('A4'), ('A5'), ('A6'), ('A7'), ('A8'),
+('B1'), ('B2'), ('B3'), ('B4'), ('B5'), ('B6'), ('B7'), ('B8'),
+('C1'), ('C2'), ('C3'), ('C4'), ('C5'), ('C6'), ('C7'), ('C8'),
+('D1'), ('D2'), ('D3'), ('D4'), ('D5'), ('D6'), ('D7'), ('D8'),
+('E1'), ('E2'), ('E3'), ('E4'), ('E5'), ('E6'), ('E7'), ('E8'),
+('F1'), ('F2'), ('F3'), ('F4'), ('F5'), ('F6'), ('F7'), ('F8');
 
-INSERT INTO Reservation (UserID, ScreeningID, SeatID, Date, NumberOfTickets, TotalPrice, Status)
+INSERT INTO ScreeningSeat (ScreeningID, SeatID, IsReserved)
 VALUES 
-(1, 1, 1, '2024-04-03', 1, 10.00, 'Confirmed'),
-(2, 2, 3, '2024-04-03', 2, 24.00, 'Confirmed'),
-(3, 3, 5, '2024-04-03', 1, 15.00, 'Confirmed');
+(1, 1, 1),
+(1, 2, 1),
+(1, 3, 0),
+(1, 4, 0),
+(1, 5, 1),
+(1, 6, 1),
+(1, 7, 0),
+(1, 8, 0),
+(1, 9, 1),
+(1, 10, 0),
+(1, 11, 0),
+(1, 12, 1),
+(1, 13, 0),
+(1, 14, 1),
+(1, 15, 0),
+(1, 16, 0),
+(1, 17, 1),
+(1, 18, 1),
+(1, 19, 0),
+(1, 20, 0),
+(1, 21, 0),
+(1, 22, 0),
+(1, 23, 1),
+(1, 24, 1),
+(1, 25, 0),
+(1, 26, 0),
+(1, 27, 0),
+(1, 28, 1),
+(1, 29, 1),
+(1, 30, 0),
+(1, 31, 0),
+(1, 32, 1),
+(1, 33, 1),
+(1, 34, 0),
+(1, 35, 0),
+(1, 36, 1),
+(1, 37, 1),
+(1, 38, 0),
+(1, 39, 1),
+(1, 40, 0),
+(1, 41, 0),
+(1, 42, 1),
+(1, 43, 0),
+(1, 44, 0),
+(1, 45, 1),
+(1, 46, 0),
+(1, 47, 1),
+(1, 48, 0),
+(2, 1, 0),
+(2, 2, 0),
+(2, 3, 0),
+(2, 4, 0),
+(2, 5, 0),
+(2, 6, 0),
+(2, 7, 0),
+(2, 8, 0),
+(2, 9, 0),
+(2, 10, 0),
+(2, 11, 0),
+(2, 12, 0),
+(2, 13, 0),
+(2, 14, 0),
+(2, 15, 0),
+(2, 16, 0),
+(2, 17, 0),
+(2, 18, 0),
+(2, 19, 0),
+(2, 20, 0),
+(2, 21, 0),
+(2, 22, 0),
+(2, 23, 0),
+(2, 24, 0),
+(2, 25, 0),
+(2, 26, 0),
+(2, 27, 0),
+(2, 28, 0),
+(2, 29, 0),
+(2, 30, 0),
+(2, 31, 0),
+(2, 32, 0),
+(2, 33, 0),
+(2, 34, 0),
+(2, 35, 0),
+(2, 36, 0),
+(2, 37, 0),
+(2, 38, 0),
+(2, 39, 0),
+(2, 40, 0),
+(2, 41, 0),
+(2, 42, 0),
+(2, 43, 0),
+(2, 44, 0),
+(2, 45, 0),
+(2, 46, 0),
+(2, 47, 0),
+(2, 48, 0);
 
-INSERT INTO Purchase (UserID, ScreeningID, SeatID, Date, NumberOfTickets, TotalPrice, Status, PayPalPaymentID)
+INSERT INTO Reservation (UserID, ScreeningID, DateTime, NumberOfTickets, TotalPrice)
 VALUES 
-(1, 1, 1, '2024-04-03', 1, 10.00, 'Completed', 1),
-(2, 2, 3, '2024-04-03', 2, 24.00, 'Completed', 2),
-(3, 3, 5, '2024-04-03', 1, 15.00, 'Completed', 3);
+(1, 1, '2024-09-10 14:00:00', 2, 21.00),
+(2, 1, '2024-09-10 14:00:00', 1, 10.50),
+(3, 2, '2024-09-10 16:30:00', 4, 52.00),
+(1, 2, '2024-09-10 16:30:00', 3, 39.00),
+(4, 3, '2024-09-10 19:00:00', 1, 15.50),
+(5, 3, '2024-09-10 19:00:00', 2, 31.00),
+(6, 4, '2024-09-11 15:00:00', 5, 90.00),
+(7, 5, '2024-09-11 18:30:00', 1, 14.50),
+(8, 6, '2024-09-12 17:00:00', 3, 33.00),
+(9, 6, '2024-09-12 17:00:00', 4, 44.00);
+
+INSERT INTO ReservationSeat (ReservationID, SeatID)
+VALUES 
+(1, 1), (1, 2),
+(2, 3),
+(3, 4), (3, 5), (3, 6),
+(4, 7),
+(5, 8),
+(6, 9), (6, 10), (6, 11), (6, 12), (6, 13),
+(7, 14),
+(8, 15), (8, 16), 
+(9, 17), (9, 18);
+
+INSERT INTO Purchase (UserID, ScreeningID, DateTime, NumberOfTickets, TotalPrice, PayPalPaymentID)
+VALUES 
+(1, 1, '2024-09-10 14:00:00', 1, 10.00, 1),
+(2, 2, '2024-09-10 16:30:00', 2, 24.00, 2),
+(3, 3, '2024-09-10 19:00:00', 1, 15.00, 3);
 
 INSERT INTO Rating (UserID, MovieID, Value, Comment)
 VALUES 
