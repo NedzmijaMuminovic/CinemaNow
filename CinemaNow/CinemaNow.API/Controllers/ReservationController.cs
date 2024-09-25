@@ -26,6 +26,30 @@ namespace CinemaNow.API.Controllers
         {
             return _service.GetByID(id);
         }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Authorize(Roles = "User")]
+        public override Reservation Insert(ReservationInsertRequest request)
+        {
+            return _service.Insert(request);
+        }
+
+        [HttpPut("{id}")]
+        [AllowAnonymous]
+        [Authorize(Roles = "User")]
+        public override Reservation Update(int id, ReservationUpdateRequest request)
+        {
+            return _service.Update(id, request);
+        }
+
+        [HttpDelete("{id}")]
+        [AllowAnonymous]
+        [Authorize(Roles = "User")]
+        public override void Delete(int id)
+        {
+            _service.Delete(id);
+        }
     }
 
 }

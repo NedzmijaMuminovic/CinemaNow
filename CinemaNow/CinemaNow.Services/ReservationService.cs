@@ -16,8 +16,11 @@ namespace CinemaNow.Services
 {
     public class ReservationService : BaseCRUDService<Models.Reservation, ReservationSearchObject, Database.Reservation, ReservationInsertRequest, ReservationUpdateRequest>, IReservationService
     {
-        public ReservationService(Ib200033Context context, IMapper mapper) : base(context, mapper)
+        private readonly IUserService _userService;
+
+        public ReservationService(Ib200033Context context, IMapper mapper, IUserService userService) : base(context, mapper)
         {
+            _userService = userService;
         }
 
         public override IQueryable<Database.Reservation> AddFilter(ReservationSearchObject search, IQueryable<Database.Reservation> query)
@@ -138,7 +141,10 @@ namespace CinemaNow.Services
 
             try
             {
-                // Check if all requested seats are available for the screening
+                int currentUserId = _userService.GetCurrentUserId();
+
+                request.UserId = currentUserId;
+
                 var unavailableSeats = Context.ScreeningSeats
                     .Where(ss => ss.ScreeningId == request.ScreeningId && request.SeatIds.Contains(ss.SeatId) && ss.IsReserved == true)
                     .Select(ss => ss.SeatId)
@@ -167,7 +173,6 @@ namespace CinemaNow.Services
 
                         Context.ReservationSeats.Add(reservationSeat);
 
-                        // Update ScreeningSeat to mark it as reserved
                         var screeningSeat = Context.ScreeningSeats
                             .FirstOrDefault(ss => ss.ScreeningId == request.ScreeningId && ss.SeatId == seatId);
 
@@ -220,17 +225,20 @@ namespace CinemaNow.Services
                 if (entity == null)
                     throw new Exception("Reservation not found");
 
-                // Get the current screening ID before updating the entity
+                var currentUserId = _userService.GetCurrentUserId();
+                if (entity.UserId != currentUserId)
+                {
+                    throw new UnauthorizedAccessException("You can only update your own reservations.");
+                }
+
                 var currentScreeningId = entity.ScreeningId;
 
                 Mapper.Map(request, entity);
 
-                // If the screening has changed, we need to reset all seats
                 bool screeningChanged = currentScreeningId != entity.ScreeningId;
 
                 if (screeningChanged)
                 {
-                    // Release all previously reserved seats
                     var screeningSeatsToRelease = Context.ScreeningSeats
                         .Where(ss => ss.ScreeningId == currentScreeningId &&
                                      entity.ReservationSeats.Select(rs => rs.SeatId).Contains(ss.SeatId));
@@ -243,7 +251,6 @@ namespace CinemaNow.Services
 
                 if (request.SeatIds != null && request.SeatIds.Any())
                 {
-                    // Check if all requested seats are available for the screening
                     var unavailableSeats = Context.ScreeningSeats
                         .Where(ss => ss.ScreeningId == entity.ScreeningId &&
                                      request.SeatIds.Contains(ss.SeatId) &&
@@ -257,7 +264,6 @@ namespace CinemaNow.Services
                         throw new InvalidOperationException($"The following seats are already reserved: {string.Join(", ", unavailableSeats)}");
                     }
 
-                    // Remove seats that are no longer in the request
                     var seatsToRemove = entity.ReservationSeats
                         .Where(rs => !request.SeatIds.Contains(rs.SeatId))
                         .ToList();
@@ -266,7 +272,6 @@ namespace CinemaNow.Services
                     {
                         entity.ReservationSeats.Remove(seatToRemove);
 
-                        // Release the seat in ScreeningSeats
                         var screeningSeat = Context.ScreeningSeats
                             .FirstOrDefault(ss => ss.ScreeningId == entity.ScreeningId && ss.SeatId == seatToRemove.SeatId);
 
@@ -276,7 +281,6 @@ namespace CinemaNow.Services
                         }
                     }
 
-                    // Add new seats
                     var existingSeats = entity.ReservationSeats.Select(rs => rs.SeatId).ToList();
                     var seatsToAdd = request.SeatIds.Except(existingSeats);
 
@@ -290,7 +294,6 @@ namespace CinemaNow.Services
                         };
                         entity.ReservationSeats.Add(reservationSeat);
 
-                        // Mark the seat as reserved in ScreeningSeats
                         var screeningSeat = Context.ScreeningSeats
                             .FirstOrDefault(ss => ss.ScreeningId == entity.ScreeningId && ss.SeatId == seatId);
 
@@ -302,10 +305,8 @@ namespace CinemaNow.Services
                 }
                 else
                 {
-                    // If no seats are specified in the request, remove all existing seats
                     entity.ReservationSeats.Clear();
 
-                    // Release all seats in ScreeningSeats
                     var screeningSeatsToRelease = Context.ScreeningSeats
                         .Where(ss => ss.ScreeningId == entity.ScreeningId &&
                                      entity.ReservationSeats.Select(rs => rs.SeatId).Contains(ss.SeatId));
@@ -360,7 +361,12 @@ namespace CinemaNow.Services
                     throw new Exception("Reservation not found");
                 }
 
-                // Release the seats in ScreeningSeats
+                var currentUserId = _userService.GetCurrentUserId();
+                if (reservation.UserId != currentUserId)
+                {
+                    throw new UnauthorizedAccessException("You can only delete your own reservations.");
+                }
+
                 foreach (var reservationSeat in reservation.ReservationSeats)
                 {
                     var screeningSeat = Context.ScreeningSeats
@@ -372,7 +378,6 @@ namespace CinemaNow.Services
                     }
                 }
 
-                // Remove the reservation and its associated seats
                 Context.ReservationSeats.RemoveRange(reservation.ReservationSeats);
                 Context.Reservations.Remove(reservation);
 
