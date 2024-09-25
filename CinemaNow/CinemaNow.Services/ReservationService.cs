@@ -132,6 +132,259 @@ namespace CinemaNow.Services
             return null;
         }
 
+        public override Models.Reservation Insert(ReservationInsertRequest request)
+        {
+            using var transaction = Context.Database.BeginTransaction();
+
+            try
+            {
+                // Check if all requested seats are available for the screening
+                var unavailableSeats = Context.ScreeningSeats
+                    .Where(ss => ss.ScreeningId == request.ScreeningId && request.SeatIds.Contains(ss.SeatId) && ss.IsReserved == true)
+                    .Select(ss => ss.SeatId)
+                    .ToList();
+
+                if (unavailableSeats.Any())
+                {
+                    throw new InvalidOperationException($"The following seats are already reserved: {string.Join(", ", unavailableSeats)}");
+                }
+
+                var entity = Mapper.Map<Database.Reservation>(request);
+
+                Context.Add(entity);
+                Context.SaveChanges();
+
+                if (request.SeatIds != null && request.SeatIds.Any())
+                {
+                    foreach (var seatId in request.SeatIds)
+                    {
+                        var reservationSeat = new Database.ReservationSeat
+                        {
+                            ReservationId = entity.Id,
+                            SeatId = seatId,
+                            ReservedAt = DateTime.Now
+                        };
+
+                        Context.ReservationSeats.Add(reservationSeat);
+
+                        // Update ScreeningSeat to mark it as reserved
+                        var screeningSeat = Context.ScreeningSeats
+                            .FirstOrDefault(ss => ss.ScreeningId == request.ScreeningId && ss.SeatId == seatId);
+
+                        if (screeningSeat != null)
+                        {
+                            screeningSeat.IsReserved = true;
+                        }
+                    }
+
+                    Context.SaveChanges();
+                }
+
+                var fullEntity = Context.Reservations
+                    .Include(r => r.User)
+                    .Include(r => r.Screening)
+                    .Include(r => r.ReservationSeats)
+                        .ThenInclude(rs => rs.Seat)
+                    .FirstOrDefault(r => r.Id == entity.Id);
+
+                var model = fullEntity.Adapt<Models.Reservation>();
+
+                model.Seats = fullEntity.ReservationSeats.Select(rs => new Models.ReservationSeat
+                {
+                    ReservationId = rs.ReservationId,
+                    SeatId = rs.SeatId,
+                    Seat = rs.Seat.Adapt<Models.Seat>()
+                }).ToList();
+
+                transaction.Commit();
+
+                return model;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+
+        public override Models.Reservation Update(int id, ReservationUpdateRequest request)
+        {
+            using var transaction = Context.Database.BeginTransaction();
+
+            try
+            {
+                var entity = Context.Reservations
+                    .Include(r => r.ReservationSeats)
+                    .FirstOrDefault(r => r.Id == id);
+
+                if (entity == null)
+                    throw new Exception("Reservation not found");
+
+                // Get the current screening ID before updating the entity
+                var currentScreeningId = entity.ScreeningId;
+
+                Mapper.Map(request, entity);
+
+                // If the screening has changed, we need to reset all seats
+                bool screeningChanged = currentScreeningId != entity.ScreeningId;
+
+                if (screeningChanged)
+                {
+                    // Release all previously reserved seats
+                    var screeningSeatsToRelease = Context.ScreeningSeats
+                        .Where(ss => ss.ScreeningId == currentScreeningId &&
+                                     entity.ReservationSeats.Select(rs => rs.SeatId).Contains(ss.SeatId));
+
+                    foreach (var seat in screeningSeatsToRelease)
+                    {
+                        seat.IsReserved = false;
+                    }
+                }
+
+                if (request.SeatIds != null && request.SeatIds.Any())
+                {
+                    // Check if all requested seats are available for the screening
+                    var unavailableSeats = Context.ScreeningSeats
+                        .Where(ss => ss.ScreeningId == entity.ScreeningId &&
+                                     request.SeatIds.Contains(ss.SeatId) &&
+                                     ss.IsReserved == true &&
+                                     !entity.ReservationSeats.Select(rs => rs.SeatId).Contains(ss.SeatId))
+                        .Select(ss => ss.SeatId)
+                        .ToList();
+
+                    if (unavailableSeats.Any())
+                    {
+                        throw new InvalidOperationException($"The following seats are already reserved: {string.Join(", ", unavailableSeats)}");
+                    }
+
+                    // Remove seats that are no longer in the request
+                    var seatsToRemove = entity.ReservationSeats
+                        .Where(rs => !request.SeatIds.Contains(rs.SeatId))
+                        .ToList();
+
+                    foreach (var seatToRemove in seatsToRemove)
+                    {
+                        entity.ReservationSeats.Remove(seatToRemove);
+
+                        // Release the seat in ScreeningSeats
+                        var screeningSeat = Context.ScreeningSeats
+                            .FirstOrDefault(ss => ss.ScreeningId == entity.ScreeningId && ss.SeatId == seatToRemove.SeatId);
+
+                        if (screeningSeat != null)
+                        {
+                            screeningSeat.IsReserved = false;
+                        }
+                    }
+
+                    // Add new seats
+                    var existingSeats = entity.ReservationSeats.Select(rs => rs.SeatId).ToList();
+                    var seatsToAdd = request.SeatIds.Except(existingSeats);
+
+                    foreach (var seatId in seatsToAdd)
+                    {
+                        var reservationSeat = new Database.ReservationSeat
+                        {
+                            ReservationId = entity.Id,
+                            SeatId = seatId,
+                            ReservedAt = DateTime.UtcNow
+                        };
+                        entity.ReservationSeats.Add(reservationSeat);
+
+                        // Mark the seat as reserved in ScreeningSeats
+                        var screeningSeat = Context.ScreeningSeats
+                            .FirstOrDefault(ss => ss.ScreeningId == entity.ScreeningId && ss.SeatId == seatId);
+
+                        if (screeningSeat != null)
+                        {
+                            screeningSeat.IsReserved = true;
+                        }
+                    }
+                }
+                else
+                {
+                    // If no seats are specified in the request, remove all existing seats
+                    entity.ReservationSeats.Clear();
+
+                    // Release all seats in ScreeningSeats
+                    var screeningSeatsToRelease = Context.ScreeningSeats
+                        .Where(ss => ss.ScreeningId == entity.ScreeningId &&
+                                     entity.ReservationSeats.Select(rs => rs.SeatId).Contains(ss.SeatId));
+
+                    foreach (var seat in screeningSeatsToRelease)
+                    {
+                        seat.IsReserved = false;
+                    }
+                }
+
+                Context.SaveChanges();
+
+                var updatedEntity = Context.Reservations
+                    .Include(r => r.User)
+                    .Include(r => r.Screening)
+                    .Include(r => r.ReservationSeats)
+                        .ThenInclude(rs => rs.Seat)
+                    .FirstOrDefault(r => r.Id == entity.Id);
+
+                var model = updatedEntity.Adapt<Models.Reservation>();
+
+                model.Seats = updatedEntity.ReservationSeats.Select(rs => new Models.ReservationSeat
+                {
+                    ReservationId = rs.ReservationId,
+                    SeatId = rs.SeatId,
+                    Seat = rs.Seat.Adapt<Models.Seat>()
+                }).ToList();
+
+                transaction.Commit();
+
+                return model;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+
+        public override void Delete(int id)
+        {
+            using var transaction = Context.Database.BeginTransaction();
+
+            try
+            {
+                var reservation = Context.Reservations
+                    .Include(r => r.ReservationSeats)
+                    .FirstOrDefault(r => r.Id == id);
+
+                if (reservation == null)
+                {
+                    throw new Exception("Reservation not found");
+                }
+
+                // Release the seats in ScreeningSeats
+                foreach (var reservationSeat in reservation.ReservationSeats)
+                {
+                    var screeningSeat = Context.ScreeningSeats
+                        .FirstOrDefault(ss => ss.ScreeningId == reservation.ScreeningId && ss.SeatId == reservationSeat.SeatId);
+
+                    if (screeningSeat != null)
+                    {
+                        screeningSeat.IsReserved = false;
+                    }
+                }
+
+                // Remove the reservation and its associated seats
+                Context.ReservationSeats.RemoveRange(reservation.ReservationSeats);
+                Context.Reservations.Remove(reservation);
+
+                Context.SaveChanges();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
 
     }
 
