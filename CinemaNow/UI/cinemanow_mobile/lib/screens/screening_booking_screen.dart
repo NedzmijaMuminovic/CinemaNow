@@ -1,4 +1,5 @@
 import 'package:cinemanow_mobile/providers/movie_provider.dart';
+import 'package:cinemanow_mobile/screens/screening_checkout_screen.dart';
 import 'package:cinemanow_mobile/widgets/common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -113,7 +114,35 @@ class _ScreeningBookingScreenState extends State<ScreeningBookingScreen> {
                   const SizedBox(height: 20),
                   buildButton(
                     text: 'Checkout',
-                    onPressed: () {},
+                    onPressed: () {
+                      if (selectedSeats.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Please select at least one seat before proceeding to checkout.'),
+                          ),
+                        );
+                      } else {
+                        final selectedScreening = screenings.firstWhere(
+                          (s) =>
+                              DateFormat('HH:mm')
+                                  .format(s.dateTime!.toLocal()) ==
+                              selectedTime,
+                        );
+
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ScreeningCheckoutScreen(
+                              selectedSeats: selectedSeats,
+                              movieTitle: movieTitle,
+                              selectedDate: selectedDate,
+                              selectedTime: selectedTime,
+                              screening: selectedScreening,
+                            ),
+                          ),
+                        );
+                      }
+                    },
                   ),
                 ],
               ),

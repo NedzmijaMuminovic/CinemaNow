@@ -487,7 +487,6 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
         });
       },
     );
-    _refreshRatings();
   }
 
   void _refreshRatings() {
