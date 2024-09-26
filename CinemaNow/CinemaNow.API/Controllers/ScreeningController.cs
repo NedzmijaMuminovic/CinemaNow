@@ -12,8 +12,11 @@ namespace CinemaNow.API.Controllers
     [Route("[controller]")]
     public class ScreeningController : BaseCRUDController<Screening, ScreeningSearchObject, ScreeningInsertRequest, ScreeningUpdateRequest>
     {
+        private readonly IScreeningService _service;
+
         public ScreeningController(IScreeningService service) : base(service)
         {
+            _service = service;
         }
 
         [HttpPut("{id}/activate")]
@@ -42,6 +45,20 @@ namespace CinemaNow.API.Controllers
         public List<string> AllowedActions(int id)
         {
             return (_service as IScreeningService).AllowedActions(id);
+        }
+
+        [HttpGet("ByMovie/{movieId}")]
+        public IActionResult GetScreeningsByMovieId(int movieId)
+        {
+            try
+            {
+                var result = _service.GetScreeningsByMovieId(movieId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cinemanow_mobile/models/movie.dart';
 import 'package:cinemanow_mobile/models/screening.dart';
 import 'package:cinemanow_mobile/models/search_result.dart';
+import 'package:cinemanow_mobile/providers/movie_provider.dart';
 import 'package:cinemanow_mobile/providers/screening_provider.dart';
 import 'package:cinemanow_mobile/screens/movie_details_screen.dart';
 import 'package:cinemanow_mobile/widgets/date_picker.dart';
@@ -46,18 +47,23 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
     });
 
     try {
-      final provider = context.read<ScreeningProvider>();
-      result = await provider.getScreenings(fts: fts, date: date);
-      final List<Screening> allScreenings = result?.result ?? [];
+      final movieProvider = context.read<MovieProvider>();
+      final screeningProvider = context.read<ScreeningProvider>();
+
+      final SearchResult<Movie> searchResult = await movieProvider.getMovies();
+      final List<Movie> movies = searchResult.result;
+
       final Map<Movie, List<Screening>> screeningsByMovie = {};
-      for (var screening in allScreenings) {
-        if (screening.movie != null) {
-          if (!screeningsByMovie.containsKey(screening.movie!)) {
-            screeningsByMovie[screening.movie!] = [];
-          }
-          screeningsByMovie[screening.movie!]!.add(screening);
+
+      for (var movie in movies) {
+        final List<Screening> screenings =
+            await screeningProvider.getScreeningsByMovieId(movie.id!);
+
+        if (screenings.isNotEmpty) {
+          screeningsByMovie[movie] = screenings;
         }
       }
+
       setState(() {
         _groupedScreenings = screeningsByMovie;
       });

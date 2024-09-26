@@ -176,5 +176,18 @@ namespace CinemaNow.Services
                 return state.AllowedActions(entity);
             }
         }
+
+        public List<Models.Screening> GetScreeningsByMovieId(int movieId)
+        {
+            var query = Context.Screenings
+                .Include(s => s.Movie)
+                .Include(s => s.Hall)
+                .Include(s => s.ViewMode)
+                .Where(s => s.MovieId == movieId && s.StateMachine == "Active")
+                .OrderBy(s => s.DateTime);
+
+            var screenings = query.ToList();
+            return Mapper.Map<List<Models.Screening>>(screenings);
+        }
     }
 }

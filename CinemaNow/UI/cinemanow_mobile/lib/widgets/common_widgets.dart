@@ -198,3 +198,23 @@ Widget buildDropdown<T>({
     ),
   );
 }
+
+Widget buildButton({
+  required String text,
+  required VoidCallback onPressed,
+}) {
+  return ElevatedButton(
+    onPressed: onPressed,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.red,
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 80),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    ),
+    child: Text(
+      text,
+      style: const TextStyle(color: Colors.white, fontSize: 16),
+    ),
+  );
+}

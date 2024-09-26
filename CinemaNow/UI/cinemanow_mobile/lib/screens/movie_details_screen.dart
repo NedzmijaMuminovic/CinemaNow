@@ -1,5 +1,7 @@
 import 'package:cinemanow_mobile/providers/movie_provider.dart';
 import 'package:cinemanow_mobile/screens/movie_ratings_screen.dart';
+import 'package:cinemanow_mobile/screens/screening_booking_screen.dart';
+import 'package:cinemanow_mobile/widgets/common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:cinemanow_mobile/models/movie.dart';
@@ -180,17 +182,18 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                               ?.copyWith(color: Colors.white),
                         ),
                         const SizedBox(height: 24),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                            ),
-                            child: const Text('Booking',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 16)),
+                        Center(
+                          child: buildButton(
+                            text: 'Booking',
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ScreeningBookingScreen(
+                                      movieId: _movie.id!),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ],

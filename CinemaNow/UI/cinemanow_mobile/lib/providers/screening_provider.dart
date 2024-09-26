@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cinemanow_mobile/models/hall.dart';
 import 'package:cinemanow_mobile/models/movie.dart';
 import 'package:cinemanow_mobile/models/screening.dart';
@@ -111,6 +113,21 @@ class ScreeningProvider extends BaseProvider<Screening> {
       notifyListeners();
     } else {
       throw Exception("Failed to activate screening");
+    }
+  }
+
+  Future<List<Screening>> getScreeningsByMovieId(int movieId) async {
+    var url = "$baseUrl$endpoint/ByMovie/$movieId";
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+
+    var response = await http.get(uri, headers: headers);
+
+    if (isValidResponse(response)) {
+      var data = jsonDecode(response.body) as List;
+      return data.map((item) => Screening.fromJson(item)).toList();
+    } else {
+      throw Exception("Failed to get screenings for movie");
     }
   }
 }
