@@ -15,6 +15,6 @@ namespace CinemaNow.Services
         public Screening Edit(int id);
         public Screening Hide(int id);
         public List<string> AllowedActions(int id);
-        public List<Models.Screening> GetScreeningsByMovieId(int movieId);
+        public List<Models.Screening> GetScreeningsByMovieId(int movieId, DateTime? date = null);
     }
 }

@@ -78,7 +78,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                             }
                           },
                           child: Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               color: Colors.black.withOpacity(0.7),
                               borderRadius: BorderRadius.circular(20),
@@ -86,13 +86,14 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                             child: Row(
                               children: [
                                 const Icon(Icons.star,
-                                    color: Colors.white, size: 16),
+                                    color: Colors.white, size: 20),
                                 const SizedBox(width: 4),
                                 Text(
                                   _movie.averageRating != null
                                       ? '${_movie.averageRating!.toStringAsFixed(1)}/5'
                                       : 'N/A',
-                                  style: const TextStyle(color: Colors.white),
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 16),
                                 ),
                               ],
                             ),

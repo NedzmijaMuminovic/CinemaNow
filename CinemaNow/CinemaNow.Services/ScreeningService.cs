@@ -177,16 +177,21 @@ namespace CinemaNow.Services
             }
         }
 
-        public List<Models.Screening> GetScreeningsByMovieId(int movieId)
+        public List<Models.Screening> GetScreeningsByMovieId(int movieId, DateTime? date = null)
         {
             var query = Context.Screenings
                 .Include(s => s.Movie)
                 .Include(s => s.Hall)
                 .Include(s => s.ViewMode)
-                .Where(s => s.MovieId == movieId && s.StateMachine == "Active")
-                .OrderBy(s => s.DateTime);
+                .Where(s => s.MovieId == movieId && s.StateMachine == "Active");
 
-            var screenings = query.ToList();
+            if (date.HasValue)
+            {
+                var nextDay = date.Value.AddDays(1);
+                query = query.Where(s => s.DateTime >= date.Value && s.DateTime < nextDay);
+            }
+
+            var screenings = query.OrderBy(s => s.DateTime).ToList();
             return Mapper.Map<List<Models.Screening>>(screenings);
         }
     }

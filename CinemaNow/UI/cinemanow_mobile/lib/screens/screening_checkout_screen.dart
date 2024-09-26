@@ -11,13 +11,13 @@ class ScreeningCheckoutScreen extends StatefulWidget {
   final Screening screening;
 
   const ScreeningCheckoutScreen({
-    Key? key,
+    super.key,
     required this.selectedSeats,
     required this.movieTitle,
     required this.selectedDate,
     required this.selectedTime,
     required this.screening,
-  }) : super(key: key);
+  });
 
   @override
   State<ScreeningCheckoutScreen> createState() =>

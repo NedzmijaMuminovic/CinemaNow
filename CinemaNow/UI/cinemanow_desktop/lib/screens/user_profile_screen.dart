@@ -481,12 +481,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       isEditingNotifier.value = false;
                       if (icon == Icons.lock) {
                         _isEditingPassword.value = false;
+                        _passwordController.text = '';
+                        _passwordConfirmationController.text = '';
+                      } else {
+                        controller.text = _getOriginalValue(icon);
                       }
-                      if (icon == Icons.lock) {
-                        _passwordController.text = _originalPassword;
-                        _passwordConfirmationController.text =
-                            _originalPassword;
-                      }
+                      setState(() {});
                     },
                   ),
                 IconButton(
@@ -512,6 +512,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         },
       ),
     );
+  }
+
+  String _getOriginalValue(IconData icon) {
+    switch (icon) {
+      case Icons.person:
+        return originalName ?? '';
+      case Icons.email:
+        return originalEmail ?? '';
+      case Icons.account_circle:
+        return originalUsername ?? '';
+      default:
+        return '';
+    }
   }
 
   Future<void> _updateUser(BuildContext context) async {
@@ -705,8 +718,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text(e.toString().replaceFirst('Exception:', '').trim())),
+            content: Text(e.toString().replaceFirst('Exception:', '').trim())),
       );
       setState(() {
         _usernameController.text = originalUsername!;

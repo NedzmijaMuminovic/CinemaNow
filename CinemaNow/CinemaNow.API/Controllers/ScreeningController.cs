@@ -48,11 +48,11 @@ namespace CinemaNow.API.Controllers
         }
 
         [HttpGet("ByMovie/{movieId}")]
-        public IActionResult GetScreeningsByMovieId(int movieId)
+        public IActionResult GetScreeningsByMovieId(int movieId, DateTime? date = null)
         {
             try
             {
-                var result = _service.GetScreeningsByMovieId(movieId);
+                var result = _service.GetScreeningsByMovieId(movieId, date);
                 return Ok(result);
             }
             catch (Exception ex)

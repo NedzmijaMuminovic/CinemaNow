@@ -50,14 +50,18 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
       final movieProvider = context.read<MovieProvider>();
       final screeningProvider = context.read<ScreeningProvider>();
 
-      final SearchResult<Movie> searchResult = await movieProvider.getMovies();
+      final SearchResult<Movie> searchResult =
+          await movieProvider.getMovies(fts: fts);
       final List<Movie> movies = searchResult.result;
 
       final Map<Movie, List<Screening>> screeningsByMovie = {};
 
       for (var movie in movies) {
         final List<Screening> screenings =
-            await screeningProvider.getScreeningsByMovieId(movie.id!);
+            await screeningProvider.getScreeningsByMovieId(
+          movie.id!,
+          date: date,
+        );
 
         if (screenings.isNotEmpty) {
           screeningsByMovie[movie] = screenings;

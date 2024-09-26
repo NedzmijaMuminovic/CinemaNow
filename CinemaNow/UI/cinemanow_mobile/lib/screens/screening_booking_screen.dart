@@ -122,12 +122,26 @@ class _ScreeningBookingScreenState extends State<ScreeningBookingScreen> {
                                 'Please select at least one seat before proceeding to checkout.'),
                           ),
                         );
+                      } else if (selectedDate == null || selectedTime == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Please select a date and time before proceeding to checkout.'),
+                          ),
+                        );
                       } else {
                         final selectedScreening = screenings.firstWhere(
                           (s) =>
+                              s.dateTime!.toLocal().year ==
+                                  selectedDate!.year &&
+                              s.dateTime!.toLocal().month ==
+                                  selectedDate!.month &&
+                              s.dateTime!.toLocal().day == selectedDate!.day &&
                               DateFormat('HH:mm')
-                                  .format(s.dateTime!.toLocal()) ==
-                              selectedTime,
+                                      .format(s.dateTime!.toLocal()) ==
+                                  selectedTime,
+                          orElse: () =>
+                              throw Exception('No matching screening found'),
                         );
 
                         Navigator.of(context).push(

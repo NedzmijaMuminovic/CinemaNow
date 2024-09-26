@@ -85,7 +85,18 @@ class ScreeningProvider extends BaseProvider<Screening> {
   }
 
   Future<Screening> getScreeningById(int id) async {
-    return await getById(id);
+    var url = "$baseUrl$endpoint/$id";
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+
+    var response = await http.get(uri, headers: headers);
+
+    if (isValidResponse(response)) {
+      var data = jsonDecode(response.body);
+      return Screening.fromJson(data);
+    } else {
+      throw Exception("Failed to get screening by ID");
+    }
   }
 
   Future<void> hideScreening(int id) async {
@@ -116,8 +127,13 @@ class ScreeningProvider extends BaseProvider<Screening> {
     }
   }
 
-  Future<List<Screening>> getScreeningsByMovieId(int movieId) async {
+  Future<List<Screening>> getScreeningsByMovieId(int movieId,
+      {DateTime? date}) async {
     var url = "$baseUrl$endpoint/ByMovie/$movieId";
+    if (date != null) {
+      var dateString = date.toIso8601String().split('T')[0];
+      url += "?date=$dateString";
+    }
     var uri = Uri.parse(url);
     var headers = createHeaders();
 
