@@ -26,18 +26,35 @@ To get the app up and running, follow these steps:
    - Build and run the backend project.
 
 4. Run the frontend:
-   - Open the Flutter project in Visual Studio Code (CinemaNow/CinemaNow/UI/cinemanow_desktop).
-   - Install the necessary dependencies:
+
+   - **For Desktop:**
+     - Open the Flutter project in Visual Studio Code (CinemaNow/CinemaNow/UI/cinemanow_desktop).
+     - Install the necessary dependencies:
+       
+       ```bash
+       dart pub get
+       ```
      
-     ```bash
-      dart pub get
-      ```
-   
-    - Run the Flutter app for Windows:
-      
-      ```bash
-      flutter run -d windows
-      ```
+     - Run the Flutter app for Windows:
+       
+       ```bash
+       flutter run -d windows
+       ```
+
+   - **For Mobile:**
+     - Open the Flutter project in Visual Studio Code (CinemaNow/CinemaNow/UI/cinemanow_mobile).
+     - Install the necessary dependencies:
+       
+       ```bash
+       dart pub get
+       ```
+     
+     - Connect a physical device or start an emulator.
+     - Run the Flutter app for mobile:
+       
+       ```bash
+       flutter run
+       ```
     
 ## License
 
