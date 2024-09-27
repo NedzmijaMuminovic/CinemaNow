@@ -24,6 +24,25 @@ namespace CinemaNow.Services
             _userService = userService;
         }
 
+        public override Models.PagedResult<Models.Rating> GetPaged(RatingSearchObject search)
+        {
+            var pagedData = base.GetPaged(search);
+
+            foreach (var rating in pagedData.ResultList)
+            {
+                if (search?.IsUserIncluded == true)
+                {
+                    var dbRating = Context.Ratings.Include(u => u.User).FirstOrDefault(r => r.Id == rating.Id);
+                    if (dbRating?.User != null)
+                    {
+                        rating.User.ImageBase64 = dbRating.User.Image != null ? Convert.ToBase64String(dbRating.User.Image) : null;
+                    }
+                }
+            }
+
+            return pagedData;
+        }
+
         public override IQueryable<Database.Rating> AddFilter(RatingSearchObject search, IQueryable<Database.Rating> query)
         {
             var filteredQuery = base.AddFilter(search, query);
@@ -136,7 +155,15 @@ namespace CinemaNow.Services
             }
 
             request.UserId = currentUserId;
-            return base.Insert(request);
+            var rating = base.Insert(request);
+
+            var user = Context.Users.Find(currentUserId);
+            if (user?.Image != null)
+            {
+                rating.User.ImageBase64 = Convert.ToBase64String(user.Image);
+            }
+
+            return rating;
         }
 
     }

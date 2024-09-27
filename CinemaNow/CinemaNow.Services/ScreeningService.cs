@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using CinemaNow.Models.DTOs;
 
 namespace CinemaNow.Services
 {
@@ -18,11 +19,13 @@ namespace CinemaNow.Services
     {
         public BaseScreeningState BaseScreeningState { get; set; }
         ILogger<ScreeningService> _logger;
+        private readonly Ib200033Context _context;
 
         public ScreeningService(Ib200033Context context, IMapper mapper, BaseScreeningState baseScreeningState, ILogger<ScreeningService> logger) : base(context, mapper)
         {
             BaseScreeningState = baseScreeningState;
             _logger = logger;
+            _context = context;
         }
 
         public override IQueryable<Screening> AddFilter(ScreeningSearchObject search, IQueryable<Screening> query)
@@ -193,6 +196,26 @@ namespace CinemaNow.Services
 
             var screenings = query.OrderBy(s => s.DateTime).ToList();
             return Mapper.Map<List<Models.Screening>>(screenings);
+        }
+
+        public async Task<List<SeatDto>> GetSeatsForScreeningAsync(int screeningId)
+        {
+            var screeningSeats = await _context.ScreeningSeats
+                .Where(ss => ss.ScreeningId == screeningId)
+                .Include(ss => ss.Seat)
+                .ToListAsync();
+
+            if (screeningSeats == null)
+            {
+                return null;
+            }
+
+            return screeningSeats.Select(ss => new SeatDto
+            {
+                SeatId = ss.SeatId,
+                SeatName = ss.Seat.Name,
+                IsReserved = ss.IsReserved
+            }).ToList();
         }
     }
 }

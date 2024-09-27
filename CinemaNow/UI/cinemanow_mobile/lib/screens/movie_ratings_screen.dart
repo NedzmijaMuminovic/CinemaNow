@@ -1,5 +1,6 @@
 import 'package:cinemanow_mobile/providers/auth_provider.dart';
 import 'package:cinemanow_mobile/providers/movie_provider.dart';
+import 'package:cinemanow_mobile/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:cinemanow_mobile/models/rating.dart';
 import 'package:cinemanow_mobile/providers/rating_provider.dart';
@@ -183,12 +184,14 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
                         children: [
                           CircleAvatar(
                             radius: 30,
-                            backgroundImage: rating.user?.imageBase64 != null
+                            backgroundImage: rating.user?.imageBase64 != null &&
+                                    rating.user!.imageBase64!.isNotEmpty
                                 ? MemoryImage(
                                     base64Decode(rating.user!.imageBase64!))
                                 : null,
                             backgroundColor: Colors.grey[700],
-                            child: rating.user?.imageBase64 == null
+                            child: (rating.user?.imageBase64 == null ||
+                                    rating.user!.imageBase64!.isEmpty)
                                 ? const Icon(Icons.person, color: Colors.white)
                                 : null,
                           ),
@@ -438,12 +441,16 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
                 onPressed: rating > 0
                     ? () async {
                         final ratingProvider = context.read<RatingProvider>();
+                        final userProvider = context.read<UserProvider>();
+                        final userId = AuthProvider.userId;
+                        final user = await userProvider.getUserById(userId!);
                         final updatedRating = Rating(
                           id: ratingId,
                           movieId: widget.movieId,
                           userId: AuthProvider.userId,
                           value: rating,
                           comment: comment.isNotEmpty ? comment : null,
+                          user: user,
                         );
 
                         try {

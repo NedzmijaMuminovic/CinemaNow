@@ -4,6 +4,7 @@ import 'package:cinemanow_mobile/models/hall.dart';
 import 'package:cinemanow_mobile/models/movie.dart';
 import 'package:cinemanow_mobile/models/screening.dart';
 import 'package:cinemanow_mobile/models/search_result.dart';
+import 'package:cinemanow_mobile/models/seat.dart';
 import 'package:cinemanow_mobile/models/view_mode.dart';
 import 'package:cinemanow_mobile/providers/base_provider.dart';
 import 'package:intl/intl.dart';
@@ -144,6 +145,35 @@ class ScreeningProvider extends BaseProvider<Screening> {
       return data.map((item) => Screening.fromJson(item)).toList();
     } else {
       throw Exception("Failed to get screenings for movie");
+    }
+  }
+
+  Future<List<Seat>> getSeatsForScreening(int screeningId) async {
+    var url = "$baseUrl$endpoint/$screeningId/seats";
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+
+    try {
+      var response = await http.get(uri, headers: headers);
+
+      if (isValidResponse(response)) {
+        var data = jsonDecode(response.body) as List;
+        return data
+            .map((item) {
+              try {
+                return Seat.fromJson(item);
+              } catch (e) {
+                return null;
+              }
+            })
+            .whereType<Seat>()
+            .toList();
+      } else {
+        throw Exception(
+            "Failed to get seats for screening: ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Failed to get seats for screening: $e");
     }
   }
 }

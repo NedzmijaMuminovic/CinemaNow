@@ -60,5 +60,18 @@ namespace CinemaNow.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("{screeningId}/seats")]
+        public async Task<IActionResult> GetSeatsForScreening(int screeningId)
+        {
+            var seats = await _service.GetSeatsForScreeningAsync(screeningId);
+
+            if (seats == null || seats.Count == 0)
+            {
+                return NotFound(new { message = "Seats not found for this screening." });
+            }
+
+            return Ok(seats);
+        }
     }
 }

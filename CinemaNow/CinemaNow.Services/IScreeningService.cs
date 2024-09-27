@@ -1,4 +1,5 @@
 ﻿using CinemaNow.Models;
+using CinemaNow.Models.DTOs;
 using CinemaNow.Models.Requests;
 using CinemaNow.Models.SearchObjects;
 using System;
@@ -16,5 +17,6 @@ namespace CinemaNow.Services
         public Screening Hide(int id);
         public List<string> AllowedActions(int id);
         public List<Models.Screening> GetScreeningsByMovieId(int movieId, DateTime? date = null);
+        public Task<List<SeatDto>> GetSeatsForScreeningAsync(int screeningId);
     }
 }

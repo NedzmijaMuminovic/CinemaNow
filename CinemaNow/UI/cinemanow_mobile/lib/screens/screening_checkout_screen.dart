@@ -6,16 +6,12 @@ import 'package:intl/intl.dart';
 class ScreeningCheckoutScreen extends StatefulWidget {
   final List<String> selectedSeats;
   final String movieTitle;
-  final DateTime? selectedDate;
-  final String? selectedTime;
   final Screening screening;
 
   const ScreeningCheckoutScreen({
     super.key,
     required this.selectedSeats,
     required this.movieTitle,
-    required this.selectedDate,
-    required this.selectedTime,
     required this.screening,
   });
 
@@ -89,9 +85,9 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildDetailRow(Icons.calendar_today, 'Date:',
-              DateFormat('MMM d, yyyy').format(widget.selectedDate!)),
-          _buildDetailRow(
-              Icons.access_time, 'Time:', widget.selectedTime ?? 'N/A'),
+              DateFormat('MMMM d').format(widget.screening.dateTime!)),
+          _buildDetailRow(Icons.access_time, 'Time:',
+              DateFormat('HH:mm').format(widget.screening.dateTime!)),
           _buildDetailRow(
               Icons.location_on, 'Hall:', widget.screening.hall?.name ?? 'N/A'),
           _buildDetailRow(Icons.video_call, 'View Mode:',

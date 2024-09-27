@@ -1,10 +1,13 @@
+import 'package:cinemanow_mobile/models/screening.dart';
 import 'package:cinemanow_mobile/providers/movie_provider.dart';
+import 'package:cinemanow_mobile/providers/screening_provider.dart';
 import 'package:cinemanow_mobile/screens/movie_ratings_screen.dart';
 import 'package:cinemanow_mobile/screens/screening_booking_screen.dart';
 import 'package:cinemanow_mobile/widgets/common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:cinemanow_mobile/models/movie.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class MovieDetailsScreen extends StatefulWidget {
@@ -19,12 +22,14 @@ class MovieDetailsScreen extends StatefulWidget {
 class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   late Movie _movie;
   bool _isLoading = true;
+  List<Screening> _screenings = [];
 
   @override
   void initState() {
     super.initState();
     _movie = widget.movie;
     _fetchFullMovieDetails();
+    _fetchScreenings();
   }
 
   Future<void> _fetchFullMovieDetails() async {
@@ -40,6 +45,91 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _fetchScreenings() async {
+    try {
+      final screeningProvider = context.read<ScreeningProvider>();
+      final screenings =
+          await screeningProvider.getScreeningsByMovieId(_movie.id!);
+      setState(() {
+        _screenings = screenings;
+      });
+    } catch (e) {
+      // Handle error
+    }
+  }
+
+  void _showScreeningSelection() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.grey[900],
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: ListView.builder(
+            itemCount: _screenings.length,
+            itemBuilder: (context, index) {
+              final screening = _screenings[index];
+              return Card(
+                color: Colors.grey[850],
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.movie,
+                    color: Colors.red,
+                    size: 40,
+                  ),
+                  title: Text(
+                    DateFormat('MMM d, yyyy HH:mm').format(screening.dateTime!),
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Hall: ${screening.hall?.name ?? 'N/A'}',
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                      Text(
+                        'View Mode: ${screening.viewMode?.name ?? 'N/A'}',
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                      Text(
+                        'Price: \$${screening.price?.toStringAsFixed(2) ?? 'N/A'}',
+                        style: const TextStyle(
+                            color: Colors.redAccent,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  trailing: const Icon(
+                    Icons.arrow_forward,
+                    color: Colors.red,
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ScreeningBookingScreen(
+                          movieId: _movie.id!,
+                          screeningId: screening.id!,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -186,15 +276,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                         Center(
                           child: buildButton(
                             text: 'Booking',
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ScreeningBookingScreen(
-                                      movieId: _movie.id!),
-                                ),
-                              );
-                            },
+                            onPressed: _showScreeningSelection,
                           ),
                         ),
                       ],
