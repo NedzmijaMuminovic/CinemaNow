@@ -314,104 +314,36 @@ VALUES
 ('E1'), ('E2'), ('E3'), ('E4'), ('E5'), ('E6'), ('E7'), ('E8'),
 ('F1'), ('F2'), ('F3'), ('F4'), ('F5'), ('F6'), ('F7'), ('F8');
 
-INSERT INTO ScreeningSeat (ScreeningID, SeatID, IsReserved)
-VALUES 
-(1, 1, 1),
-(1, 2, 1),
-(1, 3, 0),
-(1, 4, 0),
-(1, 5, 1),
-(1, 6, 1),
-(1, 7, 0),
-(1, 8, 0),
-(1, 9, 1),
-(1, 10, 0),
-(1, 11, 0),
-(1, 12, 1),
-(1, 13, 0),
-(1, 14, 1),
-(1, 15, 0),
-(1, 16, 0),
-(1, 17, 1),
-(1, 18, 1),
-(1, 19, 0),
-(1, 20, 0),
-(1, 21, 0),
-(1, 22, 0),
-(1, 23, 1),
-(1, 24, 1),
-(1, 25, 0),
-(1, 26, 0),
-(1, 27, 0),
-(1, 28, 1),
-(1, 29, 1),
-(1, 30, 0),
-(1, 31, 0),
-(1, 32, 1),
-(1, 33, 1),
-(1, 34, 0),
-(1, 35, 0),
-(1, 36, 1),
-(1, 37, 1),
-(1, 38, 0),
-(1, 39, 1),
-(1, 40, 0),
-(1, 41, 0),
-(1, 42, 1),
-(1, 43, 0),
-(1, 44, 0),
-(1, 45, 1),
-(1, 46, 0),
-(1, 47, 1),
-(1, 48, 0),
-(2, 1, 0),
-(2, 2, 0),
-(2, 3, 0),
-(2, 4, 0),
-(2, 5, 0),
-(2, 6, 0),
-(2, 7, 0),
-(2, 8, 0),
-(2, 9, 0),
-(2, 10, 0),
-(2, 11, 0),
-(2, 12, 0),
-(2, 13, 0),
-(2, 14, 0),
-(2, 15, 0),
-(2, 16, 0),
-(2, 17, 0),
-(2, 18, 0),
-(2, 19, 0),
-(2, 20, 0),
-(2, 21, 0),
-(2, 22, 0),
-(2, 23, 0),
-(2, 24, 0),
-(2, 25, 0),
-(2, 26, 0),
-(2, 27, 0),
-(2, 28, 0),
-(2, 29, 0),
-(2, 30, 0),
-(2, 31, 0),
-(2, 32, 0),
-(2, 33, 0),
-(2, 34, 0),
-(2, 35, 0),
-(2, 36, 0),
-(2, 37, 0),
-(2, 38, 0),
-(2, 39, 0),
-(2, 40, 0),
-(2, 41, 0),
-(2, 42, 0),
-(2, 43, 0),
-(2, 44, 0),
-(2, 45, 0),
-(2, 46, 0),
-(2, 47, 0),
-(2, 48, 0);
+DECLARE @ScreeningID INT = 1;
+
+WHILE @ScreeningID <= 15
+BEGIN
+    INSERT INTO ScreeningSeat (ScreeningID, SeatID, IsReserved)
+    SELECT TOP 15
+        @ScreeningID,
+        Seat.ID,
+        1
+    FROM 
+        Seat
+    WHERE 
+        Seat.ID NOT IN (SELECT SeatID FROM ScreeningSeat WHERE ScreeningID = @ScreeningID)
+    ORDER BY 
+        NEWID();
+
+    INSERT INTO ScreeningSeat (ScreeningID, SeatID, IsReserved)
+    SELECT TOP 33
+        @ScreeningID,
+        Seat.ID,
+        0
+    FROM 
+        Seat
+    WHERE 
+        Seat.ID NOT IN (SELECT SeatID FROM ScreeningSeat WHERE ScreeningID = @ScreeningID)
+    ORDER BY 
+        NEWID();
+
+    SET @ScreeningID = @ScreeningID + 1;
+END
 
 INSERT INTO Reservation (UserID, ScreeningID, DateTime, NumberOfTickets, TotalPrice)
 VALUES 

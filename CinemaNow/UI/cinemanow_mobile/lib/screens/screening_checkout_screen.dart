@@ -1,10 +1,13 @@
+import 'package:cinemanow_mobile/layouts/master_screen.dart';
 import 'package:cinemanow_mobile/models/screening.dart';
+import 'package:cinemanow_mobile/models/seat.dart';
+import 'package:cinemanow_mobile/providers/reservation_provider.dart';
 import 'package:cinemanow_mobile/widgets/common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class ScreeningCheckoutScreen extends StatefulWidget {
-  final List<String> selectedSeats;
+  final List<Seat> selectedSeats;
   final String movieTitle;
   final Screening screening;
 
@@ -22,6 +25,38 @@ class ScreeningCheckoutScreen extends StatefulWidget {
 
 class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
   String selectedPaymentMethod = 'PayPal';
+
+  void _handlePayment() async {
+    if (selectedPaymentMethod == 'Pay in Cash') {
+      try {
+        DateTime now = DateTime.now();
+        int numberOfTickets = widget.selectedSeats.length;
+        double totalPrice = numberOfTickets * (widget.screening.price ?? 0);
+
+        var reservationRequest = {
+          "screeningId": widget.screening.id,
+          "seatIds": widget.selectedSeats.map((seat) => seat.seatId).toList(),
+          "dateTime": now.toIso8601String(),
+          "numberOfTickets": numberOfTickets,
+          "totalPrice": totalPrice,
+        };
+
+        var reservationProvider = ReservationProvider();
+        await reservationProvider.insert(reservationRequest);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Your reservation is confirmed!')),
+        );
+
+        Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => const MasterScreen()));
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to confirm reservation: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +86,44 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
               Center(
                 child: buildButton(
                   text: 'Confirm Payment',
-                  onPressed: () {},
+                  onPressed: () async {
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text(
+                            'Confirm Payment',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          content: const Text(
+                            'Are you sure you want to proceed with the payment?',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Colors.grey[900],
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: const Text(
+                                'No',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: const Text(
+                                'Yes',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    if (confirmed == true) {
+                      _handlePayment();
+                    }
+                  },
                 ),
               ),
             ],
@@ -93,7 +165,10 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
           _buildDetailRow(Icons.video_call, 'View Mode:',
               widget.screening.viewMode?.name ?? 'N/A'),
           _buildDetailRow(
-              Icons.event_seat, 'Seats:', widget.selectedSeats.join(', ')),
+            Icons.event_seat,
+            'Seats:',
+            widget.selectedSeats.map((seat) => seat.seatName).join(', '),
+          ),
           _buildDetailRow(Icons.attach_money, 'Ticket Price:',
               '\$${widget.screening.price?.toStringAsFixed(2) ?? 'N/A'}'),
           _buildDetailRow(Icons.monetization_on, 'Total Price:',

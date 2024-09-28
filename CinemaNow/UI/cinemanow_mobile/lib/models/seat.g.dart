@@ -7,9 +7,9 @@ part of 'seat.dart';
 // **************************************************************************
 
 Seat _$SeatFromJson(Map<String, dynamic> json) => Seat(
-      seatId: (json['seatId'] as num).toInt(),
-      seatName: json['seatName'] as String,
-      isReserved: json['isReserved'] as bool,
+      seatId: (json['seatId'] as num?)?.toInt(),
+      seatName: json['seatName'] as String?,
+      isReserved: json['isReserved'] as bool?,
     );
 
 Map<String, dynamic> _$SeatToJson(Seat instance) => <String, dynamic>{

@@ -23,7 +23,7 @@ class ScreeningBookingScreen extends StatefulWidget {
 
 class _ScreeningBookingScreenState extends State<ScreeningBookingScreen> {
   List<Seat> seats = [];
-  List<String> selectedSeats = [];
+  List<Seat> selectedSeats = [];
   bool isLoading = true;
   String movieTitle = 'Loading...';
   String? errorMessage;
@@ -87,7 +87,10 @@ class _ScreeningBookingScreenState extends State<ScreeningBookingScreen> {
         backgroundColor: Colors.grey[850],
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(
+              color: Colors.red,
+            ))
           : errorMessage != null
               ? Center(
                   child: Column(
@@ -127,7 +130,7 @@ class _ScreeningBookingScreenState extends State<ScreeningBookingScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text(
-                                    'Please select at least one seat.'),
+                                    'Please select at least one seat to proceed.'),
                               ),
                             );
                           }
@@ -186,26 +189,26 @@ class _ScreeningBookingScreenState extends State<ScreeningBookingScreen> {
           ),
           itemBuilder: (context, index) {
             final seat = seats[index];
-            final seatId = seat.seatName;
+            final seatName = seat.seatName;
 
             Color seatColor;
-            if (seat.isReserved) {
+            if (seat.isReserved!) {
               seatColor = Colors.blueAccent;
-            } else if (selectedSeats.contains(seatId)) {
+            } else if (selectedSeats.contains(seat)) {
               seatColor = Colors.red;
             } else {
               seatColor = Colors.transparent;
             }
 
             return GestureDetector(
-              onTap: seat.isReserved
+              onTap: seat.isReserved!
                   ? null
                   : () {
                       setState(() {
-                        if (selectedSeats.contains(seatId)) {
-                          selectedSeats.remove(seatId);
+                        if (selectedSeats.contains(seat)) {
+                          selectedSeats.remove(seat);
                         } else {
-                          selectedSeats.add(seatId);
+                          selectedSeats.add(seat);
                         }
                       });
                     },
@@ -220,7 +223,7 @@ class _ScreeningBookingScreenState extends State<ScreeningBookingScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    seatId,
+                    seatName!,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

@@ -4,14 +4,14 @@ part 'seat.g.dart';
 
 @JsonSerializable()
 class Seat {
-  final int seatId;
-  final String seatName;
-  final bool isReserved;
+  int? seatId;
+  String? seatName;
+  bool? isReserved;
 
   Seat({
-    required this.seatId,
-    required this.seatName,
-    required this.isReserved,
+    this.seatId,
+    this.seatName,
+    this.isReserved,
   });
 
   factory Seat.fromJson(Map<String, dynamic> json) => _$SeatFromJson(json);

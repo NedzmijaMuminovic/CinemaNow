@@ -88,12 +88,21 @@ namespace CinemaNow.Services
 
         public async Task<IEnumerable<Models.Rating>> GetRatingsByMovieIdAsync(int movieId)
         {
-            return await Context.Ratings
+            var ratings = await Context.Ratings
                 .Where(r => r.MovieId == movieId)
                 .Include(r => r.User)
                 .Include(r => r.Movie)
-                .Select(r => Mapper.Map<Models.Rating>(r))
                 .ToListAsync();
+
+            return ratings.Select(r =>
+            {
+                var rating = Mapper.Map<Models.Rating>(r);
+                if (r.User != null && r.User.Image != null)
+                {
+                    rating.User.ImageBase64 = Convert.ToBase64String(r.User.Image);
+                }
+                return rating;
+            });
         }
 
         public override void Delete(int id)
