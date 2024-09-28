@@ -138,6 +138,16 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
         time.minute,
       );
 
+      if (dateTime.isBefore(DateTime.now())) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'Cannot insert a screening with a date in the past or present. Please choose a future date.'),
+          ),
+        );
+        return;
+      }
+
       final priceText = _priceController.text.replaceAll(',', '.');
       final price = double.tryParse(priceText);
 

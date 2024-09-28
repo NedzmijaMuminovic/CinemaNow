@@ -126,6 +126,9 @@ namespace CinemaNow.Services
 
         public override Models.Screening Insert(ScreeningInsertRequest request)
         {
+            if (request.DateTime <= DateTime.Now)
+                throw new Exception("Cannot insert a screening with a date in the past or present. Please choose a future date.");
+
             var state = BaseScreeningState.CreateState("initial");
             var insertedScreening = state.Insert(request);
 
@@ -135,6 +138,9 @@ namespace CinemaNow.Services
 
         public override Models.Screening Update(int id, ScreeningUpdateRequest request)
         {
+            if (request.DateTime <= DateTime.Now)
+                throw new Exception("Cannot insert a screening with a date in the past or present. Please choose a future date.");
+
             var entity = GetByID(id);
             var state = BaseScreeningState.CreateState(entity.StateMachine);
             var updatedScreening = state.Update(id, request);
