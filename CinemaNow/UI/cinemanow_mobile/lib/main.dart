@@ -3,6 +3,7 @@ import 'package:cinemanow_mobile/providers/genre_provider.dart';
 import 'package:cinemanow_mobile/providers/hall_provider.dart';
 import 'package:cinemanow_mobile/providers/movie_provider.dart';
 import 'package:cinemanow_mobile/providers/rating_provider.dart';
+import 'package:cinemanow_mobile/providers/reservation_provider.dart';
 import 'package:cinemanow_mobile/providers/screening_provider.dart';
 import 'package:cinemanow_mobile/providers/user_provider.dart';
 import 'package:cinemanow_mobile/providers/view_mode_provider.dart';
@@ -26,6 +27,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => GenreProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => ScreeningProvider()),
+        ChangeNotifierProvider(create: (_) => ReservationProvider()),
       ],
       child: const MyApp(),
     ),

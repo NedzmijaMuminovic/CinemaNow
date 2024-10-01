@@ -11,16 +11,19 @@ using System.Linq.Dynamic.Core;
 using CinemaNow.Models.Requests;
 using Microsoft.EntityFrameworkCore;
 using Mapster;
+using CinemaNow.Models.DTOs;
 
 namespace CinemaNow.Services
 {
     public class ReservationService : BaseCRUDService<Models.Reservation, ReservationSearchObject, Database.Reservation, ReservationInsertRequest, ReservationUpdateRequest>, IReservationService
     {
         private readonly IUserService _userService;
+        private readonly Ib200033Context _context;
 
         public ReservationService(Ib200033Context context, IMapper mapper, IUserService userService) : base(context, mapper)
         {
             _userService = userService;
+            _context = context;
         }
 
         public override IQueryable<Database.Reservation> AddFilter(ReservationSearchObject search, IQueryable<Database.Reservation> query)
@@ -391,6 +394,32 @@ namespace CinemaNow.Services
             }
         }
 
+        public List<ReservationMovieDto> GetReservationsByUserId(int userId)
+        {
+            var reservations = _context.Reservations
+                .Include(r => r.Screening)
+                .ThenInclude(s => s.Movie)
+                .Where(r => r.UserId == userId)
+                .Select(r => new ReservationMovieDto
+                {
+                    ReservationId = r.Id,
+                    ReservationDate = r.DateTime ?? DateTime.MinValue,
+                    ScreeningId = r.ScreeningId ?? 0,
+                    ScreeningDate = r.Screening.DateTime ?? DateTime.MinValue,
+                    SeatIds = r.ReservationSeats.Select(rs => rs.SeatId).ToList(),
+
+                    MovieId = r.Screening.Movie.Id,
+                    MovieTitle = r.Screening.Movie.Title,
+                    MovieDuration = r.Screening.Movie.Duration,
+                    MovieSynopsis = r.Screening.Movie.Synopsis,
+                    MovieImageBase64 = r.Screening.Movie.Image != null
+    ? Convert.ToBase64String(r.Screening.Movie.Image)
+    : null
+                })
+                .ToList();
+
+            return reservations;
+        }
     }
 
 }

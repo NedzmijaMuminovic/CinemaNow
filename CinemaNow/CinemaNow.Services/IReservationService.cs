@@ -1,4 +1,5 @@
 ﻿using CinemaNow.Models;
+using CinemaNow.Models.DTOs;
 using CinemaNow.Models.Requests;
 using CinemaNow.Models.SearchObjects;
 using System;
@@ -11,5 +12,6 @@ namespace CinemaNow.Services
 {
     public interface IReservationService : IBaseCRUDService<Reservation, ReservationSearchObject, ReservationInsertRequest, ReservationUpdateRequest>
     {
+        List<ReservationMovieDto> GetReservationsByUserId(int userId);
     }
 }

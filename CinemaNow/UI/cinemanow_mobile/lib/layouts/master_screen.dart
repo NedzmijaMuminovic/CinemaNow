@@ -1,5 +1,6 @@
 import 'package:cinemanow_mobile/screens/movie_screening_list_screen.dart';
 import 'package:cinemanow_mobile/screens/user_profile_screen.dart';
+import 'package:cinemanow_mobile/screens/user_screening_list_screen.dart';
 import 'package:flutter/material.dart';
 
 class MasterScreen extends StatefulWidget {
@@ -12,10 +13,10 @@ class MasterScreen extends StatefulWidget {
 class _MasterScreenState extends State<MasterScreen> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _pages = <Widget>[
-    MovieScreeningListScreen(),
-    MovieScreeningListScreen(),
-    UserProfileScreen(),
+  static final List<Widget> _pages = <Widget>[
+    const MovieScreeningListScreen(),
+    const UserScreeningListScreen(),
+    const UserProfileScreen(),
   ];
 
   void _onItemTapped(int index) {

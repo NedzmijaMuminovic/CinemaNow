@@ -1,4 +1,5 @@
 ﻿using CinemaNow.Models;
+using CinemaNow.Models.DTOs;
 using CinemaNow.Models.Requests;
 using CinemaNow.Models.SearchObjects;
 using CinemaNow.Services;
@@ -11,8 +12,11 @@ namespace CinemaNow.API.Controllers
     [Route("[controller]")]
     public class ReservationController : BaseCRUDController<Reservation, ReservationSearchObject, ReservationInsertRequest, ReservationUpdateRequest>
     {
+        private readonly IReservationService _reservationService;
+
         public ReservationController(IReservationService service) : base(service)
         {
+            _reservationService = service;
         }
 
         [HttpGet]
@@ -49,6 +53,13 @@ namespace CinemaNow.API.Controllers
         public override void Delete(int id)
         {
             _service.Delete(id);
+        }
+
+        [HttpGet("user/{userId}")]
+        [Authorize(Roles = "User")]
+        public List<ReservationMovieDto> GetReservationsByUserId(int userId)
+        {
+            return _reservationService.GetReservationsByUserId(userId);
         }
     }
 

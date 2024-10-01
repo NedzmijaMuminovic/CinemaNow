@@ -6,6 +6,7 @@ import 'package:cinemanow_mobile/models/search_result.dart';
 import 'package:cinemanow_mobile/providers/movie_provider.dart';
 import 'package:cinemanow_mobile/providers/screening_provider.dart';
 import 'package:cinemanow_mobile/screens/movie_details_screen.dart';
+import 'package:cinemanow_mobile/widgets/common_widgets.dart';
 import 'package:cinemanow_mobile/widgets/date_picker.dart';
 import 'package:cinemanow_mobile/utilities/utils.dart';
 import 'package:flutter/material.dart';
@@ -186,24 +187,27 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
   }
 
   Widget _buildResultView() {
-    if (_groupedScreenings.isEmpty) {
-      return _buildNoScreeningsView();
-    }
-
     return Expanded(
-      child: ListView.builder(
-        itemCount: _groupedScreenings.keys.length,
-        itemBuilder: (context, index) {
-          final movie = _groupedScreenings.keys.elementAt(index);
-          final screenings = _groupedScreenings[movie]!;
+      child: _groupedScreenings.isEmpty
+          ? const Center(
+              child: NoScreeningsView(
+              title: 'No Screenings Available',
+              message: 'Try selecting a different date or search term.',
+              icon: Icons.movie,
+            ))
+          : ListView.builder(
+              itemCount: _groupedScreenings.keys.length,
+              itemBuilder: (context, index) {
+                final movie = _groupedScreenings.keys.elementAt(index);
+                final screenings = _groupedScreenings[movie]!;
 
-          return Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
-            child: _buildMovieCard(movie, screenings),
-          );
-        },
-      ),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 16.0, horizontal: 20.0),
+                  child: _buildMovieCard(movie, screenings),
+                );
+              },
+            ),
     );
   }
 
@@ -355,34 +359,6 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNoScreeningsView() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.movie, color: Colors.red, size: 60),
-          const SizedBox(height: 16),
-          Text(
-            'No Screenings Available',
-            style: TextStyle(
-              color: Colors.grey[500],
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Try selecting a different date or search term.',
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 16,
             ),
           ),
         ],

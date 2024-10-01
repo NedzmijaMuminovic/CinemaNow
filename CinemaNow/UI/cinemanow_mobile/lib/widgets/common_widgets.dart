@@ -221,3 +221,45 @@ Widget buildButton({
     ),
   );
 }
+
+class NoScreeningsView extends StatelessWidget {
+  final String title;
+  final String message;
+  final IconData icon;
+
+  const NoScreeningsView({
+    super.key,
+    this.title = 'No Screenings Available',
+    this.message = 'Try selecting a different date or search term.',
+    this.icon = Icons.movie,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: Colors.red, size: 60),
+          const SizedBox(height: 16),
+          Text(
+            title,
+            style: TextStyle(
+              color: Colors.grey[500],
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            message,
+            style: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
