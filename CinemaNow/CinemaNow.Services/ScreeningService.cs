@@ -218,8 +218,8 @@ namespace CinemaNow.Services
 
             return screeningSeats.Select(ss => new SeatDto
             {
-                SeatId = ss.SeatId,
-                SeatName = ss.Seat.Name,
+                Id = ss.SeatId,
+                Name = ss.Seat.Name,
                 IsReserved = ss.IsReserved
             }).ToList();
         }

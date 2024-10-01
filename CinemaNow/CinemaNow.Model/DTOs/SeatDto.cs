@@ -6,8 +6,8 @@ namespace CinemaNow.Models.DTOs
 {
     public class SeatDto
     {
-        public int SeatId { get; set; }
-        public string? SeatName { get; set; }
+        public int Id { get; set; }
+        public string? Name { get; set; }
         public bool? IsReserved { get; set; }
     }
 

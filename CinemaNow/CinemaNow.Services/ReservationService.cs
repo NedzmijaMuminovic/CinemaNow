@@ -98,6 +98,11 @@ namespace CinemaNow.Services
             var entity = Context.Reservations
                 .Include(r => r.User)
                 .Include(r => r.Screening)
+            .ThenInclude(s => s.Movie)
+        .Include(r => r.Screening)
+            .ThenInclude(s => s.Hall)
+        .Include(r => r.Screening)
+            .ThenInclude(s => s.ViewMode)
                 .Include(r => r.ReservationSeats)
                     .ThenInclude(rs => rs.Seat)
                 .FirstOrDefault(r => r.Id == id);
@@ -130,7 +135,28 @@ namespace CinemaNow.Services
                     ViewModeId = entity.Screening.ViewModeId,
                     DateTime = entity.Screening.DateTime,
                     Price = entity.Screening.Price,
-                    StateMachine = entity.Screening.StateMachine
+                    StateMachine = entity.Screening.StateMachine,
+
+                    Movie = entity.Screening.Movie != null ? new Models.Movie
+                    {
+                        Id = entity.Screening.Movie.Id,
+                        Title = entity.Screening.Movie.Title,
+                        Duration = entity.Screening.Movie.Duration,
+                        Synopsis = entity.Screening.Movie.Synopsis,
+                    } : null,
+
+                    Hall = entity.Screening.Hall != null ? new Models.Hall
+                    {
+                        Id = entity.Screening.Hall.Id,
+                        Name = entity.Screening.Hall.Name,
+                    } : null,
+
+                    ViewMode = entity.Screening.ViewMode != null ? new Models.ViewMode
+                    {
+                        Id = entity.Screening.ViewMode.Id,
+                        Name = entity.Screening.ViewMode.Name
+                    } : null
+
                 } : null;
 
                 return model;

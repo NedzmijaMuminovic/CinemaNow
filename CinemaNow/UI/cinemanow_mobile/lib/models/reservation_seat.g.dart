@@ -12,7 +12,7 @@ ReservationSeat _$ReservationSeatFromJson(Map<String, dynamic> json) =>
       seatId: (json['seatId'] as num?)?.toInt(),
       seat: json['seat'] == null
           ? null
-          : Seat.fromJson(json['seat'] as Map<String, dynamic>),
+          : SeatDto.fromJson(json['seat'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$ReservationSeatToJson(ReservationSeat instance) =>

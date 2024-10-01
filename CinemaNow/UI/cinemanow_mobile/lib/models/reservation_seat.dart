@@ -1,4 +1,4 @@
-import 'package:cinemanow_mobile/models/seat.dart';
+import 'package:cinemanow_mobile/models/DTOs/seat_dto.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'reservation_seat.g.dart';
@@ -7,7 +7,7 @@ part 'reservation_seat.g.dart';
 class ReservationSeat {
   int? reservationId;
   int? seatId;
-  Seat? seat;
+  SeatDto? seat;
 
   ReservationSeat({
     this.reservationId,

@@ -1,13 +1,13 @@
 import 'package:cinemanow_mobile/layouts/master_screen.dart';
 import 'package:cinemanow_mobile/models/screening.dart';
-import 'package:cinemanow_mobile/models/seat.dart';
+import 'package:cinemanow_mobile/models/DTOs/seat_dto.dart';
 import 'package:cinemanow_mobile/providers/reservation_provider.dart';
 import 'package:cinemanow_mobile/widgets/common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class ScreeningCheckoutScreen extends StatefulWidget {
-  final List<Seat> selectedSeats;
+  final List<SeatDto> selectedSeats;
   final String movieTitle;
   final Screening screening;
 
@@ -35,7 +35,7 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
 
         var reservationRequest = {
           "screeningId": widget.screening.id,
-          "seatIds": widget.selectedSeats.map((seat) => seat.seatId).toList(),
+          "seatIds": widget.selectedSeats.map((seat) => seat.id).toList(),
           "dateTime": now.toIso8601String(),
           "numberOfTickets": numberOfTickets,
           "totalPrice": totalPrice,
@@ -167,7 +167,7 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
           _buildDetailRow(
             Icons.event_seat,
             'Seats:',
-            widget.selectedSeats.map((seat) => seat.seatName).join(', '),
+            widget.selectedSeats.map((seat) => seat.name).join(', '),
           ),
           _buildDetailRow(Icons.attach_money, 'Ticket Price:',
               '\$${widget.screening.price?.toStringAsFixed(2) ?? 'N/A'}'),

@@ -4,7 +4,7 @@ import 'package:cinemanow_mobile/models/hall.dart';
 import 'package:cinemanow_mobile/models/movie.dart';
 import 'package:cinemanow_mobile/models/screening.dart';
 import 'package:cinemanow_mobile/models/search_result.dart';
-import 'package:cinemanow_mobile/models/seat.dart';
+import 'package:cinemanow_mobile/models/DTOs/seat_dto.dart';
 import 'package:cinemanow_mobile/models/view_mode.dart';
 import 'package:cinemanow_mobile/providers/base_provider.dart';
 import 'package:intl/intl.dart';
@@ -148,7 +148,7 @@ class ScreeningProvider extends BaseProvider<Screening> {
     }
   }
 
-  Future<List<Seat>> getSeatsForScreening(int screeningId) async {
+  Future<List<SeatDto>> getSeatsForScreening(int screeningId) async {
     var url = "$baseUrl$endpoint/$screeningId/seats";
     var uri = Uri.parse(url);
     var headers = createHeaders();
@@ -161,12 +161,12 @@ class ScreeningProvider extends BaseProvider<Screening> {
         return data
             .map((item) {
               try {
-                return Seat.fromJson(item);
+                return SeatDto.fromJson(item);
               } catch (e) {
                 return null;
               }
             })
-            .whereType<Seat>()
+            .whereType<SeatDto>()
             .toList();
       } else {
         throw Exception(

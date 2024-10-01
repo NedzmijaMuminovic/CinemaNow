@@ -1,5 +1,5 @@
 import 'package:cinemanow_mobile/models/screening.dart';
-import 'package:cinemanow_mobile/models/seat.dart';
+import 'package:cinemanow_mobile/models/DTOs/seat_dto.dart';
 import 'package:cinemanow_mobile/providers/movie_provider.dart';
 import 'package:cinemanow_mobile/screens/screening_checkout_screen.dart';
 import 'package:cinemanow_mobile/widgets/common_widgets.dart';
@@ -22,8 +22,8 @@ class ScreeningBookingScreen extends StatefulWidget {
 }
 
 class _ScreeningBookingScreenState extends State<ScreeningBookingScreen> {
-  List<Seat> seats = [];
-  List<Seat> selectedSeats = [];
+  List<SeatDto> seats = [];
+  List<SeatDto> selectedSeats = [];
   bool isLoading = true;
   String movieTitle = 'Loading...';
   String? errorMessage;
@@ -189,7 +189,7 @@ class _ScreeningBookingScreenState extends State<ScreeningBookingScreen> {
           ),
           itemBuilder: (context, index) {
             final seat = seats[index];
-            final seatName = seat.seatName;
+            final seatName = seat.name;
 
             Color seatColor;
             if (seat.isReserved!) {
