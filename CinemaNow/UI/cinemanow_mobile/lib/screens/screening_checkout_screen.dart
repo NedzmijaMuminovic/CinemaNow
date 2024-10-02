@@ -48,8 +48,10 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
           const SnackBar(content: Text('Your reservation is confirmed!')),
         );
 
-        Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const MasterScreen()));
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const MasterScreen()),
+          (Route<dynamic> route) => false,
+        );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to confirm reservation: $e')),

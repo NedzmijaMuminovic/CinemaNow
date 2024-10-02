@@ -43,8 +43,10 @@ class _LoginPageState extends State<LoginPage> {
         AuthProvider.setUser(response);
 
         if (_isUser(response)) {
-          Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const MasterScreen()));
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const MasterScreen()),
+            (Route<dynamic> route) => false,
+          );
         } else {
           _showErrorDialog("You do not have permission to access this area.");
         }

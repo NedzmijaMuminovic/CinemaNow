@@ -132,6 +132,21 @@ namespace CinemaNow.Services
             var state = BaseScreeningState.CreateState("initial");
             var insertedScreening = state.Insert(request);
 
+            var seats = _context.Seats.ToList();
+
+            foreach (var seat in seats)
+            {
+                var screeningSeat = new ScreeningSeat
+                {
+                    ScreeningId = insertedScreening.Id,
+                    SeatId = seat.Id,
+                    IsReserved = false
+                };
+                _context.ScreeningSeats.Add(screeningSeat);
+            }
+
+            _context.SaveChanges();
+
             var entity = Context.Screenings.Include(s => s.Movie).Include(s => s.Hall).Include(s => s.ViewMode).FirstOrDefault(s => s.Id == insertedScreening.Id);
             return Mapper.Map<Models.Screening>(entity);
         }

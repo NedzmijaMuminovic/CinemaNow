@@ -13,7 +13,7 @@ class ReservationDetailsScreen extends StatefulWidget {
     super.key,
     required this.reservationId,
     ReservationProvider? provider,
-  })  : reservationProvider = provider ?? ReservationProvider();
+  }) : reservationProvider = provider ?? ReservationProvider();
 
   @override
   _ReservationDetailsScreenState createState() =>
@@ -21,27 +21,33 @@ class ReservationDetailsScreen extends StatefulWidget {
 }
 
 class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
+  Reservation? reservation;
   String movieTitle = 'Loading...';
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchMovieTitle();
+    _fetchData();
   }
 
-  Future<void> _fetchMovieTitle() async {
+  Future<void> _fetchData() async {
     try {
-      final movieProvider = context.read<MovieProvider>();
-      final reservation =
+      final reservationData =
           await widget.reservationProvider.getById(widget.reservationId);
+      final movieProvider = context.read<MovieProvider>();
       final movie =
-          await movieProvider.getById(reservation.screening?.movieId ?? 0);
+          await movieProvider.getById(reservationData.screening?.movieId ?? 0);
+
       setState(() {
+        reservation = reservationData;
         movieTitle = movie.title ?? 'Movie Details';
+        isLoading = false;
       });
     } catch (e) {
       setState(() {
         movieTitle = 'Movie Details';
+        isLoading = false;
       });
     }
   }
@@ -57,37 +63,27 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
         ),
         backgroundColor: Colors.grey[850],
       ),
-      body: FutureBuilder<Reservation>(
-        future: widget.reservationProvider.getById(widget.reservationId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData) {
-            return const Center(child: Text('No reservation found'));
-          }
-
-          final reservation = snapshot.data!;
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionTitle('Screening Details'),
-                  const SizedBox(height: 10),
-                  _buildScreeningDetails(reservation),
-                  const SizedBox(height: 20),
-                  _buildSectionTitle('Reservation Details'),
-                  const SizedBox(height: 10),
-                  _buildReservationDetails(reservation),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator(color: Colors.red))
+          : reservation == null
+              ? const Center(child: Text('No reservation found'))
+              : SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionTitle('Screening Details'),
+                        const SizedBox(height: 10),
+                        _buildScreeningDetails(reservation!),
+                        const SizedBox(height: 20),
+                        _buildSectionTitle('Reservation Details'),
+                        const SizedBox(height: 10),
+                        _buildReservationDetails(reservation!),
+                      ],
+                    ),
+                  ),
+                ),
     );
   }
 

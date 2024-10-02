@@ -1,4 +1,5 @@
 import 'package:cinemanow_desktop/screens/actor_list_screen.dart';
+import 'package:cinemanow_desktop/screens/management_screen.dart';
 import 'package:cinemanow_desktop/screens/movie_list_screen.dart';
 import 'package:cinemanow_desktop/screens/screening_list_screen.dart';
 import 'package:cinemanow_desktop/screens/user_profile_screen.dart';
@@ -93,6 +94,28 @@ class MasterScreenState extends State<MasterScreen> {
                     builder: (context) => const MasterScreen(
                       Scaffold(
                         body: ActorListScreen(),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.list,
+                color: Colors.white,
+                size: 32,
+              ),
+              title: const Text('Management',
+                  style: TextStyle(color: Colors.white, fontSize: 18)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MasterScreen(
+                      Scaffold(
+                        body: ManagementScreen(),
                       ),
                     ),
                   ),
