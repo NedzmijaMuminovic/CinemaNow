@@ -184,7 +184,19 @@ namespace CinemaNow.Services
                     throw new InvalidOperationException($"The following seats are already reserved: {string.Join(", ", unavailableSeats)}");
                 }
 
+                var screening = Context.Screenings.FirstOrDefault(s => s.Id == request.ScreeningId);
+                if (screening == null)
+                {
+                    throw new InvalidOperationException("Screening not found.");
+                }
+
+                var numberOfTickets = request.SeatIds?.Count ?? 0;
+                var totalPrice = screening.Price * (request.SeatIds?.Count ?? 0);
+
                 var entity = Mapper.Map<Database.Reservation>(request);
+                entity.NumberOfTickets = numberOfTickets;
+                entity.TotalPrice = totalPrice;
+                entity.DateTime = DateTime.Now;
 
                 Context.Add(entity);
                 Context.SaveChanges();
@@ -260,6 +272,8 @@ namespace CinemaNow.Services
                     throw new UnauthorizedAccessException("You can only update your own reservations.");
                 }
 
+                entity.DateTime = DateTime.Now;
+
                 var currentScreeningId = entity.ScreeningId;
 
                 Mapper.Map(request, entity);
@@ -293,6 +307,15 @@ namespace CinemaNow.Services
                         throw new InvalidOperationException($"The following seats are already reserved: {string.Join(", ", unavailableSeats)}");
                     }
 
+                    var screening = Context.Screenings.FirstOrDefault(s => s.Id == entity.ScreeningId);
+                    if (screening == null)
+                    {
+                        throw new InvalidOperationException("Screening not found.");
+                    }
+
+                    entity.NumberOfTickets = request.SeatIds.Count;
+                    entity.TotalPrice = screening.Price * (request.SeatIds.Count);
+
                     var seatsToRemove = entity.ReservationSeats
                         .Where(rs => !request.SeatIds.Contains(rs.SeatId))
                         .ToList();
@@ -319,7 +342,7 @@ namespace CinemaNow.Services
                         {
                             ReservationId = entity.Id,
                             SeatId = seatId,
-                            ReservedAt = DateTime.UtcNow
+                            ReservedAt = DateTime.Now
                         };
                         entity.ReservationSeats.Add(reservationSeat);
 

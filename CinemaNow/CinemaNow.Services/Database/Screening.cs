@@ -23,8 +23,6 @@ public partial class Screening
 
     public virtual Movie? Movie { get; set; }
 
-    public virtual ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
-
     public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 
     public virtual ICollection<ScreeningSeat> ScreeningSeats { get; set; } = new List<ScreeningSeat>();

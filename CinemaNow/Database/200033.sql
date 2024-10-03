@@ -85,13 +85,6 @@ CREATE TABLE Screening (
     FOREIGN KEY (ViewModeID) REFERENCES ViewMode(ID) ON DELETE CASCADE
 );
 
-CREATE TABLE PayPalPayment (
-    ID INT PRIMARY KEY IDENTITY,
-    UserID INT,
-    Info VARCHAR(MAX),
-    FOREIGN KEY (UserID) REFERENCES [User](ID) ON DELETE CASCADE
-);
-
 CREATE TABLE Seat (
     ID INT PRIMARY KEY IDENTITY,
     Name VARCHAR(10)
@@ -106,6 +99,17 @@ CREATE TABLE ScreeningSeat (
     PRIMARY KEY (ScreeningID, SeatID)
 );
 
+CREATE TABLE Payment (
+    ID INT PRIMARY KEY IDENTITY,
+    UserID INT,
+    Provider VARCHAR(50),
+    TransactionID VARCHAR(255),
+    Amount DECIMAL(10,2),
+    DateTime DATETIME,
+    Status VARCHAR(50),
+    FOREIGN KEY (UserID) REFERENCES [User](ID) ON DELETE CASCADE
+);
+
 CREATE TABLE Reservation (
     ID INT PRIMARY KEY IDENTITY,
     UserID INT,
@@ -113,8 +117,10 @@ CREATE TABLE Reservation (
     DateTime DATETIME,
     NumberOfTickets INT,
     TotalPrice DECIMAL(10,2),
+	PaymentID INT NULL,
     FOREIGN KEY (UserID) REFERENCES [User](ID) ON DELETE NO ACTION,
-    FOREIGN KEY (ScreeningID) REFERENCES Screening(ID) ON DELETE CASCADE
+    FOREIGN KEY (ScreeningID) REFERENCES Screening(ID) ON DELETE CASCADE,
+	FOREIGN KEY (PaymentID) REFERENCES Payment(ID) ON DELETE SET NULL
 );
 
 CREATE TABLE ReservationSeat (
@@ -124,19 +130,6 @@ CREATE TABLE ReservationSeat (
     FOREIGN KEY (ReservationID) REFERENCES Reservation(ID) ON DELETE CASCADE,
     FOREIGN KEY (SeatID) REFERENCES Seat(ID) ON DELETE CASCADE,
     PRIMARY KEY (ReservationID, SeatID)
-);
-
-CREATE TABLE Purchase (
-    ID INT PRIMARY KEY IDENTITY,
-    UserID INT,
-    ScreeningID INT,
-    DateTime DATETIME,
-    NumberOfTickets INT,
-    TotalPrice DECIMAL(10,2),
-    PayPalPaymentID INT,
-    FOREIGN KEY (UserID) REFERENCES [User](ID) ON DELETE NO ACTION,
-    FOREIGN KEY (ScreeningID) REFERENCES Screening(ID) ON DELETE NO ACTION,
-    FOREIGN KEY (PayPalPaymentID) REFERENCES PayPalPayment(ID) ON DELETE NO ACTION
 );
 
 CREATE TABLE Rating (
@@ -299,12 +292,6 @@ VALUES
 (4, 5, 1, '2024-12-25 14:00:00', 11.50, 'active'),
 (5, 6, 2, '2024-12-27 17:30:00', 13.00, 'hidden');
 
-INSERT INTO PayPalPayment (UserID, Info)
-VALUES 
-(1, 'Payment information for John Doe'),
-(2, 'Payment information for Jane Smith'),
-(3, 'Payment information for Michael Johnson');
-
 INSERT INTO Seat (Name)
 VALUES 
 ('A1'), ('A2'), ('A3'), ('A4'), ('A5'), ('A6'), ('A7'), ('A8'),
@@ -345,18 +332,32 @@ BEGIN
     SET @ScreeningID = @ScreeningID + 1;
 END
 
-INSERT INTO Reservation (UserID, ScreeningID, DateTime, NumberOfTickets, TotalPrice)
+INSERT INTO Payment (UserID, Provider, TransactionID, Amount, DateTime, Status)
+VALUES
+(1, 'Stripe', 'txn_1', 21.00, '2024-09-10 14:00:00', 'Completed'),
+(2, 'Stripe', 'txn_2', 10.50, '2024-09-10 14:00:00', 'Completed'),
+(3, 'Cash', NULL, 52.00, '2024-09-10 16:30:00', 'Completed'),
+(1, 'Stripe', 'txn_3', 39.00, '2024-09-10 16:30:00', 'Completed'),
+(4, 'Cash', NULL, 15.50, '2024-09-10 19:00:00', 'Completed'),
+(5, 'Stripe', 'txn_4', 31.00, '2024-09-10 19:00:00', 'Completed'),
+(6, 'Stripe', 'txn_5', 90.00, '2024-09-11 15:00:00', 'Completed'),
+(7, 'Cash', NULL, 14.50, '2024-09-11 18:30:00', 'Completed'),
+(8, 'Stripe', 'txn_6', 33.00, '2024-09-12 17:00:00', 'Completed'),
+(9, 'Cash', NULL, 44.00, '2024-09-12 17:00:00', 'Completed');
+
+INSERT INTO Reservation (UserID, ScreeningID, DateTime, NumberOfTickets, TotalPrice, PaymentID)
 VALUES 
-(1, 1, '2024-09-10 14:00:00', 2, 21.00),
-(2, 1, '2024-09-10 14:00:00', 1, 10.50),
-(3, 2, '2024-09-10 16:30:00', 4, 52.00),
-(1, 2, '2024-09-10 16:30:00', 3, 39.00),
-(4, 3, '2024-09-10 19:00:00', 1, 15.50),
-(5, 3, '2024-09-10 19:00:00', 2, 31.00),
-(6, 4, '2024-09-11 15:00:00', 5, 90.00),
-(7, 5, '2024-09-11 18:30:00', 1, 14.50),
-(8, 6, '2024-09-12 17:00:00', 3, 33.00),
-(9, 6, '2024-09-12 17:00:00', 4, 44.00);
+(1, 1, '2024-09-10 14:00:00', 2, 21.00, 1),
+(2, 1, '2024-09-10 14:00:00', 1, 10.50, 2),
+(3, 2, '2024-09-10 16:30:00', 4, 52.00, NULL),
+(1, 2, '2024-09-10 16:30:00', 3, 39.00, 4),
+(4, 3, '2024-09-10 19:00:00', 1, 15.50, NULL),
+(5, 3, '2024-09-10 19:00:00', 2, 31.00, 6),
+(6, 4, '2024-09-11 15:00:00', 5, 90.00, 7),
+(7, 5, '2024-09-11 18:30:00', 1, 14.50, NULL),
+(8, 6, '2024-09-12 17:00:00', 3, 33.00, 9),
+(9, 6, '2024-09-12 17:00:00', 4, 44.00, NULL);
+
 
 INSERT INTO ReservationSeat (ReservationID, SeatID, ReservedAt)
 VALUES 
@@ -372,12 +373,6 @@ VALUES
 (6, 10, GETDATE()), 
 (6, 11, GETDATE()), 
 (6, 12, GETDATE());
-
-INSERT INTO Purchase (UserID, ScreeningID, DateTime, NumberOfTickets, TotalPrice, PayPalPaymentID)
-VALUES 
-(1, 1, '2024-09-10 14:00:00', 1, 10.00, 1),
-(2, 2, '2024-09-10 16:30:00', 2, 24.00, 2),
-(3, 3, '2024-09-10 19:00:00', 1, 15.00, 3);
 
 INSERT INTO Rating (UserID, MovieID, Value, Comment)
 VALUES 

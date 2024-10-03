@@ -89,17 +89,22 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             TextButton(
               child: const Text('Logout', style: TextStyle(color: Colors.red)),
               onPressed: () {
-                AuthProvider.userId = null;
-                AuthProvider.username = null;
-
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
+                _performLogout(context);
               },
             ),
           ],
         );
       },
+    );
+  }
+
+  void _performLogout(BuildContext context) {
+    AuthProvider.userId = null;
+    AuthProvider.username = null;
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (Route<dynamic> route) => false,
     );
   }
 
