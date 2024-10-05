@@ -4,12 +4,17 @@ using CinemaNow.Models.SearchObjects;
 using CinemaNow.Services;
 using CinemaNow.Services.Database;
 using CinemaNow.Services.ScreeningStateMachine;
+using DotNetEnv;
 using Mapster;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
+Env.Load(@"../.env");
+
 var builder = WebApplication.CreateBuilder(args);
+
+var stripeSecretKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
 
 // Add services to the container.
 builder.Services.AddTransient<IMovieService, MovieService>();
@@ -22,6 +27,9 @@ builder.Services.AddTransient<ISeatService, SeatService>();
 builder.Services.AddTransient<IHallService, HallService>();
 builder.Services.AddTransient<IViewModeService, ViewModeService>();
 builder.Services.AddTransient<IRatingService, RatingService>();
+
+builder.Services.AddTransient(sp => new PaymentService(stripeSecretKey, sp.GetRequiredService<Ib200033Context>()));
+
 builder.Services.AddTransient<IReservationService, ReservationService>();
 
 builder.Services.AddTransient<BaseScreeningState>();
@@ -29,8 +37,6 @@ builder.Services.AddTransient<InitialScreeningState>();
 builder.Services.AddTransient<DraftScreeningState>();
 builder.Services.AddTransient<ActiveScreeningState>();
 builder.Services.AddTransient<HiddenScreeningState>();
-
-builder.Services.AddTransient<PaymentService>();
 
 builder.Services.AddHttpContextAccessor();
 

@@ -15,13 +15,11 @@ namespace CinemaNow.Services
 {
     public class PaymentService
     {
-        private readonly string _secretKey;
         private readonly Ib200033Context _context;
 
-        public PaymentService(IConfiguration configuration, Ib200033Context context)
+        public PaymentService(string stripeSecretKey, Ib200033Context context)
         {
-            _secretKey = configuration["Stripe:SecretKey"];
-            StripeConfiguration.ApiKey = _secretKey;
+            StripeConfiguration.ApiKey = stripeSecretKey;
             _context = context;
         }
 
