@@ -19,6 +19,8 @@ public partial class Reservation
 
     public int? PaymentId { get; set; }
 
+    public string? PaymentType { get; set; }
+
     public virtual Payment? Payment { get; set; }
 
     public virtual ICollection<ReservationSeat> ReservationSeats { get; set; } = new List<ReservationSeat>();

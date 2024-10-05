@@ -12,8 +12,11 @@ namespace CinemaNow.Models
         public DateTime? DateTime { get; set; }
         public int? NumberOfTickets { get; set; }
         public decimal? TotalPrice { get; set; }
+        public int? PaymentId { get; set; }
+        public string? PaymentType { get; set; }
         public List<ReservationSeat>? Seats { get; set; } = new List<ReservationSeat>();
         public User? User { get; set; }
         public Screening? Screening { get; set; }
+        public Payment? Payment { get; set; }
     }
 }

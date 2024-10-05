@@ -17,8 +17,6 @@ public partial class Payment
 
     public DateTime? DateTime { get; set; }
 
-    public string? Status { get; set; }
-
     public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 
     public virtual User? User { get; set; }

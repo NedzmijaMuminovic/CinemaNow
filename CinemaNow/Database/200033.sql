@@ -106,7 +106,6 @@ CREATE TABLE Payment (
     TransactionID VARCHAR(255),
     Amount DECIMAL(10,2),
     DateTime DATETIME,
-    Status VARCHAR(50),
     FOREIGN KEY (UserID) REFERENCES [User](ID) ON DELETE CASCADE
 );
 
@@ -118,6 +117,7 @@ CREATE TABLE Reservation (
     NumberOfTickets INT,
     TotalPrice DECIMAL(10,2),
 	PaymentID INT NULL,
+	PaymentType VARCHAR(50) DEFAULT 'Cash',
     FOREIGN KEY (UserID) REFERENCES [User](ID) ON DELETE NO ACTION,
     FOREIGN KEY (ScreeningID) REFERENCES Screening(ID) ON DELETE CASCADE,
 	FOREIGN KEY (PaymentID) REFERENCES Payment(ID) ON DELETE SET NULL
@@ -332,32 +332,31 @@ BEGIN
     SET @ScreeningID = @ScreeningID + 1;
 END
 
-INSERT INTO Payment (UserID, Provider, TransactionID, Amount, DateTime, Status)
+INSERT INTO Payment (UserID, Provider, TransactionID, Amount, DateTime)
 VALUES
-(1, 'Stripe', 'txn_1', 21.00, '2024-09-10 14:00:00', 'Completed'),
-(2, 'Stripe', 'txn_2', 10.50, '2024-09-10 14:00:00', 'Completed'),
-(3, 'Cash', NULL, 52.00, '2024-09-10 16:30:00', 'Completed'),
-(1, 'Stripe', 'txn_3', 39.00, '2024-09-10 16:30:00', 'Completed'),
-(4, 'Cash', NULL, 15.50, '2024-09-10 19:00:00', 'Completed'),
-(5, 'Stripe', 'txn_4', 31.00, '2024-09-10 19:00:00', 'Completed'),
-(6, 'Stripe', 'txn_5', 90.00, '2024-09-11 15:00:00', 'Completed'),
-(7, 'Cash', NULL, 14.50, '2024-09-11 18:30:00', 'Completed'),
-(8, 'Stripe', 'txn_6', 33.00, '2024-09-12 17:00:00', 'Completed'),
-(9, 'Cash', NULL, 44.00, '2024-09-12 17:00:00', 'Completed');
+(1, 'Stripe', 'txn_1', 21.00, '2024-09-10 14:00:00'),
+(2, 'Stripe', 'txn_2', 10.50, '2024-09-10 14:00:00'),
+(3, 'Cash', NULL, 52.00, '2024-09-10 16:30:00'),
+(1, 'Stripe', 'txn_3', 39.00, '2024-09-10 16:30:00'),
+(4, 'Cash', NULL, 15.50, '2024-09-10 19:00:00'),
+(5, 'Stripe', 'txn_4', 31.00, '2024-09-10 19:00:00'),
+(6, 'Stripe', 'txn_5', 90.00, '2024-09-11 15:00:00'),
+(7, 'Cash', NULL, 14.50, '2024-09-11 18:30:00'),
+(8, 'Stripe', 'txn_6', 33.00, '2024-09-12 17:00:00'),
+(9, 'Cash', NULL, 44.00, '2024-09-12 17:00:00');
 
-INSERT INTO Reservation (UserID, ScreeningID, DateTime, NumberOfTickets, TotalPrice, PaymentID)
+INSERT INTO Reservation (UserID, ScreeningID, DateTime, NumberOfTickets, TotalPrice, PaymentID, PaymentType)
 VALUES 
-(1, 1, '2024-09-10 14:00:00', 2, 21.00, 1),
-(2, 1, '2024-09-10 14:00:00', 1, 10.50, 2),
-(3, 2, '2024-09-10 16:30:00', 4, 52.00, NULL),
-(1, 2, '2024-09-10 16:30:00', 3, 39.00, 4),
-(4, 3, '2024-09-10 19:00:00', 1, 15.50, NULL),
-(5, 3, '2024-09-10 19:00:00', 2, 31.00, 6),
-(6, 4, '2024-09-11 15:00:00', 5, 90.00, 7),
-(7, 5, '2024-09-11 18:30:00', 1, 14.50, NULL),
-(8, 6, '2024-09-12 17:00:00', 3, 33.00, 9),
-(9, 6, '2024-09-12 17:00:00', 4, 44.00, NULL);
-
+(1, 1, '2024-09-10 14:00:00', 2, 21.00, 1, 'Stripe'),
+(2, 1, '2024-09-10 14:00:00', 1, 10.50, 2, 'Stripe'),
+(3, 2, '2024-09-10 16:30:00', 4, 52.00, NULL, 'Cash'),
+(1, 2, '2024-09-10 16:30:00', 3, 39.00, 4, 'Stripe'),
+(4, 3, '2024-09-10 19:00:00', 1, 15.50, NULL, 'Cash'),
+(5, 3, '2024-09-10 19:00:00', 2, 31.00, 6, 'Stripe'),
+(6, 4, '2024-09-11 15:00:00', 5, 90.00, 7, 'Stripe'),
+(7, 5, '2024-09-11 18:30:00', 1, 14.50, NULL, 'Cash'),
+(8, 6, '2024-09-12 17:00:00', 3, 33.00, 9, 'Stripe'),
+(9, 6, '2024-09-12 17:00:00', 4, 44.00, NULL, 'Cash');
 
 INSERT INTO ReservationSeat (ReservationID, SeatID, ReservedAt)
 VALUES 

@@ -12,6 +12,7 @@ using CinemaNow.Models.Requests;
 using Microsoft.EntityFrameworkCore;
 using Mapster;
 using CinemaNow.Models.DTOs;
+using Stripe;
 
 namespace CinemaNow.Services
 {
@@ -19,11 +20,13 @@ namespace CinemaNow.Services
     {
         private readonly IUserService _userService;
         private readonly Ib200033Context _context;
+        private readonly PaymentService _paymentService;
 
-        public ReservationService(Ib200033Context context, IMapper mapper, IUserService userService) : base(context, mapper)
+        public ReservationService(Ib200033Context context, IMapper mapper, IUserService userService, PaymentService paymentService) : base(context, mapper)
         {
             _userService = userService;
             _context = context;
+            _paymentService = paymentService;
         }
 
         public override IQueryable<Database.Reservation> AddFilter(ReservationSearchObject search, IQueryable<Database.Reservation> query)
@@ -171,76 +174,35 @@ namespace CinemaNow.Services
             try
             {
                 int currentUserId = _userService.GetCurrentUserId();
-
                 request.UserId = currentUserId;
 
-                var unavailableSeats = Context.ScreeningSeats
-                    .Where(ss => ss.ScreeningId == request.ScreeningId && request.SeatIds.Contains(ss.SeatId) && ss.IsReserved == true)
-                    .Select(ss => ss.SeatId)
-                    .ToList();
+                ValidateSeatsAvailability(request.ScreeningId.Value, request.SeatIds);
 
-                if (unavailableSeats.Any())
+                var screening = GetScreeningById(request.ScreeningId.Value);
+
+                var reservation = CreateReservationEntity(request, screening);
+
+                if (!string.IsNullOrEmpty(request.StripePaymentToken))
                 {
-                    throw new InvalidOperationException($"The following seats are already reserved: {string.Join(", ", unavailableSeats)}");
+                    var payment = _paymentService.ProcessStripePayment(request.StripePaymentToken, reservation.TotalPrice.Value);
+                    reservation.PaymentId = payment.Id;
+                    reservation.PaymentType = "Stripe";
+
+                    reservation.Payment = payment;
                 }
 
-                var screening = Context.Screenings.FirstOrDefault(s => s.Id == request.ScreeningId);
-                if (screening == null)
-                {
-                    throw new InvalidOperationException("Screening not found.");
-                }
 
-                var numberOfTickets = request.SeatIds?.Count ?? 0;
-                var totalPrice = screening.Price * (request.SeatIds?.Count ?? 0);
-
-                var entity = Mapper.Map<Database.Reservation>(request);
-                entity.NumberOfTickets = numberOfTickets;
-                entity.TotalPrice = totalPrice;
-                entity.DateTime = DateTime.Now;
-
-                Context.Add(entity);
+                Context.Add(reservation);
                 Context.SaveChanges();
 
                 if (request.SeatIds != null && request.SeatIds.Any())
                 {
-                    foreach (var seatId in request.SeatIds)
-                    {
-                        var reservationSeat = new Database.ReservationSeat
-                        {
-                            ReservationId = entity.Id,
-                            SeatId = seatId,
-                            ReservedAt = DateTime.Now
-                        };
-
-                        Context.ReservationSeats.Add(reservationSeat);
-
-                        var screeningSeat = Context.ScreeningSeats
-                            .FirstOrDefault(ss => ss.ScreeningId == request.ScreeningId && ss.SeatId == seatId);
-
-                        if (screeningSeat != null)
-                        {
-                            screeningSeat.IsReserved = true;
-                        }
-                    }
-
-                    Context.SaveChanges();
+                    ReserveSeatsForReservation(request.SeatIds, request.ScreeningId.Value, reservation.Id);
                 }
 
-                var fullEntity = Context.Reservations
-                    .Include(r => r.User)
-                    .Include(r => r.Screening)
-                    .Include(r => r.ReservationSeats)
-                        .ThenInclude(rs => rs.Seat)
-                    .FirstOrDefault(r => r.Id == entity.Id);
+                var fullEntity = GetFullReservationById(reservation.Id);
 
-                var model = fullEntity.Adapt<Models.Reservation>();
-
-                model.Seats = fullEntity.ReservationSeats.Select(rs => new Models.ReservationSeat
-                {
-                    ReservationId = rs.ReservationId,
-                    SeatId = rs.SeatId,
-                    Seat = rs.Seat.Adapt<Models.Seat>()
-                }).ToList();
+                var model = MapToModel(fullEntity);
 
                 transaction.Commit();
 
@@ -253,149 +215,139 @@ namespace CinemaNow.Services
             }
         }
 
+        private Database.Payment ProcessStripePayment(string stripePaymentToken, decimal amount)
+        {
+            var options = new ChargeCreateOptions
+            {
+                Amount = (long)(amount * 100),
+                Currency = "usd",
+                Description = "Cinema ticket purchase",
+                Source = stripePaymentToken,
+            };
+
+            var service = new ChargeService();
+            Charge charge = service.Create(options);
+
+            var payment = new Database.Payment
+            {
+                UserId = _userService.GetCurrentUserId(),
+                Provider = "Stripe",
+                TransactionId = charge.Id,
+                Amount = amount,
+                DateTime = DateTime.Now
+            };
+
+            Context.Payments.Add(payment);
+            Context.SaveChanges();
+
+            return payment;
+        }
+
+        private void ValidateSeatsAvailability(int screeningId, List<int> seatIds)
+        {
+            var unavailableSeats = Context.ScreeningSeats
+                .Where(ss => ss.ScreeningId == screeningId && seatIds.Contains(ss.SeatId) && ss.IsReserved.Value)
+                .Select(ss => ss.SeatId)
+                .ToList();
+
+            if (unavailableSeats.Any())
+            {
+                throw new InvalidOperationException($"The following seats are already reserved: {string.Join(", ", unavailableSeats)}");
+            }
+        }
+
+        private Database.Screening GetScreeningById(int screeningId)
+        {
+            var screening = Context.Screenings.FirstOrDefault(s => s.Id == screeningId);
+            if (screening == null)
+            {
+                throw new InvalidOperationException("Screening not found.");
+            }
+            return screening;
+        }
+
+        private Database.Reservation CreateReservationEntity(ReservationInsertRequest request, Database.Screening screening)
+        {
+            var numberOfTickets = request.SeatIds?.Count ?? 0;
+            var totalPrice = screening.Price * numberOfTickets;
+
+            var entity = Mapper.Map<Database.Reservation>(request);
+            entity.NumberOfTickets = numberOfTickets;
+            entity.TotalPrice = totalPrice;
+            entity.DateTime = DateTime.Now;
+
+            if (entity.PaymentId == null)
+            {
+                entity.PaymentType = "Cash";
+            }
+
+            return entity;
+        }
+
+        private void ReserveSeatsForReservation(List<int> seatIds, int screeningId, int reservationId)
+        {
+            foreach (var seatId in seatIds)
+            {
+                var reservationSeat = new Database.ReservationSeat
+                {
+                    ReservationId = reservationId,
+                    SeatId = seatId,
+                    ReservedAt = DateTime.Now
+                };
+
+                Context.ReservationSeats.Add(reservationSeat);
+
+                var screeningSeat = Context.ScreeningSeats
+                    .FirstOrDefault(ss => ss.ScreeningId == screeningId && ss.SeatId == seatId);
+
+                if (screeningSeat != null)
+                {
+                    screeningSeat.IsReserved = true;
+                }
+            }
+
+            Context.SaveChanges();
+        }
+
+        private Database.Reservation GetFullReservationById(int reservationId)
+        {
+            return Context.Reservations
+                .Include(r => r.User)
+                .Include(r => r.Screening)
+                .Include(r => r.ReservationSeats)
+                    .ThenInclude(rs => rs.Seat)
+                .FirstOrDefault(r => r.Id == reservationId);
+        }
+
+        private Models.Reservation MapToModel(Database.Reservation fullEntity)
+        {
+            var model = fullEntity.Adapt<Models.Reservation>();
+
+            model.Seats = fullEntity.ReservationSeats.Select(rs => new Models.ReservationSeat
+            {
+                ReservationId = rs.ReservationId,
+                SeatId = rs.SeatId,
+                Seat = rs.Seat.Adapt<Models.Seat>()
+            }).ToList();
+
+            if (fullEntity.Payment != null)
+            {
+                model.Payment = new Models.Payment
+                {
+                    Id = fullEntity.Payment.Id,
+                    Provider = fullEntity.Payment.Provider,
+                    TransactionId = fullEntity.Payment.TransactionId,
+                    Amount = fullEntity.Payment.Amount,
+                    DateTime = fullEntity.Payment.DateTime
+                };
+            }
+
+            return model;
+        }
+
         public override Models.Reservation Update(int id, ReservationUpdateRequest request)
         {
-            using var transaction = Context.Database.BeginTransaction();
-
-            try
-            {
-                var entity = Context.Reservations
-                    .Include(r => r.ReservationSeats)
-                    .FirstOrDefault(r => r.Id == id);
-
-                if (entity == null)
-                    throw new Exception("Reservation not found");
-
-                var currentUserId = _userService.GetCurrentUserId();
-                if (entity.UserId != currentUserId)
-                {
-                    throw new UnauthorizedAccessException("You can only update your own reservations.");
-                }
-
-                entity.DateTime = DateTime.Now;
-
-                var currentScreeningId = entity.ScreeningId;
-
-                Mapper.Map(request, entity);
-
-                bool screeningChanged = currentScreeningId != entity.ScreeningId;
-
-                if (screeningChanged)
-                {
-                    var screeningSeatsToRelease = Context.ScreeningSeats
-                        .Where(ss => ss.ScreeningId == currentScreeningId &&
-                                     entity.ReservationSeats.Select(rs => rs.SeatId).Contains(ss.SeatId));
-
-                    foreach (var seat in screeningSeatsToRelease)
-                    {
-                        seat.IsReserved = false;
-                    }
-                }
-
-                if (request.SeatIds != null && request.SeatIds.Any())
-                {
-                    var unavailableSeats = Context.ScreeningSeats
-                        .Where(ss => ss.ScreeningId == entity.ScreeningId &&
-                                     request.SeatIds.Contains(ss.SeatId) &&
-                                     ss.IsReserved == true &&
-                                     !entity.ReservationSeats.Select(rs => rs.SeatId).Contains(ss.SeatId))
-                        .Select(ss => ss.SeatId)
-                        .ToList();
-
-                    if (unavailableSeats.Any())
-                    {
-                        throw new InvalidOperationException($"The following seats are already reserved: {string.Join(", ", unavailableSeats)}");
-                    }
-
-                    var screening = Context.Screenings.FirstOrDefault(s => s.Id == entity.ScreeningId);
-                    if (screening == null)
-                    {
-                        throw new InvalidOperationException("Screening not found.");
-                    }
-
-                    entity.NumberOfTickets = request.SeatIds.Count;
-                    entity.TotalPrice = screening.Price * (request.SeatIds.Count);
-
-                    var seatsToRemove = entity.ReservationSeats
-                        .Where(rs => !request.SeatIds.Contains(rs.SeatId))
-                        .ToList();
-
-                    foreach (var seatToRemove in seatsToRemove)
-                    {
-                        entity.ReservationSeats.Remove(seatToRemove);
-
-                        var screeningSeat = Context.ScreeningSeats
-                            .FirstOrDefault(ss => ss.ScreeningId == entity.ScreeningId && ss.SeatId == seatToRemove.SeatId);
-
-                        if (screeningSeat != null)
-                        {
-                            screeningSeat.IsReserved = false;
-                        }
-                    }
-
-                    var existingSeats = entity.ReservationSeats.Select(rs => rs.SeatId).ToList();
-                    var seatsToAdd = request.SeatIds.Except(existingSeats);
-
-                    foreach (var seatId in seatsToAdd)
-                    {
-                        var reservationSeat = new Database.ReservationSeat
-                        {
-                            ReservationId = entity.Id,
-                            SeatId = seatId,
-                            ReservedAt = DateTime.Now
-                        };
-                        entity.ReservationSeats.Add(reservationSeat);
-
-                        var screeningSeat = Context.ScreeningSeats
-                            .FirstOrDefault(ss => ss.ScreeningId == entity.ScreeningId && ss.SeatId == seatId);
-
-                        if (screeningSeat != null)
-                        {
-                            screeningSeat.IsReserved = true;
-                        }
-                    }
-                }
-                else
-                {
-                    entity.ReservationSeats.Clear();
-
-                    var screeningSeatsToRelease = Context.ScreeningSeats
-                        .Where(ss => ss.ScreeningId == entity.ScreeningId &&
-                                     entity.ReservationSeats.Select(rs => rs.SeatId).Contains(ss.SeatId));
-
-                    foreach (var seat in screeningSeatsToRelease)
-                    {
-                        seat.IsReserved = false;
-                    }
-                }
-
-                Context.SaveChanges();
-
-                var updatedEntity = Context.Reservations
-                    .Include(r => r.User)
-                    .Include(r => r.Screening)
-                    .Include(r => r.ReservationSeats)
-                        .ThenInclude(rs => rs.Seat)
-                    .FirstOrDefault(r => r.Id == entity.Id);
-
-                var model = updatedEntity.Adapt<Models.Reservation>();
-
-                model.Seats = updatedEntity.ReservationSeats.Select(rs => new Models.ReservationSeat
-                {
-                    ReservationId = rs.ReservationId,
-                    SeatId = rs.SeatId,
-                    Seat = rs.Seat.Adapt<Models.Seat>()
-                }).ToList();
-
-                transaction.Commit();
-
-                return model;
-            }
-            catch
-            {
-                transaction.Rollback();
-                throw;
-            }
+            throw new NotImplementedException("Update operation is not allowed for reservations.");
         }
 
         public override void Delete(int id)
