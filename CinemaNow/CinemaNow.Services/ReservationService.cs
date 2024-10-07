@@ -21,6 +21,7 @@ namespace CinemaNow.Services
         private readonly IUserService _userService;
         private readonly Ib200033Context _context;
         private readonly PaymentService _paymentService;
+        private PaymentService paymentService;
 
         public ReservationService(Ib200033Context context, IMapper mapper, IUserService userService, PaymentService paymentService) : base(context, mapper)
         {
@@ -182,15 +183,13 @@ namespace CinemaNow.Services
 
                 var reservation = CreateReservationEntity(request, screening);
 
-                if (!string.IsNullOrEmpty(request.StripePaymentToken))
+                if (!string.IsNullOrEmpty(request.StripePaymentIntentId))
                 {
-                    var payment = _paymentService.ProcessStripePayment(request.StripePaymentToken, reservation.TotalPrice.Value);
+                    var payment = _paymentService.ProcessStripePayment(request.StripePaymentIntentId, reservation.TotalPrice.Value);
                     reservation.PaymentId = payment.Id;
                     reservation.PaymentType = "Stripe";
-
                     reservation.Payment = payment;
                 }
-
 
                 Context.Add(reservation);
                 Context.SaveChanges();
@@ -213,34 +212,6 @@ namespace CinemaNow.Services
                 transaction.Rollback();
                 throw;
             }
-        }
-
-        private Database.Payment ProcessStripePayment(string stripePaymentToken, decimal amount)
-        {
-            var options = new ChargeCreateOptions
-            {
-                Amount = (long)(amount * 100),
-                Currency = "usd",
-                Description = "Cinema ticket purchase",
-                Source = stripePaymentToken,
-            };
-
-            var service = new ChargeService();
-            Charge charge = service.Create(options);
-
-            var payment = new Database.Payment
-            {
-                UserId = _userService.GetCurrentUserId(),
-                Provider = "Stripe",
-                TransactionId = charge.Id,
-                Amount = amount,
-                DateTime = DateTime.Now
-            };
-
-            Context.Payments.Add(payment);
-            Context.SaveChanges();
-
-            return payment;
         }
 
         private void ValidateSeatsAvailability(int screeningId, List<int> seatIds)

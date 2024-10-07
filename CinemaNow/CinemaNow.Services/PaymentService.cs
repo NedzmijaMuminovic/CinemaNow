@@ -23,23 +23,20 @@ namespace CinemaNow.Services
             _context = context;
         }
 
-        public Payment ProcessStripePayment(string stripePaymentToken, decimal amount)
+        public Payment ProcessStripePayment(string paymentIntentId, decimal amount)
         {
-            var options = new ChargeCreateOptions
-            {
-                Amount = (long)(amount * 100),
-                Currency = "usd",
-                Description = "Cinema ticket purchase",
-                Source = stripePaymentToken,
-            };
+            var service = new PaymentIntentService();
+            var paymentIntent = service.Get(paymentIntentId);
 
-            var service = new ChargeService();
-            Charge charge = service.Create(options);
+            //if (paymentIntent.Status != "succeeded")
+            //{
+            //    throw new InvalidOperationException("Payment not successful.");
+            //}
 
             var payment = new Payment
             {
                 Provider = "Stripe",
-                TransactionId = charge.Id,
+                TransactionId = paymentIntent.Id,
                 Amount = amount,
                 DateTime = DateTime.Now
             };
@@ -48,6 +45,18 @@ namespace CinemaNow.Services
             _context.SaveChanges();
 
             return payment;
+        }
+
+        public async Task<PaymentIntent> CreatePaymentIntentAsync(int amount)
+        {
+            var options = new PaymentIntentCreateOptions
+            {
+                Amount = amount,
+                Currency = "usd",
+                PaymentMethodTypes = new List<string> { "card" },
+            };
+            var service = new PaymentIntentService();
+            return await service.CreateAsync(options);
         }
     }
 
