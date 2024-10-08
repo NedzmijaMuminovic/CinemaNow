@@ -54,14 +54,17 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
         await _paymentProvider
             .initializePaymentSheet(paymentIntentData['clientSecret']);
 
-        await _paymentProvider.presentPaymentSheet();
+        bool paymentSuccess = await _paymentProvider.presentPaymentSheet();
+
+        if (!paymentSuccess) {
+          setState(() {
+            _isLoading = false;
+          });
+          return;
+        }
 
         await _createReservation(
             paymentIntentData['clientSecret'].split('_secret').first);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Payment successful!')),
-        );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Payment failed: $e')),
@@ -137,7 +140,7 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
                       color: Colors.red,
                     ))
                   : buildButton(
-                      text: 'Confirm Payment',
+                      text: 'Pay',
                       onPressed: () async {
                         if (selectedPaymentMethod == 'Stripe') {
                           _handlePayment();
@@ -147,11 +150,11 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
                             builder: (context) {
                               return AlertDialog(
                                 title: const Text(
-                                  'Confirm Payment',
+                                  'Confirm Reservation',
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 content: const Text(
-                                  'Are you sure you want to proceed with the payment?',
+                                  'Are you sure you want to proceed with the reservation?',
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 backgroundColor: Colors.grey[900],

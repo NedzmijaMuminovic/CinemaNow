@@ -64,4 +64,9 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    def emoji2_version = "1.4.0"
+    implementation("androidx.emoji2:emoji2:$emoji2_version")
+    implementation("androidx.emoji2:emoji2-views:$emoji2_version")
+    implementation("androidx.emoji2:emoji2-views-helper:$emoji2_version")
+}

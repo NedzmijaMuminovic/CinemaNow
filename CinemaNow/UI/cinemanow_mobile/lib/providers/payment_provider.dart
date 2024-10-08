@@ -36,9 +36,17 @@ class PaymentProvider extends BaseProvider {
     );
   }
 
-  Future<void> presentPaymentSheet() async {
+  Future<bool> presentPaymentSheet() async {
     try {
       await Stripe.instance.presentPaymentSheet();
+      return true;
+    } on StripeException catch (e) {
+      if (e.error.localizedMessage != null &&
+          e.error.localizedMessage!.contains('canceled')) {
+        return false;
+      } else {
+        throw Exception('Payment failed: ${e.error.localizedMessage}');
+      }
     } catch (e) {
       throw Exception('Payment failed: $e');
     }
