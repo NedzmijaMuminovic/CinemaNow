@@ -1,3 +1,5 @@
+import 'package:cinemanow_mobile/providers/payment_provider.dart';
+
 import 'package:cinemanow_mobile/layouts/master_screen.dart';
 import 'package:cinemanow_mobile/models/screening.dart';
 import 'package:cinemanow_mobile/models/DTOs/seat_dto.dart';
@@ -26,76 +28,51 @@ class ScreeningCheckoutScreen extends StatefulWidget {
 class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
   String selectedPaymentMethod = 'Stripe';
   bool _isLoading = false;
-  final TextEditingController _cardNumberController = TextEditingController();
-  final TextEditingController _expiryDateController = TextEditingController();
-  final TextEditingController _cvcController = TextEditingController();
+  final PaymentProvider _paymentProvider = PaymentProvider();
 
   @override
   void initState() {
     super.initState();
-
-    _expiryDateController.addListener(() {
-      String text = _expiryDateController.text;
-      if (text.length == 2 && !text.contains('/')) {
-        _expiryDateController.text = '$text/';
-        _expiryDateController.selection = TextSelection.fromPosition(
-          TextPosition(offset: _expiryDateController.text.length),
-        );
-      }
-    });
   }
 
-  bool _isStripeFormValid() {
-    bool isCardNumberValid = RegExp(r'^[0-9]{13,19}$').hasMatch(
-        _cardNumberController.text.replaceAll(RegExp(r'\s+\b|\b\s'), ''));
-
-    bool isExpiryDateValid = RegExp(r'^(0[1-9]|1[0-2])\/([0-9]{2})$')
-        .hasMatch(_expiryDateController.text);
-
-    bool isCvcValid = RegExp(r'^[0-9]{3}$').hasMatch(_cvcController.text);
-
-    if (!isCardNumberValid) {
-      _showValidationError('Invalid card number. Please enter 13-19 digits.');
-      return false;
-    }
-
-    if (!isExpiryDateValid) {
-      _showValidationError('Invalid expiry date. Please use MM/YY format.');
-      return false;
-    }
-
-    if (!isCvcValid) {
-      _showValidationError('Invalid CVC. Please enter 3 digits.');
-      return false;
-    }
-
-    return true;
-  }
-
-  void _showValidationError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+  int _getTotalAmountInCents() {
+    final totalAmount =
+        widget.selectedSeats.length * (widget.screening.price ?? 0);
+    return (totalAmount * 100).toInt();
   }
 
   void _handlePayment() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      if (selectedPaymentMethod == 'Stripe') {
-      } else {
-        await _handleCashPayment();
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Payment failed: $e')),
-      );
-    } finally {
+    if (selectedPaymentMethod == 'Stripe') {
       setState(() {
-        _isLoading = false;
+        _isLoading = true;
       });
+
+      try {
+        final paymentIntentData = await _paymentProvider
+            .createPaymentIntent(_getTotalAmountInCents());
+
+        await _paymentProvider
+            .initializePaymentSheet(paymentIntentData['clientSecret']);
+
+        await _paymentProvider.presentPaymentSheet();
+
+        await _createReservation(
+            paymentIntentData['clientSecret'].split('_secret').first);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Payment successful!')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Payment failed: $e')),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } else {
+      await _handleCashPayment();
     }
   }
 
@@ -103,12 +80,12 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
     await _createReservation(null);
   }
 
-  Future<void> _createReservation(String? stripePaymentToken) async {
+  Future<void> _createReservation(String? stripePaymentIntentId) async {
     try {
       var reservationRequest = {
         "screeningId": widget.screening.id,
         "seatIds": widget.selectedSeats.map((seat) => seat.id).toList(),
-        "stripePaymentToken": stripePaymentToken,
+        "stripePaymentIntentId": stripePaymentIntentId,
       };
 
       var reservationProvider = ReservationProvider();
@@ -154,57 +131,58 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
               const SizedBox(height: 10),
               _buildPaymentMethodSelector(),
               const SizedBox(height: 20),
-              if (selectedPaymentMethod == 'Stripe')
-                _buildStripePaymentFields(),
-              const SizedBox(height: 20),
-              Center(
-                child: buildButton(
-                  text: 'Confirm Payment',
-                  onPressed: () async {
-                    if (selectedPaymentMethod == 'Stripe' &&
-                        !_isStripeFormValid()) {
-                      return;
-                    }
+              _isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(
+                      color: Colors.red,
+                    ))
+                  : buildButton(
+                      text: 'Confirm Payment',
+                      onPressed: () async {
+                        if (selectedPaymentMethod == 'Stripe') {
+                          _handlePayment();
+                        } else {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text(
+                                  'Confirm Payment',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                content: const Text(
+                                  'Are you sure you want to proceed with the payment?',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.grey[900],
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                    child: const Text(
+                                      'No',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(true),
+                                    child: const Text(
+                                      'Yes',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
 
-                    final confirmed = await showDialog<bool>(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text(
-                            'Confirm Payment',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          content: const Text(
-                            'Are you sure you want to proceed with the payment?',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          backgroundColor: Colors.grey[900],
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(false),
-                              child: const Text(
-                                'No',
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(true),
-                              child: const Text(
-                                'Yes',
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            ),
-                          ],
-                        );
+                          if (confirmed == true) {
+                            _handlePayment();
+                          }
+                        }
                       },
-                    );
-
-                    if (confirmed == true) {
-                      _handlePayment();
-                    }
-                  },
-                ),
-              ),
+                    ),
             ],
           ),
         ),
@@ -289,7 +267,7 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
         children: [
           _buildPaymentOption('Stripe', Icons.credit_card),
           const Divider(color: Colors.grey, height: 1),
-          _buildPaymentOption('Pay in Cash', Icons.attach_money),
+          _buildPaymentOption('Cash', Icons.attach_money),
         ],
       ),
     );
@@ -317,74 +295,6 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
           selectedPaymentMethod = method;
         });
       },
-    );
-  }
-
-  Widget _buildStripePaymentFields() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[850],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildTextField(
-            controller: _cardNumberController,
-            label: 'Card Number',
-            icon: Icons.credit_card,
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildTextField(
-                  controller: _expiryDateController,
-                  label: 'MM/YY',
-                  icon: Icons.date_range,
-                  keyboardType: TextInputType.datetime,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildTextField(
-                  controller: _cvcController,
-                  label: 'CVC',
-                  icon: Icons.security,
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    required TextInputType keyboardType,
-  }) {
-    return TextField(
-      controller: controller,
-      style: const TextStyle(color: Colors.white),
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: Icon(icon, color: Colors.red),
-        enabledBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white30),
-        ),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.red),
-        ),
-      ),
-      cursorColor: Colors.red,
     );
   }
 }

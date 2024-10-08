@@ -56,6 +56,9 @@ namespace CinemaNow.Services
                     .ThenInclude(rs => rs.Seat);
             }
 
+            if (search?.IsPaymentIncluded == true)
+                filteredQuery = filteredQuery.Include(x => x.Payment);
+
             return filteredQuery;
         }
 

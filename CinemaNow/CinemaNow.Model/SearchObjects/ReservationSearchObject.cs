@@ -11,5 +11,6 @@ namespace CinemaNow.Models.SearchObjects
         public bool? IsUserIncluded { get; set; }
         public bool? IsScreeningIncluded { get; set; }
         public bool? AreSeatsIncluded { get; set; }
+        public bool? IsPaymentIncluded { get; set; }
     }
 }

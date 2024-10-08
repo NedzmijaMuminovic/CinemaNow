@@ -17,7 +17,7 @@ class UserScreeningListScreen extends StatefulWidget {
 }
 
 class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
-  bool _isFutureSelected = true;
+  bool _isUpcomingSelected = true;
   List<ReservationMovieDto> _filteredReservations = [];
 
   @override
@@ -32,10 +32,10 @@ class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
         child: Column(
           children: [
             ToggleButtons(
-              isSelected: [_isFutureSelected, !_isFutureSelected],
+              isSelected: [_isUpcomingSelected, !_isUpcomingSelected],
               onPressed: (int index) {
                 setState(() {
-                  _isFutureSelected = index == 0;
+                  _isUpcomingSelected = index == 0;
                 });
               },
               color: Colors.white,
@@ -45,18 +45,30 @@ class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
               selectedBorderColor: Colors.red,
               borderRadius: BorderRadius.circular(8),
               children: const [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 32.0),
-                  child: Text(
-                    'Future',
-                    style: TextStyle(color: Colors.white),
+                SizedBox(
+                  width: 150,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Center(
+                      child: Text(
+                        'Upcoming',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 32.0),
-                  child: Text(
-                    'Past',
-                    style: TextStyle(color: Colors.white),
+                SizedBox(
+                  width: 150,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Center(
+                      child: Text(
+                        'Past',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -80,7 +92,7 @@ class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
 
                   _filteredReservations = reservations.where((reservation) {
                     final screeningDate = reservation.screeningDate.toLocal();
-                    return _isFutureSelected
+                    return _isUpcomingSelected
                         ? screeningDate.isAfter(DateTime.now())
                         : screeningDate.isBefore(DateTime.now());
                   }).toList();
