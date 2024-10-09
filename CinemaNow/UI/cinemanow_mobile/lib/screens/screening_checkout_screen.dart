@@ -1,9 +1,8 @@
 import 'package:cinemanow_mobile/providers/payment_provider.dart';
-
-import 'package:cinemanow_mobile/layouts/master_screen.dart';
 import 'package:cinemanow_mobile/models/screening.dart';
 import 'package:cinemanow_mobile/models/DTOs/seat_dto.dart';
 import 'package:cinemanow_mobile/providers/reservation_provider.dart';
+import 'package:cinemanow_mobile/screens/reservation_qr_code.dart';
 import 'package:cinemanow_mobile/widgets/common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -92,14 +91,18 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
       };
 
       var reservationProvider = ReservationProvider();
-      await reservationProvider.insert(reservationRequest);
+      var createdReservation =
+          await reservationProvider.insert(reservationRequest);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Your reservation is confirmed!')),
       );
 
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const MasterScreen()),
+        MaterialPageRoute(
+          builder: (context) =>
+              ReservationQRCodeScreen(reservationId: createdReservation.id!),
+        ),
         (Route<dynamic> route) => false,
       );
     } catch (e) {

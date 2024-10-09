@@ -1,4 +1,5 @@
 import 'package:cinemanow_mobile/providers/movie_provider.dart';
+import 'package:cinemanow_mobile/screens/reservation_qr_code.dart';
 import 'package:flutter/material.dart';
 import 'package:cinemanow_mobile/models/reservation.dart';
 import 'package:cinemanow_mobile/providers/reservation_provider.dart';
@@ -80,6 +81,43 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                         _buildSectionTitle('Reservation Details'),
                         const SizedBox(height: 10),
                         _buildReservationDetails(reservation!),
+                        const SizedBox(height: 40),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ReservationQRCodeScreen(
+                                      reservationId: widget.reservationId),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.red,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 32, vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              elevation: 5,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(Icons.qr_code, size: 24),
+                                SizedBox(width: 8),
+                                Text(
+                                  'View QR Code',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

@@ -21,6 +21,8 @@ public partial class Reservation
 
     public string? PaymentType { get; set; }
 
+    public string? QrcodeBase64 { get; set; }
+
     public virtual Payment? Payment { get; set; }
 
     public virtual ICollection<ReservationSeat> ReservationSeats { get; set; } = new List<ReservationSeat>();

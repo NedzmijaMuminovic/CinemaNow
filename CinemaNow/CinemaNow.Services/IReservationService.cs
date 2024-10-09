@@ -2,6 +2,7 @@
 using CinemaNow.Models.DTOs;
 using CinemaNow.Models.Requests;
 using CinemaNow.Models.SearchObjects;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +14,6 @@ namespace CinemaNow.Services
     public interface IReservationService : IBaseCRUDService<Reservation, ReservationSearchObject, ReservationInsertRequest, ReservationUpdateRequest>
     {
         List<ReservationMovieDto> GetReservationsByUserId(int userId);
+        string GenerateQRCode(int reservationId);
     }
 }

@@ -13,6 +13,9 @@ using Microsoft.EntityFrameworkCore;
 using Mapster;
 using CinemaNow.Models.DTOs;
 using Stripe;
+using System.Drawing;
+using System.IO;
+using QRCoder;
 
 namespace CinemaNow.Services
 {
@@ -171,6 +174,34 @@ namespace CinemaNow.Services
             return null;
         }
 
+        public string GenerateQRCode(int reservationId)
+        {
+            var reservation = GetByID(reservationId);
+            if (reservation == null)
+            {
+                throw new Exception("Reservation not found");
+            }
+
+            var qrCodeContent = $"Reservation ID: {reservation.Id}\n" +
+                                $"User: {reservation.User?.Username} ({reservation.User?.Name} {reservation.User?.Surname})\n" +
+                                $"Movie: {reservation.Screening?.Movie?.Title}\n" +
+                                $"Date: {reservation.Screening?.DateTime}\n" +
+                                $"Hall: {reservation.Screening?.Hall?.Name}\n" +
+                                $"View Mode: {reservation.Screening?.ViewMode?.Name}\n" +
+                                $"Ticket Price: {reservation.Screening?.Price}\n" +
+                                $"Reservation Date: {reservation.DateTime}\n" +
+                                $"Seats: {string.Join(", ", reservation.Seats.Select(s => s.Seat.Name))}\n" +
+                                $"Total Price: {reservation.TotalPrice}\n" +
+                                $"Payment Type: {reservation.PaymentType}\n";
+
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(qrCodeContent, QRCodeGenerator.ECCLevel.Q);
+            PngByteQRCode qrCode = new PngByteQRCode(qrCodeData);
+            byte[] qrCodeImage = qrCode.GetGraphic(20);
+
+            return Convert.ToBase64String(qrCodeImage);
+        }
+
         public override Models.Reservation Insert(ReservationInsertRequest request)
         {
             using var transaction = Context.Database.BeginTransaction();
@@ -205,6 +236,10 @@ namespace CinemaNow.Services
                 var fullEntity = GetFullReservationById(reservation.Id);
 
                 var model = MapToModel(fullEntity);
+
+                string qrCodeBase64 = GenerateQRCode(reservation.Id);
+
+                reservation.QrcodeBase64 = qrCodeBase64;
 
                 transaction.Commit();
 

@@ -29,4 +29,18 @@ class ReservationProvider extends BaseProvider<Reservation> {
       throw Exception("Failed to load reservations");
     }
   }
+
+  Future<String> getQRCode(int reservationId) async {
+    var url = "$baseUrl$endpoint/$reservationId/qrcode";
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+
+    var response = await http.get(uri, headers: headers);
+
+    if (isValidResponse(response)) {
+      return response.body;
+    } else {
+      throw Exception("Failed to load QR code");
+    }
+  }
 }

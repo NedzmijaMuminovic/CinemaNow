@@ -118,6 +118,7 @@ CREATE TABLE Reservation (
     TotalPrice DECIMAL(10,2),
 	PaymentID INT NULL,
 	PaymentType VARCHAR(50) DEFAULT 'Cash',
+	QRCodeBase64 NVARCHAR(MAX),
     FOREIGN KEY (UserID) REFERENCES [User](ID) ON DELETE NO ACTION,
     FOREIGN KEY (ScreeningID) REFERENCES Screening(ID) ON DELETE CASCADE,
 	FOREIGN KEY (PaymentID) REFERENCES Payment(ID) ON DELETE SET NULL
@@ -345,18 +346,18 @@ VALUES
 (8, 'Stripe', 'txn_6', 33.00, '2024-09-12 17:00:00'),
 (9, 'Cash', NULL, 44.00, '2024-09-12 17:00:00');
 
-INSERT INTO Reservation (UserID, ScreeningID, DateTime, NumberOfTickets, TotalPrice, PaymentID, PaymentType)
+INSERT INTO Reservation (UserID, ScreeningID, DateTime, NumberOfTickets, TotalPrice, PaymentID, PaymentType, QRCodeBase64)
 VALUES 
-(1, 1, '2024-09-10 14:00:00', 2, 21.00, 1, 'Stripe'),
-(2, 1, '2024-09-10 14:00:00', 1, 10.50, 2, 'Stripe'),
-(3, 2, '2024-09-10 16:30:00', 4, 52.00, NULL, 'Cash'),
-(1, 2, '2024-09-10 16:30:00', 3, 39.00, 4, 'Stripe'),
-(4, 3, '2024-09-10 19:00:00', 1, 15.50, NULL, 'Cash'),
-(5, 3, '2024-09-10 19:00:00', 2, 31.00, 6, 'Stripe'),
-(6, 4, '2024-09-11 15:00:00', 5, 90.00, 7, 'Stripe'),
-(7, 5, '2024-09-11 18:30:00', 1, 14.50, NULL, 'Cash'),
-(8, 6, '2024-09-12 17:00:00', 3, 33.00, 9, 'Stripe'),
-(9, 6, '2024-09-12 17:00:00', 4, 44.00, NULL, 'Cash');
+(1, 1, '2024-09-10 14:00:00', 2, 21.00, 1, 'Stripe', NULL),
+(2, 1, '2024-09-10 14:00:00', 1, 10.50, 2, 'Stripe', NULL),
+(3, 2, '2024-09-10 16:30:00', 4, 52.00, NULL, 'Cash', NULL),
+(1, 2, '2024-09-10 16:30:00', 3, 39.00, 4, 'Stripe', NULL),
+(4, 3, '2024-09-10 19:00:00', 1, 15.50, NULL, 'Cash', NULL),
+(5, 3, '2024-09-10 19:00:00', 2, 31.00, 6, 'Stripe', NULL),
+(6, 4, '2024-09-11 15:00:00', 5, 90.00, 7, 'Stripe', NULL),
+(7, 5, '2024-09-11 18:30:00', 1, 14.50, NULL, 'Cash', NULL),
+(8, 6, '2024-09-12 17:00:00', 3, 33.00, 9, 'Stripe', NULL),
+(9, 6, '2024-09-12 17:00:00', 4, 44.00, NULL, 'Cash', NULL);
 
 INSERT INTO ReservationSeat (ReservationID, SeatID, ReservedAt)
 VALUES 

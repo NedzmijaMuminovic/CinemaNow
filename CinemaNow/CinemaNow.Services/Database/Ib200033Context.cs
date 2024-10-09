@@ -51,7 +51,7 @@ public partial class Ib200033Context : DbContext
     {
         modelBuilder.Entity<Actor>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Actor__3214EC271072C444");
+            entity.HasKey(e => e.Id).HasName("PK__Actor__3214EC27B4AF84B3");
 
             entity.ToTable("Actor");
 
@@ -66,7 +66,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Genre>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Genre__3214EC270E0F14F1");
+            entity.HasKey(e => e.Id).HasName("PK__Genre__3214EC270240ED1C");
 
             entity.ToTable("Genre");
 
@@ -78,7 +78,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Hall>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Hall__3214EC275F28A35A");
+            entity.HasKey(e => e.Id).HasName("PK__Hall__3214EC2780F1BB57");
 
             entity.ToTable("Hall");
 
@@ -90,7 +90,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Movie>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Movie__3214EC27F7675308");
+            entity.HasKey(e => e.Id).HasName("PK__Movie__3214EC27419F16D6");
 
             entity.ToTable("Movie");
 
@@ -111,7 +111,7 @@ public partial class Ib200033Context : DbContext
                         .HasConstraintName("FK__MovieActo__Movie__35BCFE0A"),
                     j =>
                     {
-                        j.HasKey("MovieId", "ActorId").HasName("PK__MovieAct__EEA9AA98AF4C030D");
+                        j.HasKey("MovieId", "ActorId").HasName("PK__MovieAct__EEA9AA98236A3AAD");
                         j.ToTable("MovieActor");
                         j.IndexerProperty<int>("MovieId").HasColumnName("MovieID");
                         j.IndexerProperty<int>("ActorId").HasColumnName("ActorID");
@@ -128,7 +128,7 @@ public partial class Ib200033Context : DbContext
                         .HasConstraintName("FK__MovieGenr__Movie__300424B4"),
                     j =>
                     {
-                        j.HasKey("MovieId", "GenreId").HasName("PK__MovieGen__BBEAC46FB8831894");
+                        j.HasKey("MovieId", "GenreId").HasName("PK__MovieGen__BBEAC46F08737E6A");
                         j.ToTable("MovieGenre");
                         j.IndexerProperty<int>("MovieId").HasColumnName("MovieID");
                         j.IndexerProperty<int>("GenreId").HasColumnName("GenreID");
@@ -137,7 +137,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Payment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Payment__3214EC27ED4C9778");
+            entity.HasKey(e => e.Id).HasName("PK__Payment__3214EC2721DC910F");
 
             entity.ToTable("Payment");
 
@@ -161,7 +161,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Rating>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Rating__3214EC274BD50EB1");
+            entity.HasKey(e => e.Id).HasName("PK__Rating__3214EC274335AECF");
 
             entity.ToTable("Rating");
 
@@ -183,7 +183,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Reservation>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Reservat__3214EC27994E893E");
+            entity.HasKey(e => e.Id).HasName("PK__Reservat__3214EC27012066A8");
 
             entity.ToTable("Reservation");
 
@@ -194,6 +194,7 @@ public partial class Ib200033Context : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasDefaultValueSql("('Cash')");
+            entity.Property(e => e.QrcodeBase64).HasColumnName("QRCodeBase64");
             entity.Property(e => e.ScreeningId).HasColumnName("ScreeningID");
             entity.Property(e => e.TotalPrice).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.UserId).HasColumnName("UserID");
@@ -215,7 +216,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<ReservationSeat>(entity =>
         {
-            entity.HasKey(e => new { e.ReservationId, e.SeatId }).HasName("PK__Reservat__94FF2E395ACC2C31");
+            entity.HasKey(e => new { e.ReservationId, e.SeatId }).HasName("PK__Reservat__94FF2E3994FCB2FD");
 
             entity.ToTable("ReservationSeat");
 
@@ -234,7 +235,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Role__3214EC27CC9E2091");
+            entity.HasKey(e => e.Id).HasName("PK__Role__3214EC27D23CA84C");
 
             entity.ToTable("Role");
 
@@ -246,7 +247,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Screening>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Screenin__3214EC2795550F26");
+            entity.HasKey(e => e.Id).HasName("PK__Screenin__3214EC2715F0EFBE");
 
             entity.ToTable("Screening");
 
@@ -278,7 +279,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<ScreeningSeat>(entity =>
         {
-            entity.HasKey(e => new { e.ScreeningId, e.SeatId }).HasName("PK__Screenin__542595519284AB32");
+            entity.HasKey(e => new { e.ScreeningId, e.SeatId }).HasName("PK__Screenin__5425955105BE9AC7");
 
             entity.ToTable("ScreeningSeat");
 
@@ -297,7 +298,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<Seat>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Seat__3214EC27947DB9FE");
+            entity.HasKey(e => e.Id).HasName("PK__Seat__3214EC27C939006D");
 
             entity.ToTable("Seat");
 
@@ -309,7 +310,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__User__3214EC27530295EF");
+            entity.HasKey(e => e.Id).HasName("PK__User__3214EC27B869C138");
 
             entity.ToTable("User");
 
@@ -340,7 +341,7 @@ public partial class Ib200033Context : DbContext
                         .HasConstraintName("FK__UserRole__UserID__286302EC"),
                     j =>
                     {
-                        j.HasKey("UserId", "RoleId").HasName("PK__UserRole__AF27604F70C939AA");
+                        j.HasKey("UserId", "RoleId").HasName("PK__UserRole__AF27604FDB71F5D1");
                         j.ToTable("UserRole");
                         j.IndexerProperty<int>("UserId").HasColumnName("UserID");
                         j.IndexerProperty<int>("RoleId").HasColumnName("RoleID");
@@ -349,7 +350,7 @@ public partial class Ib200033Context : DbContext
 
         modelBuilder.Entity<ViewMode>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__ViewMode__3214EC275D5F9962");
+            entity.HasKey(e => e.Id).HasName("PK__ViewMode__3214EC2718679022");
 
             entity.ToTable("ViewMode");
 

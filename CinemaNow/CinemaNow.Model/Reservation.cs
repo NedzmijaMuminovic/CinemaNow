@@ -18,5 +18,6 @@ namespace CinemaNow.Models
         public User? User { get; set; }
         public Screening? Screening { get; set; }
         public Payment? Payment { get; set; }
+        public string? QRCodeBase64 { get; set; }
     }
 }

@@ -61,6 +61,14 @@ namespace CinemaNow.API.Controllers
         {
             return _reservationService.GetReservationsByUserId(userId);
         }
+
+        [HttpGet("{id}/qrcode")]
+        [Authorize(Roles = "User")]
+        public ActionResult<string> GetQRCode(int id)
+        {
+            var qrCode = ((ReservationService)_service).GenerateQRCode(id);
+            return Ok(qrCode);
+        }
     }
 
 }
