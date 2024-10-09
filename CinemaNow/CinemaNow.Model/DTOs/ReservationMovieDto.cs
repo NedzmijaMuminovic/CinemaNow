@@ -8,6 +8,7 @@ namespace CinemaNow.Models.DTOs
     {
         public int ReservationId { get; set; }
         public DateTime ReservationDate { get; set; }
+        public string? ReservationPaymentType { get; set; }
         public int ScreeningId { get; set; }
         public DateTime ScreeningDate { get; set; }
         public List<int> SeatIds { get; set; } = new List<int>();

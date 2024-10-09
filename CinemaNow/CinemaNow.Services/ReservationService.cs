@@ -332,6 +332,7 @@ namespace CinemaNow.Services
             {
                 var reservation = Context.Reservations
                     .Include(r => r.ReservationSeats)
+                    .Include(r => r.Screening)
                     .FirstOrDefault(r => r.Id == id);
 
                 if (reservation == null)
@@ -343,6 +344,16 @@ namespace CinemaNow.Services
                 if (reservation.UserId != currentUserId)
                 {
                     throw new UnauthorizedAccessException("You can only delete your own reservations.");
+                }
+
+                if (reservation.PaymentType == "Stripe")
+                {
+                    throw new InvalidOperationException("Reservations paid with Stripe cannot be deleted.");
+                }
+
+                if (reservation.Screening.DateTime < DateTime.Now)
+                {
+                    throw new InvalidOperationException("Past reservations cannot be deleted.");
                 }
 
                 foreach (var reservationSeat in reservation.ReservationSeats)
@@ -379,6 +390,7 @@ namespace CinemaNow.Services
                 {
                     ReservationId = r.Id,
                     ReservationDate = r.DateTime ?? DateTime.MinValue,
+                    ReservationPaymentType = r.PaymentType,
                     ScreeningId = r.ScreeningId ?? 0,
                     ScreeningDate = r.Screening.DateTime ?? DateTime.MinValue,
                     SeatIds = r.ReservationSeats.Select(rs => rs.SeatId).ToList(),

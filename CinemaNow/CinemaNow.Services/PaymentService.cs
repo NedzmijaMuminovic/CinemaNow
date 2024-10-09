@@ -28,10 +28,10 @@ namespace CinemaNow.Services
             var service = new PaymentIntentService();
             var paymentIntent = service.Get(paymentIntentId);
 
-            //if (paymentIntent.Status != "succeeded")
-            //{
-            //    throw new InvalidOperationException("Payment not successful.");
-            //}
+            if (paymentIntent.Status != "succeeded")
+            {
+                throw new InvalidOperationException("Payment not successful.");
+            }
 
             var payment = new Payment
             {

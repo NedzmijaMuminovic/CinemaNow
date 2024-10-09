@@ -10,6 +10,7 @@ ReservationMovieDto _$ReservationMovieDtoFromJson(Map<String, dynamic> json) =>
     ReservationMovieDto(
       reservationId: (json['reservationId'] as num).toInt(),
       reservationDate: DateTime.parse(json['reservationDate'] as String),
+      reservationPaymentType: json['reservationPaymentType'] as String,
       screeningId: (json['screeningId'] as num).toInt(),
       screeningDate: DateTime.parse(json['screeningDate'] as String),
       seatIds: (json['seatIds'] as List<dynamic>)
@@ -27,6 +28,7 @@ Map<String, dynamic> _$ReservationMovieDtoToJson(
     <String, dynamic>{
       'reservationId': instance.reservationId,
       'reservationDate': instance.reservationDate.toIso8601String(),
+      'reservationPaymentType': instance.reservationPaymentType,
       'screeningId': instance.screeningId,
       'screeningDate': instance.screeningDate.toIso8601String(),
       'seatIds': instance.seatIds,

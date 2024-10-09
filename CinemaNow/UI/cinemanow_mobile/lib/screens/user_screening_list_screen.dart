@@ -18,6 +18,7 @@ class UserScreeningListScreen extends StatefulWidget {
 
 class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
   bool _isUpcomingSelected = true;
+  bool _isStripeSelected = true;
   List<ReservationMovieDto> _filteredReservations = [];
 
   @override
@@ -31,44 +32,28 @@ class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            ToggleButtons(
-              isSelected: [_isUpcomingSelected, !_isUpcomingSelected],
-              onPressed: (int index) {
-                setState(() {
-                  _isUpcomingSelected = index == 0;
-                });
-              },
-              color: Colors.white,
-              selectedColor: Colors.white,
-              fillColor: Colors.red,
-              borderColor: Colors.red,
-              selectedBorderColor: Colors.red,
-              borderRadius: BorderRadius.circular(8),
-              children: const [
-                SizedBox(
-                  width: 150,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 32.0),
-                    child: Center(
-                      child: Text(
-                        'Upcoming',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildToggleButtons(
+                    ['Upcoming', 'Past'],
+                    [_isUpcomingSelected, !_isUpcomingSelected],
+                    (index) {
+                      setState(() {
+                        _isUpcomingSelected = index == 0;
+                      });
+                    },
                   ),
                 ),
-                SizedBox(
-                  width: 150,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 32.0),
-                    child: Center(
-                      child: Text(
-                        'Past',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
+                Expanded(
+                  child: _buildToggleButtons(
+                    ['Stripe', 'Cash'],
+                    [_isStripeSelected, !_isStripeSelected],
+                    (index) {
+                      setState(() {
+                        _isStripeSelected = index == 0;
+                      });
+                    },
                   ),
                 ),
               ],
@@ -92,9 +77,12 @@ class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
 
                   _filteredReservations = reservations.where((reservation) {
                     final screeningDate = reservation.screeningDate.toLocal();
-                    return _isUpcomingSelected
-                        ? screeningDate.isAfter(DateTime.now())
-                        : screeningDate.isBefore(DateTime.now());
+                    final isUpcoming = screeningDate.isAfter(DateTime.now());
+                    final isCorrectPaymentType = _isStripeSelected
+                        ? reservation.reservationPaymentType == 'Stripe'
+                        : reservation.reservationPaymentType == 'Cash';
+                    return (_isUpcomingSelected ? isUpcoming : !isUpcoming) &&
+                        isCorrectPaymentType;
                   }).toList();
 
                   if (_filteredReservations.isEmpty) {
@@ -120,6 +108,41 @@ class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildToggleButtons(
+      List<String> labels, List<bool> isSelected, Function(int) onPressed) {
+    return Center(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: ToggleButtons(
+          isSelected: isSelected,
+          onPressed: onPressed,
+          color: Colors.white,
+          selectedColor: Colors.white,
+          fillColor: Colors.red,
+          borderColor: Colors.red,
+          selectedBorderColor: Colors.red,
+          borderRadius: BorderRadius.circular(8),
+          children: labels
+              .map(
+                (label) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
         ),
       ),
     );
@@ -209,8 +232,9 @@ class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
                   ),
                   const SizedBox(height: 16),
                   if (reservation.screeningDate
-                      .toLocal()
-                      .isAfter(DateTime.now()))
+                          .toLocal()
+                          .isAfter(DateTime.now()) &&
+                      reservation.reservationPaymentType == 'Cash')
                     ElevatedButton(
                       onPressed: () async {
                         final confirmed = await showDialog<bool>(

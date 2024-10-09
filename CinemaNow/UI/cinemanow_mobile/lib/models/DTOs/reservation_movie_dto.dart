@@ -6,6 +6,7 @@ part 'reservation_movie_dto.g.dart';
 class ReservationMovieDto {
   final int reservationId;
   final DateTime reservationDate;
+  final String reservationPaymentType;
   final int screeningId;
   final DateTime screeningDate;
   final List<int> seatIds;
@@ -18,6 +19,7 @@ class ReservationMovieDto {
   ReservationMovieDto({
     required this.reservationId,
     required this.reservationDate,
+    required this.reservationPaymentType,
     required this.screeningId,
     required this.screeningDate,
     required this.seatIds,
