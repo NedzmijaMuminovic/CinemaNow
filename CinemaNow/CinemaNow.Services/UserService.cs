@@ -15,18 +15,23 @@ using Microsoft.Extensions.Logging;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using RabbitMQ.Client;
+using CinemaNow.Models.Messages;
+using System.Text.Json;
 
 namespace CinemaNow.Services
 {
     public class UserService : BaseCRUDService<Models.User, UserSearchObject, Database.User, UserInsertRequest, UserUpdateRequest>, IUserService
     {
-        ILogger<UserService> _logger;
+        Microsoft.Extensions.Logging.ILogger<UserService> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IConnectionFactory _rabbitMqConnectionFactory;
 
-        public UserService(Ib200033Context context, IMapper mapper, ILogger<UserService> logger, IHttpContextAccessor httpContextAccessor) : base(context, mapper)
+        public UserService(Ib200033Context context, IMapper mapper, Microsoft.Extensions.Logging.ILogger<UserService> logger, IHttpContextAccessor httpContextAccessor, IConnectionFactory rabbitMqConnectionFactory) : base(context, mapper)
         {
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
+            _rabbitMqConnectionFactory = rabbitMqConnectionFactory;
         }
 
         public override IQueryable<Database.User> AddFilter(UserSearchObject searchObject, IQueryable<Database.User> query)
@@ -124,6 +129,43 @@ namespace CinemaNow.Services
             }
 
             base.BeforeInsert(request, entity);
+        }
+
+        private void PublishRegistrationEvent(Models.User user)
+        {
+            using var connection = _rabbitMqConnectionFactory.CreateConnection();
+            using var channel = connection.CreateModel();
+
+            channel.QueueDeclare(queue: "user-registration",
+                                 durable: false,
+                                 exclusive: false,
+                                 autoDelete: false,
+                                 arguments: null);
+
+            var message = new UserRegistrationMessage
+            {
+                Email = user.Email,
+                Name = user.Name
+            };
+
+            string serializedMessage = JsonSerializer.Serialize(message);
+            var body = Encoding.UTF8.GetBytes(serializedMessage);
+
+            channel.BasicPublish(exchange: "",
+                                 routingKey: "user-registration",
+                                 basicProperties: null,
+                                 body: body);
+
+            _logger.LogInformation("Published registration message to RabbitMQ for user: {Email}", user.Email);
+        }
+
+        public override Models.User Insert(UserInsertRequest request)
+        {
+            var user = base.Insert(request);
+
+            PublishRegistrationEvent(user);
+
+            return user;
         }
 
         public static string GenerateSalt()

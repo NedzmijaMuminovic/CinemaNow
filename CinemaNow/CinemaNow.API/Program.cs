@@ -9,12 +9,18 @@ using Mapster;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using RabbitMQ.Client;
 
 Env.Load(@"../.env");
 
 var builder = WebApplication.CreateBuilder(args);
 
 var stripeSecretKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
+
+builder.Services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory()
+{
+    HostName = "localhost"
+});
 
 // Add services to the container.
 builder.Services.AddTransient<IMovieService, MovieService>();
