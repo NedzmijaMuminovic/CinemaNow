@@ -37,6 +37,7 @@ builder.Services.AddTransient<IRatingService, RatingService>();
 builder.Services.AddTransient(sp => new PaymentService(stripeSecretKey, sp.GetRequiredService<Ib200033Context>()));
 
 builder.Services.AddTransient<IReservationService, ReservationService>();
+builder.Services.AddTransient<IReportService, ReportService>();
 
 builder.Services.AddTransient<BaseScreeningState>();
 builder.Services.AddTransient<InitialScreeningState>();

@@ -18,6 +18,7 @@ using System.Security.Claims;
 using RabbitMQ.Client;
 using CinemaNow.Models.Messages;
 using System.Text.Json;
+using System.Xml.Linq;
 
 namespace CinemaNow.Services
 {
@@ -275,6 +276,23 @@ namespace CinemaNow.Services
             return base.Update(id, request);
         }
 
+        public override void Delete(int id)
+        {
+            var user = Context.Set<Database.User>().Include(u => u.Reservations).FirstOrDefault(u => u.Id == id);
+
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }
+
+            foreach (var reservation in user.Reservations.ToList())
+            {
+                Context.Set<Database.Reservation>().Remove(reservation);
+            }
+
+            Context.Set<Database.User>().Remove(user);
+            Context.SaveChanges();
+        }
 
     }
 }

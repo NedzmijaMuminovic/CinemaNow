@@ -62,5 +62,22 @@ namespace CinemaNow.API.Controllers
             return Ok(isTaken);
         }
 
+        [HttpDelete("{id}")]
+        [AllowAnonymous]
+        [Authorize]
+        public override void Delete(int id)
+        {
+            var currentUserId = _userService.GetCurrentUserId();
+
+            var isAdmin = User.IsInRole("Admin");
+
+            if (currentUserId != id && !isAdmin)
+            {
+                throw new UnauthorizedAccessException("You are not authorized to delete another user's profile.");
+            }
+
+            _userService.Delete(id);
+        }
+
     }
 }
