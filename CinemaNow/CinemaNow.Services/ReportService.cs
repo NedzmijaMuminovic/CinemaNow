@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Linq.Dynamic.Core;
 using CinemaNow.Models.Requests;
 using Microsoft.EntityFrameworkCore;
+using CinemaNow.Models.Reports;
 
 namespace CinemaNow.Services
 {
@@ -39,5 +40,24 @@ namespace CinemaNow.Services
 
             return totalIncome ?? 0;
         }
+
+        public async Task<List<MovieReservationSeatCount>> GetTop5WatchedMoviesAsync()
+        {
+            var top5Movies = await _context.Reservations
+                .SelectMany(r => r.ReservationSeats)
+                .GroupBy(rs => rs.Reservation.Screening.MovieId)
+                .Select(g => new MovieReservationSeatCount
+                {
+                    MovieId = g.Key ?? 0,
+                    MovieTitle = g.FirstOrDefault().Reservation.Screening.Movie.Title,
+                    ReservationSeatCount = g.Count()
+                })
+                .OrderByDescending(m => m.ReservationSeatCount)
+                .Take(5)
+                .ToListAsync();
+
+            return top5Movies;
+        }
+
     }
 }

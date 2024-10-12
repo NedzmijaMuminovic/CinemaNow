@@ -1,4 +1,5 @@
 ﻿using CinemaNow.Models;
+using CinemaNow.Models.Reports;
 using CinemaNow.Models.Requests;
 using CinemaNow.Models.SearchObjects;
 using System;
@@ -13,5 +14,6 @@ namespace CinemaNow.Services
     {
         Task<int> GetUserCountAsync();
         Task<decimal> GetTotalCinemaIncomeAsync();
+        Task<List<MovieReservationSeatCount>> GetTop5WatchedMoviesAsync();
     }
 }
