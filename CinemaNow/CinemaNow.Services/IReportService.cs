@@ -15,5 +15,6 @@ namespace CinemaNow.Services
         Task<int> GetUserCountAsync();
         Task<decimal> GetTotalCinemaIncomeAsync();
         Task<List<MovieReservationSeatCount>> GetTop5WatchedMoviesAsync();
+        Task<List<MovieRevenue>> GetRevenueByMovieAsync();
     }
 }

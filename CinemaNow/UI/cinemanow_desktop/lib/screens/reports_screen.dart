@@ -1,9 +1,7 @@
 import 'package:cinemanow_desktop/models/movie_reservation_seat_count.dart';
+import 'package:cinemanow_desktop/models/movie_revenue.dart';
+import 'package:cinemanow_desktop/utilities/pdf_exporter.dart';
 import 'package:flutter/material.dart';
-import 'package:screenshot/screenshot.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
 import 'package:cinemanow_desktop/providers/report_provider.dart';
@@ -29,6 +27,7 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
   int? userCount;
   double? totalIncome;
   List<MovieReservationSeatCount>? top5Movies;
+  List<MovieRevenue>? movieRevenues;
   final List<Color> sharedColors = [
     Colors.red,
     Colors.blue,
@@ -43,6 +42,7 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
     fetchUserCount();
     fetchTotalIncome();
     fetchTop5WatchedMovies();
+    fetchMovieRevenues();
   }
 
   Future<void> fetchUserCount() async {
@@ -90,138 +90,32 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
     }
   }
 
-  Future<void> _exportToPDF() async {
-    final pdf = pw.Document();
-    final font = await PdfGoogleFonts.robotoRegular();
-
+  Future<void> fetchMovieRevenues() async {
     try {
       final reportProvider =
           Provider.of<ReportProvider>(context, listen: false);
-
-      final int fetchedUserCount = await reportProvider.getUserCount();
-      final double fetchedTotalIncome =
-          await reportProvider.getTotalCinemaIncome();
-      final List<MovieReservationSeatCount> fetchedTop5Movies =
-          await reportProvider.getTop5WatchedMovies();
-
-      final pieChartImage = await _capturePieChartImage(fetchedTop5Movies);
-
-      pdf.addPage(
-        pw.Page(
-          build: (context) => pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.center,
-            children: [
-              pw.Text('Cinema Report',
-                  style: pw.TextStyle(font: font, fontSize: 24)),
-              pw.SizedBox(height: 20),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildPdfCard('App Users',
-                      fetchedUserCount == -1 ? 'Error' : '$fetchedUserCount'),
-                  _buildPdfCard(
-                      'Cinema Income',
-                      fetchedTotalIncome == -1
-                          ? 'Error'
-                          : '\$${fetchedTotalIncome.toStringAsFixed(2)}'),
-                ],
-              ),
-              pw.SizedBox(height: 30),
-              pw.Text('Top 5 Watched Movies',
-                  style: pw.TextStyle(font: font, fontSize: 18)),
-              pieChartImage != null ? pw.Image(pieChartImage) : pw.Container(),
-              pw.SizedBox(height: 20),
-              ..._buildLegendPdf(font, fetchedTop5Movies),
-            ],
-          ),
-        ),
-      );
-
-      await Printing.layoutPdf(
-          onLayout: (PdfPageFormat format) async => pdf.save());
-    } catch (error) {}
-  }
-
-  Future<pw.ImageProvider?> _capturePieChartImage(
-      List<MovieReservationSeatCount> top5Movies) async {
-    final screenshotController = ScreenshotController();
-    final pieChart = PieChart(
-      PieChartData(
-        sectionsSpace: 2,
-        centerSpaceRadius: 50,
-        sections: _getPieChartSections(top5Movies),
-      ),
-    );
-
-    final bytes = await screenshotController.captureFromWidget(
-      MediaQuery(
-        data: MediaQueryData.fromView(View.of(context)),
-        child: Directionality(
-          textDirection: TextDirection.ltr,
-          child: pieChart,
-        ),
-      ),
-    );
-
-    return pw.MemoryImage(bytes);
-  }
-
-  List<pw.Widget> _buildLegendPdf(
-      pw.Font font, List<MovieReservationSeatCount> top5Movies) {
-    final int totalReservations =
-        top5Movies.fold(0, (sum, movie) => sum + movie.reservationSeatCount);
-
-    final List<pw.Widget> legend = [];
-
-    for (var i = 0; i < top5Movies.length; i++) {
-      final movie = top5Movies[i];
-      final flutterColor = sharedColors[i % sharedColors.length];
-      final pdfColor = PdfColor.fromInt(flutterColor.value);
-
-      final double percentage =
-          (movie.reservationSeatCount / totalReservations) * 100;
-
-      legend.add(
-        pw.Row(
-          children: [
-            pw.Container(
-              width: 10,
-              height: 10,
-              color: pdfColor,
-            ),
-            pw.SizedBox(width: 5),
-            pw.Text(movie.movieTitle, style: pw.TextStyle(font: font)),
-            pw.Spacer(),
-            pw.Text('${percentage.toStringAsFixed(1)}%',
-                style: pw.TextStyle(font: font)),
-          ],
-        ),
-      );
-      legend.add(pw.SizedBox(height: 5));
+      final revenues = await reportProvider.getRevenueByMovie();
+      setState(() {
+        movieRevenues = revenues;
+      });
+    } catch (e) {
+      setState(() {
+        movieRevenues = [];
+      });
     }
-    return legend;
   }
 
-  pw.Widget _buildPdfCard(String title, String value) {
-    return pw.Container(
-      padding: const pw.EdgeInsets.all(12),
-      decoration: pw.BoxDecoration(
-        borderRadius: pw.BorderRadius.circular(10),
-        color: PdfColors.grey800,
-      ),
-      child: pw.Column(
-        children: [
-          pw.Text(title,
-              style: const pw.TextStyle(color: PdfColors.white, fontSize: 18)),
-          pw.SizedBox(height: 8),
-          pw.Text(value,
-              style: pw.TextStyle(
-                  color: PdfColors.white,
-                  fontSize: 24,
-                  fontWeight: pw.FontWeight.bold)),
-        ],
-      ),
-    );
+  Future<void> _exportToPDF() async {
+    if (userCount != null && totalIncome != null && top5Movies != null) {
+      await PdfExporter.exportToPDF(
+        context,
+        userCount!,
+        totalIncome!,
+        top5Movies!,
+        movieRevenues!,
+        sharedColors,
+      );
+    }
   }
 
   @override
@@ -229,7 +123,10 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
     return Scaffold(
       backgroundColor: Colors.grey[900],
       body: Center(
-        child: userCount == null || totalIncome == null || top5Movies == null
+        child: userCount == null ||
+                totalIncome == null ||
+                top5Movies == null ||
+                movieRevenues == null
             ? const CircularProgressIndicator(
                 color: Colors.red,
               )
@@ -260,6 +157,8 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
                     ),
                     const SizedBox(height: 40),
                     _buildPieChartWithLegend(),
+                    const SizedBox(height: 40),
+                    _buildRevenueBarChart(),
                     const SizedBox(height: 40),
                     ElevatedButton.icon(
                       onPressed: _exportToPDF,
@@ -444,5 +343,156 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
         );
       }).toList(),
     );
+  }
+
+  Widget _buildRevenueBarChart() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.grey[850]!.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text(
+            'Revenue by Movie',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white70,
+            ),
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            height: 400,
+            child: BarChart(
+              BarChartData(
+                alignment: BarChartAlignment.spaceAround,
+                maxY: (((movieRevenues!
+                                        .map((e) => e.totalRevenue)
+                                        .reduce((a, b) => a > b ? a : b) *
+                                    1.2) /
+                                50)
+                            .ceil() *
+                        50) -
+                    50,
+                barTouchData: BarTouchData(
+                  touchTooltipData: BarTouchTooltipData(
+                    tooltipBgColor: Colors.grey[800]!,
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      return BarTooltipItem(
+                        '${movieRevenues![group.x.toInt()].movieTitle}\n',
+                        const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: '\$${rod.toY.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              color: sharedColors[
+                                  group.x.toInt() % sharedColors.length],
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+                titlesData: FlTitlesData(
+                  show: true,
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 60,
+                      getTitlesWidget: (value, meta) {
+                        return const Padding(
+                          padding: EdgeInsets.only(top: 8.0),
+                          child: RotatedBox(
+                            quarterTurns: 1,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 60,
+                      getTitlesWidget: (value, meta) {
+                        return Text(
+                          '\$${value.toInt()}',
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                ),
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  horizontalInterval: 1000,
+                  getDrawingHorizontalLine: (value) {
+                    return const FlLine(
+                      color: Colors.white10,
+                      strokeWidth: 1,
+                    );
+                  },
+                ),
+                borderData: FlBorderData(
+                  show: true,
+                  border: const Border(
+                    bottom: BorderSide(color: Colors.white24, width: 1),
+                    left: BorderSide(color: Colors.white24, width: 1),
+                  ),
+                ),
+                barGroups: _getBarChartGroups(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<BarChartGroupData> _getBarChartGroups() {
+    return movieRevenues!.asMap().entries.map((entry) {
+      final index = entry.key;
+      final revenue = entry.value.totalRevenue;
+      return BarChartGroupData(
+        x: index,
+        barRods: [
+          BarChartRodData(
+            toY: revenue.toDouble(),
+            color: sharedColors[index % sharedColors.length],
+            width: 20,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(4),
+              topRight: Radius.circular(4),
+            ),
+          ),
+        ],
+        showingTooltipIndicators: [0],
+      );
+    }).toList();
   }
 }

@@ -41,5 +41,12 @@ namespace CinemaNow.API.Controllers
             return Ok(top5Movies);
         }
 
+        [HttpGet("revenue-by-movie")]
+        public async Task<IActionResult> GetRevenueByMovie()
+        {
+            var movieRevenues = await _reportService.GetRevenueByMovieAsync();
+            return Ok(movieRevenues);
+        }
+
     }
 }
