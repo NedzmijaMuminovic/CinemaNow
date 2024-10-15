@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:cinemanow_mobile/providers/base_provider.dart';
 
 class PaymentProvider extends BaseProvider {
-  PaymentProvider() : super("api/Payment");
+  PaymentProvider() : super("Payment");
 
   Future<Map<String, dynamic>> createPaymentIntent(int amountInCents) async {
     var url = "$baseUrl$endpoint/create-payment-intent";

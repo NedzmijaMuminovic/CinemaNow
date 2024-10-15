@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CinemaNow.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [Authorize]
     public class PaymentController : ControllerBase
     {

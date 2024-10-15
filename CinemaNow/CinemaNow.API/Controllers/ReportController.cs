@@ -48,5 +48,12 @@ namespace CinemaNow.API.Controllers
             return Ok(movieRevenues);
         }
 
+        [HttpGet("top-5-customers")]
+        public async Task<IActionResult> GetTop5Customers()
+        {
+            var top5Customers = await _reportService.GetTop5CustomersAsync();
+            return Ok(top5Customers);
+        }
+
     }
 }

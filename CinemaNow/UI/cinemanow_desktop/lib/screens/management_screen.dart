@@ -58,7 +58,6 @@ class _ManagementScreenState extends State<ManagementScreen> {
       setState(() {
         isLoading = false;
       });
-      print("Error fetching data: $error");
     }
   }
 
@@ -288,7 +287,8 @@ class _ManagementScreenState extends State<ManagementScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+                      borderSide:
+                          const BorderSide(color: Colors.redAccent, width: 2),
                     ),
                   ),
                 ),
@@ -298,8 +298,8 @@ class _ManagementScreenState extends State<ManagementScreen> {
                   children: [
                     TextButton(
                       style: TextButton.styleFrom(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
                         backgroundColor: Colors.redAccent.withOpacity(0.1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -319,8 +319,8 @@ class _ManagementScreenState extends State<ManagementScreen> {
                     const SizedBox(width: 10),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
                         backgroundColor: Colors.grey[700],
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),

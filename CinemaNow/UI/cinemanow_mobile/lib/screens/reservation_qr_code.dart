@@ -43,7 +43,8 @@ class _ReservationQRCodeScreenState extends State<ReservationQRCodeScreen> {
                 future: _qrCodeFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator(color: Colors.red);
+                    return Center(
+                        child: CircularProgressIndicator(color: Colors.red));
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}',
                         style: TextStyle(color: Colors.white));

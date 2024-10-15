@@ -76,5 +76,23 @@ namespace CinemaNow.Services
             return movieRevenues;
         }
 
+        public async Task<List<TopCustomer>> GetTop5CustomersAsync()
+        {
+            var top5Customers = await _context.Reservations
+                .GroupBy(r => r.UserId)
+                .Select(g => new TopCustomer
+                {
+                    UserId = g.Key,
+                    Name = g.FirstOrDefault().User.Name,
+                    Surname = g.FirstOrDefault().User.Surname,
+                    TotalSpent = g.Sum(r => r.TotalPrice) ?? 0
+                })
+                .OrderByDescending(c => c.TotalSpent)
+                .Take(5)
+                .ToListAsync();
+
+            return top5Customers;
+        }
+
     }
 }

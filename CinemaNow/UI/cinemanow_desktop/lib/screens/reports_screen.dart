@@ -1,5 +1,6 @@
 import 'package:cinemanow_desktop/models/movie_reservation_seat_count.dart';
 import 'package:cinemanow_desktop/models/movie_revenue.dart';
+import 'package:cinemanow_desktop/models/top_customer.dart';
 import 'package:cinemanow_desktop/utilities/pdf_exporter.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -28,6 +29,7 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
   double? totalIncome;
   List<MovieReservationSeatCount>? top5Movies;
   List<MovieRevenue>? movieRevenues;
+  List<TopCustomer>? top5Customers;
   final List<Color> sharedColors = [
     Colors.red,
     Colors.blue,
@@ -35,14 +37,22 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
     Colors.orange,
     Colors.purple,
   ];
+  bool _isExporting = false;
 
   @override
   void initState() {
     super.initState();
-    fetchUserCount();
-    fetchTotalIncome();
-    fetchTop5WatchedMovies();
-    fetchMovieRevenues();
+    _fetchAllData();
+  }
+
+  Future<void> _fetchAllData() async {
+    await Future.wait([
+      fetchUserCount(),
+      fetchTotalIncome(),
+      fetchTop5WatchedMovies(),
+      fetchMovieRevenues(),
+      fetchTop5Customers(),
+    ]);
   }
 
   Future<void> fetchUserCount() async {
@@ -105,17 +115,54 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
     }
   }
 
+  Future<void> fetchTop5Customers() async {
+    try {
+      final reportProvider =
+          Provider.of<ReportProvider>(context, listen: false);
+      final customers = await reportProvider.getTop5Customers();
+      setState(() {
+        top5Customers = customers;
+      });
+    } catch (e) {
+      setState(() {
+        top5Customers = [];
+      });
+    }
+  }
+
   Future<void> _exportToPDF() async {
-    if (userCount != null && totalIncome != null && top5Movies != null) {
+    setState(() {
+      _isExporting = true;
+    });
+
+    setState(() {
+      userCount = null;
+      totalIncome = null;
+      top5Movies = null;
+      movieRevenues = null;
+      top5Customers = null;
+    });
+
+    await _fetchAllData();
+
+    if (userCount != null &&
+        totalIncome != null &&
+        top5Movies != null &&
+        movieRevenues != null &&
+        top5Customers != null) {
       await PdfExporter.exportToPDF(
         context,
         userCount!,
         totalIncome!,
         top5Movies!,
         movieRevenues!,
+        top5Customers!,
         sharedColors,
       );
     }
+    setState(() {
+      _isExporting = false;
+    });
   }
 
   @override
@@ -126,7 +173,8 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
         child: userCount == null ||
                 totalIncome == null ||
                 top5Movies == null ||
-                movieRevenues == null
+                movieRevenues == null ||
+                top5Customers == null
             ? const CircularProgressIndicator(
                 color: Colors.red,
               )
@@ -135,6 +183,42 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    ElevatedButton(
+                      onPressed: _isExporting ? null : _exportToPDF,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: _isExporting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.red,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                  Icon(Icons.picture_as_pdf,
+                                      color: Colors.white),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Export to PDF',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ]),
+                    ),
+                    const SizedBox(height: 30),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -160,27 +244,7 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
                     const SizedBox(height: 40),
                     _buildRevenueBarChart(),
                     const SizedBox(height: 40),
-                    ElevatedButton.icon(
-                      onPressed: _exportToPDF,
-                      icon:
-                          const Icon(Icons.picture_as_pdf, color: Colors.white),
-                      label: const Text(
-                        'Export to PDF',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                    ),
+                    _buildTop5Customers(),
                   ],
                 ),
               ),
@@ -189,43 +253,45 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
   }
 
   Widget _buildInfoCard(String title, String value, IconData icon) {
-    return Container(
-      width: 280,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.grey[850]!.withOpacity(0.8),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            spreadRadius: 2,
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Icon(icon, size: 48, color: Colors.red),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.white70,
+    return Flexible(
+      child: Container(
+        width: 280,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.grey[850]!.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+          ],
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 48, color: Colors.red),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.white70,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -494,5 +560,85 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
         showingTooltipIndicators: [0],
       );
     }).toList();
+  }
+
+  Widget _buildTop5Customers() {
+    if (top5Customers == null || top5Customers!.isEmpty) {
+      return const Text(
+        'No customer data available',
+        style: TextStyle(color: Colors.white70, fontSize: 16),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.grey[850]!.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text(
+            'Top 5 Customers',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white70,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Column(
+            children: top5Customers!.map((customer) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[800]!,
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${customer.name} ${customer.surname}',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        '\$${customer.totalSpent.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.greenAccent,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
   }
 }

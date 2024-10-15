@@ -215,6 +215,11 @@ namespace CinemaNow.Services
 
                 var screening = GetScreeningById(request.ScreeningId.Value);
 
+                if (screening.StateMachine != "active")
+                {
+                    throw new InvalidOperationException("Reservations can only be made for screenings that are active.");
+                }
+
                 var reservation = CreateReservationEntity(request, screening);
 
                 if (!string.IsNullOrEmpty(request.StripePaymentIntentId))
