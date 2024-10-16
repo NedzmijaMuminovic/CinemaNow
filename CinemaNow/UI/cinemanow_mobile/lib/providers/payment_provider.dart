@@ -32,6 +32,31 @@ class PaymentProvider extends BaseProvider {
         paymentIntentClientSecret: clientSecret,
         style: ThemeMode.dark,
         merchantDisplayName: 'Cinema Now',
+        appearance: PaymentSheetAppearance(
+          colors: PaymentSheetAppearanceColors(
+            background: Colors.grey[900],
+            componentBackground: Colors.grey[800],
+            primary: Colors.red,
+            componentText: Colors.white,
+            secondaryText: Colors.grey[300],
+            placeholderText: Colors.grey[500],
+            icon: Colors.white,
+            primaryText: Colors.white,
+          ),
+          shapes: PaymentSheetShape(
+            borderRadius: 12,
+            shadow:
+                PaymentSheetShadowParams(color: Colors.black.withOpacity(0.5)),
+          ),
+          primaryButton: PaymentSheetPrimaryButtonAppearance(
+            colors: PaymentSheetPrimaryButtonTheme(
+              dark: PaymentSheetPrimaryButtonThemeColors(
+                background: Colors.red,
+                text: Colors.white,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -9,7 +9,7 @@ import 'package:printing/printing.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class PdfExporter {
-  static Future<void> exportToPDF(
+  static Future<String> exportToPDF(
     BuildContext context,
     int userCount,
     double totalIncome,
@@ -95,10 +95,17 @@ class PdfExporter {
         ),
       );
 
-      await Printing.layoutPdf(
-          onLayout: (PdfPageFormat format) async => pdf.save());
+      final result = await Printing.layoutPdf(
+          onLayout: (PdfPageFormat format) async => pdf.save(),
+          name: 'Cinema Report');
+
+      if (result) {
+        return 'success';
+      } else {
+        return 'cancelled';
+      }
     } catch (error) {
-      // Handle errors
+      return 'error';
     }
   }
 

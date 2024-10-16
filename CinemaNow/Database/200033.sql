@@ -165,7 +165,14 @@ INSERT INTO UserRole (UserID, RoleID)
 VALUES 
 (1, 1),
 (2, 1),
-(3, 2);
+(3, 1),
+(4, 1),
+(5, 1),
+(6, 1),
+(7, 1),
+(8, 1),
+(9, 2),
+(10, 2);
 
 INSERT INTO Movie (Title, Duration, Synopsis, Image)
 VALUES 
@@ -303,32 +310,52 @@ VALUES
 ('F1'), ('F2'), ('F3'), ('F4'), ('F5'), ('F6'), ('F7'), ('F8');
 
 DECLARE @ScreeningID INT = 1;
+DECLARE @MaxScreeningID INT;
 
-WHILE @ScreeningID <= 15
+SELECT @MaxScreeningID = MAX(ID) FROM Screening;
+
+WHILE @ScreeningID <= @MaxScreeningID
 BEGIN
-    INSERT INTO ScreeningSeat (ScreeningID, SeatID, IsReserved)
-    SELECT TOP 15
-        @ScreeningID,
-        Seat.ID,
-        1
-    FROM 
-        Seat
-    WHERE 
-        Seat.ID NOT IN (SELECT SeatID FROM ScreeningSeat WHERE ScreeningID = @ScreeningID)
-    ORDER BY 
-        NEWID();
+    DECLARE @StateMachine VARCHAR(50);
+    
+    SELECT @StateMachine = StateMachine
+    FROM Screening
+    WHERE ID = @ScreeningID;
 
-    INSERT INTO ScreeningSeat (ScreeningID, SeatID, IsReserved)
-    SELECT TOP 33
-        @ScreeningID,
-        Seat.ID,
-        0
-    FROM 
-        Seat
-    WHERE 
-        Seat.ID NOT IN (SELECT SeatID FROM ScreeningSeat WHERE ScreeningID = @ScreeningID)
-    ORDER BY 
-        NEWID();
+    IF @StateMachine = 'active'
+    BEGIN
+        INSERT INTO ScreeningSeat (ScreeningID, SeatID, IsReserved)
+        SELECT TOP 15
+            @ScreeningID,
+            Seat.ID,
+            1
+        FROM 
+            Seat
+        ORDER BY 
+            NEWID();
+
+        INSERT INTO ScreeningSeat (ScreeningID, SeatID, IsReserved)
+        SELECT TOP 33
+            @ScreeningID,
+            Seat.ID,
+            0
+        FROM 
+            Seat
+        WHERE 
+            Seat.ID NOT IN (SELECT SeatID FROM ScreeningSeat WHERE ScreeningID = @ScreeningID)
+        ORDER BY 
+            NEWID();
+    END
+    ELSE
+    BEGIN
+        INSERT INTO ScreeningSeat (ScreeningID, SeatID, IsReserved)
+        SELECT
+            @ScreeningID,
+            Seat.ID,
+            0
+        FROM 
+            Seat;
+    END
 
     SET @ScreeningID = @ScreeningID + 1;
 END
@@ -350,14 +377,14 @@ INSERT INTO Reservation (UserID, ScreeningID, DateTime, NumberOfTickets, TotalPr
 VALUES 
 (1, 1, '2024-09-10 14:00:00', 2, 21.00, 1, 'Stripe', NULL),
 (2, 1, '2024-09-10 14:00:00', 1, 10.50, 2, 'Stripe', NULL),
-(3, 2, '2024-09-10 16:30:00', 4, 52.00, NULL, 'Cash', NULL),
-(1, 2, '2024-09-10 16:30:00', 3, 39.00, 4, 'Stripe', NULL),
-(4, 3, '2024-09-10 19:00:00', 1, 15.50, NULL, 'Cash', NULL),
-(5, 3, '2024-09-10 19:00:00', 2, 31.00, 6, 'Stripe', NULL),
-(6, 4, '2024-09-11 15:00:00', 5, 90.00, 7, 'Stripe', NULL),
-(7, 5, '2024-09-11 18:30:00', 1, 14.50, NULL, 'Cash', NULL),
-(8, 6, '2024-09-12 17:00:00', 3, 33.00, 9, 'Stripe', NULL),
-(9, 6, '2024-09-12 17:00:00', 4, 44.00, NULL, 'Cash', NULL);
+(3, 3, '2024-09-10 16:30:00', 4, 52.00, NULL, 'Cash', NULL),
+(1, 3, '2024-09-10 16:30:00', 3, 39.00, 4, 'Stripe', NULL),
+(4, 4, '2024-09-10 19:00:00', 1, 15.50, NULL, 'Cash', NULL),
+(5, 6, '2024-09-10 19:00:00', 2, 31.00, 6, 'Stripe', NULL),
+(6, 8, '2024-09-11 15:00:00', 5, 90.00, 7, 'Stripe', NULL),
+(7, 9, '2024-09-11 18:30:00', 1, 14.50, NULL, 'Cash', NULL),
+(8, 11, '2024-09-12 17:00:00', 3, 33.00, 9, 'Stripe', NULL),
+(9, 13, '2024-09-12 17:00:00', 4, 44.00, NULL, 'Cash', NULL);
 
 INSERT INTO ReservationSeat (ReservationID, SeatID, ReservedAt)
 VALUES 
@@ -372,7 +399,16 @@ VALUES
 (6, 9, GETDATE()), 
 (6, 10, GETDATE()), 
 (6, 11, GETDATE()), 
-(6, 12, GETDATE());
+(6, 12, GETDATE()),
+(7, 12, GETDATE()),
+(8, 12, GETDATE()),
+(8, 13, GETDATE()),
+(9, 12, GETDATE()),
+(9, 13, GETDATE()),
+(10, 12, GETDATE()),
+(10, 13, GETDATE()),
+(10, 14, GETDATE()),
+(10, 15, GETDATE());
 
 INSERT INTO Rating (UserID, MovieID, Value, Comment)
 VALUES 

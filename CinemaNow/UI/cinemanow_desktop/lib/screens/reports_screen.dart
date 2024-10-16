@@ -150,7 +150,7 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
         top5Movies != null &&
         movieRevenues != null &&
         top5Customers != null) {
-      await PdfExporter.exportToPDF(
+      String result = await PdfExporter.exportToPDF(
         context,
         userCount!,
         totalIncome!,
@@ -159,6 +159,23 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
         top5Customers!,
         sharedColors,
       );
+      if (result == 'success') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('PDF exported successfully!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      } else if (result == 'error') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to export PDF. Please try again.'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
     }
     setState(() {
       _isExporting = false;
