@@ -2,6 +2,7 @@ import 'package:cinemanow_desktop/models/movie_reservation_seat_count.dart';
 import 'package:cinemanow_desktop/models/movie_revenue.dart';
 import 'package:cinemanow_desktop/models/top_customer.dart';
 import 'package:cinemanow_desktop/utilities/pdf_exporter.dart';
+import 'package:cinemanow_desktop/utilities/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
@@ -163,7 +164,6 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('PDF exported successfully!'),
-            backgroundColor: Colors.green,
             duration: Duration(seconds: 3),
           ),
         );
@@ -171,7 +171,6 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Failed to export PDF. Please try again.'),
-            backgroundColor: Colors.red,
             duration: Duration(seconds: 3),
           ),
         );
@@ -251,7 +250,7 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
                           'Cinema Income',
                           totalIncome == -1
                               ? 'Error fetching data'
-                              : '\$${totalIncome!.toStringAsFixed(2)}',
+                              : '\$${formatNumber(totalIncome)}',
                           Icons.attach_money,
                         ),
                       ],
@@ -481,7 +480,7 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
                         ),
                         children: [
                           TextSpan(
-                            text: '\$${rod.toY.toStringAsFixed(2)}',
+                            text: '\$${formatNumber(rod.toY)}',
                             style: TextStyle(
                               color: sharedColors[
                                   group.x.toInt() % sharedColors.length],
@@ -641,7 +640,7 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
                         ),
                       ),
                       Text(
-                        '\$${customer.totalSpent.toStringAsFixed(2)}',
+                        '\$${formatNumber(customer.totalSpent)}',
                         style: const TextStyle(
                           fontSize: 18,
                           color: Colors.greenAccent,

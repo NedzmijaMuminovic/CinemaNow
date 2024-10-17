@@ -28,4 +28,8 @@
     <ProjectReference Include="..\CinemaNow.Services\CinemaNow.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
+
 </Project>

@@ -185,7 +185,12 @@ VALUES
 ('Pulp Fiction', 154, 'The lives of two mob hitmen, a boxer, a gangster’s wife, and a pair of diner bandits intertwine...', NULL),
 ('Forrest Gump', 142, 'The presidencies of Kennedy and Johnson, the Vietnam War, the Watergate scandal and other historical events unfold...', NULL),
 ('The Lord of the Rings: The Return of the King', 201, 'Gandalf and Aragorn lead the World of Men against Sauron''s army to end his reign over Middle-earth...', NULL),
-('The Silence of the Lambs', 118, 'A young F.B.I. cadet must confide in an incarcerated and manipulative killer to receive his help on catching another serial killer...', NULL);
+('The Silence of the Lambs', 118, 'A young F.B.I. cadet must confide in an incarcerated and manipulative killer to receive his help on catching another serial killer...', NULL),
+('10 Things I Hate About You', 97, 'A high-school boy, Cameron, cannot date Bianca until her anti-social older sister, Kat, has a boyfriend. So, Cameron pays a mysterious boy, Patrick, to charm Kat.', NULL),
+('Titanic', 194, 'A seventeen-year-old aristocrat falls in love with a kind but poor artist aboard the luxurious, ill-fated R.M.S. Titanic.', NULL),
+('Shutter Island', 138, 'Teddy Daniels and Chuck Aule, two US marshals, are sent to an asylum on a remote island in order to investigate the disappearance of a patient, where Teddy uncovers a shocking truth about the place.', NULL),
+('The Great Gatsby', 143, 'A writer and wall street trader, Nick Carraway, finds himself drawn to the past and lifestyle of his mysterious millionaire neighbor, Jay Gatsby, amid the riotous parties of the Jazz Age.', NULL),
+('Troy', 163, 'An adaptation of Homer''s great epic, the film follows the assault on Troy by the united Greek forces.', NULL);
 
 INSERT INTO Genre (Name)
 VALUES 
@@ -222,7 +227,18 @@ VALUES
 (9, 6),
 (10, 1),
 (10, 2),
-(10, 5);
+(10, 5),
+(11, 1),
+(11, 4),
+(11, 9),
+(12, 1),
+(12, 9),
+(13, 1),
+(13, 5),
+(14, 1),
+(14, 9),
+(15, 1),
+(15, 10);
 
 INSERT INTO Actor (Name, Surname, Image)
 VALUES 
@@ -264,7 +280,13 @@ VALUES
 (7, 15),
 (8, 16),
 (9, 17),
-(10, 18);
+(10, 18),
+(3, 1),
+(11, 3),
+(12, 4),
+(13, 4),
+(14, 4),
+(15, 6);
 
 INSERT INTO Hall (Name)
 VALUES 

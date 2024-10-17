@@ -3,6 +3,7 @@ using CinemaNow.API.Filters;
 using CinemaNow.Models.SearchObjects;
 using CinemaNow.Services;
 using CinemaNow.Services.Database;
+using CinemaNow.Services.MachineLearning;
 using CinemaNow.Services.ScreeningStateMachine;
 using DotNetEnv;
 using Mapster;
@@ -24,6 +25,7 @@ builder.Services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory()
 
 // Add services to the container.
 builder.Services.AddTransient<IMovieService, MovieService>();
+builder.Services.AddTransient<IMovieRecommenderService, MovieRecommenderService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IGenreService, GenreService>();
 builder.Services.AddTransient<IRoleService, RoleService>();

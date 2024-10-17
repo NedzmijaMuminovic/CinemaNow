@@ -11,6 +11,7 @@ using System.Linq.Dynamic.Core;
 using CinemaNow.Models.Requests;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using CinemaNow.Models.MachineLearningModels;
 
 namespace CinemaNow.Services
 {
@@ -173,6 +174,27 @@ namespace CinemaNow.Services
             base.BeforeUpdate(request, entity);
 
         }
+
+        public IEnumerable<MovieData> LoadMovieData()
+        {
+            var movies = Context.Movies.Include(m => m.Genres).Include(m => m.Actors).ToList();
+
+            var movieData = new List<MovieData>();
+
+            foreach (var movie in movies)
+            {
+                movieData.Add(new MovieData
+                {
+                    MovieId = movie.Id,
+                    Title = movie.Title,
+                    Genres = movie.Genres.Select(g => g.Name).ToArray(),
+                    Actors = movie.Actors.Select(a => $"{a.Name} {a.Surname}").ToArray(),
+                });
+            }
+
+            return movieData;
+        }
+
 
     }
 }
