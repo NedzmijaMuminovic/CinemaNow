@@ -6,8 +6,9 @@ namespace CinemaNow.Models.MachineLearningModels
 {
     public class MoviePrediction
     {
-        public int MovieId { get; set; }
-        public float Score { get; set; }
+        public int Id { get; set; }
         public string Title { get; set; }
+        public string? ImageBase64 { get; set; }
+        public float Score { get; set; }
     }
 }

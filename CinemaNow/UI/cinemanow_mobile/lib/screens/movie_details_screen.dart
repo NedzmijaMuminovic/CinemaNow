@@ -23,13 +23,78 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
   late Movie _movie;
   bool _isLoading = true;
   List<Screening> _screenings = [];
+  List<Movie> _recommendations = [];
+  List<Movie> _filteredRecommendations = [];
 
   @override
   void initState() {
     super.initState();
     _movie = widget.movie;
-    _fetchFullMovieDetails();
-    _fetchScreenings();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    if (_movie.id != null) {
+      try {
+        final movieProvider = context.read<MovieProvider>();
+        final screeningProvider = context.read<ScreeningProvider>();
+
+        final results = await Future.wait([
+          movieProvider.getById(_movie.id!),
+          screeningProvider.getScreeningsByMovieId(_movie.id!),
+          movieProvider.getRecommendations(_movie.id!),
+        ]);
+
+        if (mounted) {
+          final List<Movie> recommendations = results[2] as List<Movie>;
+
+          _filteredRecommendations =
+              await _filterRecommendationsWithActiveScreenings(
+            recommendations,
+            screeningProvider,
+          );
+
+          setState(() {
+            _movie = results[0] as Movie;
+            _screenings = results[1] as List<Screening>;
+            _recommendations = recommendations;
+            _isLoading = false;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error loading movie details: $e')),
+          );
+        }
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Movie ID is null. Cannot load details.')),
+      );
+    }
+  }
+
+  Future<List<Movie>> _filterRecommendationsWithActiveScreenings(
+    List<Movie> recommendations,
+    ScreeningProvider screeningProvider,
+  ) async {
+    List<Movie> filteredMovies = [];
+
+    for (var movie in recommendations) {
+      if (movie.id != null) {
+        final screenings =
+            await screeningProvider.getScreeningsByMovieId(movie.id!);
+        if (screenings.any((screening) => screening.stateMachine == 'active')) {
+          filteredMovies.add(movie);
+        }
+      }
+    }
+
+    return filteredMovies;
   }
 
   Future<void> _fetchFullMovieDetails() async {
@@ -47,17 +112,103 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
     }
   }
 
-  Future<void> _fetchScreenings() async {
-    try {
-      final screeningProvider = context.read<ScreeningProvider>();
-      final screenings =
-          await screeningProvider.getScreeningsByMovieId(_movie.id!);
-      setState(() {
-        _screenings = screenings;
-      });
-    } catch (e) {
-      // Handle error
+  Widget _buildRecommendationsSection() {
+    if (_filteredRecommendations.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        alignment: Alignment.center,
+        child: const Text(
+          'No recommendations available',
+          style: TextStyle(color: Colors.white70),
+        ),
+      );
     }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'More like this',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 200,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: _filteredRecommendations.length,
+            itemBuilder: (context, index) {
+              final movie = _filteredRecommendations[index];
+              return GestureDetector(
+                onTap: () async {
+                  if (movie.id != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MovieDetailsScreen(movie: movie),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content:
+                              Text('Selected movie does not have a valid ID.')),
+                    );
+                  }
+                },
+                child: Container(
+                  width: 130,
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: movie.imageBase64 != null
+                            ? Image.memory(
+                                base64Decode(movie.imageBase64!),
+                                height: 160,
+                                width: 130,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.asset(
+                                'assets/images/default.jpg',
+                                height: 160,
+                                width: 130,
+                                fit: BoxFit.cover,
+                              ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        movie.title ?? '',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 
   void _showScreeningSelection() {
@@ -272,6 +423,8 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                               .bodyMedium
                               ?.copyWith(color: Colors.white),
                         ),
+                        const SizedBox(height: 24),
+                        _buildRecommendationsSection(),
                         const SizedBox(height: 24),
                         Center(
                           child: buildButton(

@@ -94,7 +94,7 @@ namespace CinemaNow.Services.MachineLearning
             var movieData = ConvertMovieToMovieData(targetMovie);
             var targetVector = ConvertMovieToFeatureVector(movieData);
 
-            var allMovies = _movieService.LoadMovieData().Where(m => m.MovieId != targetMovie.Id).ToList();
+            var allMovies = _movieService.LoadMovieData().Where(m => m.Id != targetMovie.Id).ToList();
 
             var predictions = new List<MoviePrediction>();
 
@@ -105,8 +105,9 @@ namespace CinemaNow.Services.MachineLearning
 
                 predictions.Add(new MoviePrediction
                 {
-                    MovieId = movie.MovieId,
+                    Id = movie.Id,
                     Title = movie.Title,
+                    ImageBase64 = movie.ImageBase64,
                     Score = similarityScore
                 });
             }
@@ -119,10 +120,11 @@ namespace CinemaNow.Services.MachineLearning
         {
             return new MovieData
             {
-                MovieId = movie.Id,
+                Id = movie.Id,
                 Title = movie.Title,
                 Genres = movie.Genres.Select(g => g.Name).ToArray(),
-                Actors = movie.Actors.Select(a => $"{a.Name} {a.Surname}").ToArray()
+                Actors = movie.Actors.Select(a => $"{a.Name} {a.Surname}").ToArray(),
+                ImageBase64 = movie.ImageBase64
             };
         }
 

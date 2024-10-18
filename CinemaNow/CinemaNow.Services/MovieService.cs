@@ -185,10 +185,11 @@ namespace CinemaNow.Services
             {
                 movieData.Add(new MovieData
                 {
-                    MovieId = movie.Id,
+                    Id = movie.Id,
                     Title = movie.Title,
                     Genres = movie.Genres.Select(g => g.Name).ToArray(),
                     Actors = movie.Actors.Select(a => $"{a.Name} {a.Surname}").ToArray(),
+                    ImageBase64 = movie.Image != null ? Convert.ToBase64String(movie.Image) : null
                 });
             }
 
