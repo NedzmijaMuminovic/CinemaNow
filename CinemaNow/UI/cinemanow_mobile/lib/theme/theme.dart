@@ -5,9 +5,21 @@ ThemeData buildDarkTheme(BuildContext context) {
     scaffoldBackgroundColor: Colors.grey[900],
     dialogBackgroundColor: Colors.grey[900],
     textTheme: const TextTheme(),
-    colorScheme: const ColorScheme.dark(
-      primary: Colors.red,
+    colorScheme: ColorScheme.dark(
+      primary: Colors.grey[700]!,
       onPrimary: Colors.white,
+      secondary: Colors.grey[600]!,
+      surface: Colors.grey[800]!,
+      background: Colors.grey[900]!,
+    ),
+    datePickerTheme: DatePickerThemeData(
+      backgroundColor: Colors.grey[900],
+    ),
+    timePickerTheme: TimePickerThemeData(
+      backgroundColor: Colors.grey[900],
+      hourMinuteColor: Colors.grey[800],
+      dialBackgroundColor: Colors.grey[800],
+      dialHandColor: Colors.grey[600],
     ),
   );
 }

@@ -31,6 +31,9 @@ class _ReservationQRCodeScreenState extends State<ReservationQRCodeScreen> {
           'Your Movie Ticket',
           style: const TextStyle(color: Colors.white70),
         ),
+        iconTheme: IconThemeData(
+          color: Colors.white70,
+        ),
         backgroundColor: Colors.grey[850],
       ),
       backgroundColor: Colors.grey[900],

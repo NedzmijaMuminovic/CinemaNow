@@ -160,29 +160,31 @@ class _MovieListScreenState extends State<MovieListScreen> {
 
   Widget _buildResultView() {
     if (result == null || result!.result.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.movie, color: Colors.red, size: 60),
-            const SizedBox(height: 16),
-            Text(
-              'No Movies Available',
-              style: TextStyle(
-                color: Colors.grey[500],
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+      return Expanded(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.movie, color: Colors.red, size: 60),
+              const SizedBox(height: 16),
+              Text(
+                'No Movies Available',
+                style: TextStyle(
+                  color: Colors.grey[500],
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Try searching for a different movie.',
-              style: TextStyle(
-                color: Colors.grey[400],
-                fontSize: 16,
+              const SizedBox(height: 8),
+              Text(
+                'Try searching for a different movie.',
+                style: TextStyle(
+                  color: Colors.grey[400],
+                  fontSize: 16,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }

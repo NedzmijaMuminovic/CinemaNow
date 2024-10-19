@@ -62,6 +62,9 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
           movieTitle,
           style: const TextStyle(color: Colors.white70),
         ),
+        iconTheme: IconThemeData(
+          color: Colors.white70,
+        ),
         backgroundColor: Colors.grey[850],
       ),
       body: isLoading

@@ -31,7 +31,6 @@ class _MasterScreenState extends State<MasterScreen> {
       backgroundColor: Colors.grey[900],
       appBar: AppBar(
         backgroundColor: Colors.grey[850],
-        //automaticallyImplyLeading: false,
       ),
       body: IndexedStack(
         index: _selectedIndex,

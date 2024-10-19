@@ -256,9 +256,23 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
                             initialDate: DateTime.now(),
                             firstDate: DateTime(2000),
                             lastDate: DateTime(2101),
-                            builder: (context, child) {
+                            builder: (BuildContext context, Widget? child) {
                               return Theme(
-                                data: buildDarkTheme(context),
+                                data: buildDarkTheme(context).copyWith(
+                                  dialogBackgroundColor: Colors.grey[900],
+                                  colorScheme: ColorScheme.dark(
+                                    primary: Colors.grey[700]!,
+                                    surface: Colors.grey[800]!,
+                                  ),
+                                  buttonBarTheme: ButtonBarThemeData(
+                                    buttonTextTheme: ButtonTextTheme.primary,
+                                  ),
+                                  textButtonTheme: TextButtonThemeData(
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Colors.red,
+                                    ),
+                                  ),
+                                ),
                                 child: child!,
                               );
                             },
@@ -282,9 +296,38 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
                           final TimeOfDay? pickedTime = await showTimePicker(
                             context: context,
                             initialTime: TimeOfDay.now(),
-                            builder: (context, child) {
+                            builder: (BuildContext context, Widget? child) {
                               return Theme(
-                                data: buildDarkTheme(context),
+                                data: buildDarkTheme(context).copyWith(
+                                  dialogBackgroundColor: Colors.grey[900],
+                                  timePickerTheme: TimePickerThemeData(
+                                    backgroundColor: Colors.grey[900],
+                                    hourMinuteTextColor:
+                                        MaterialStateColor.resolveWith(
+                                            (states) {
+                                      if (states
+                                          .contains(MaterialState.selected)) {
+                                        return Colors.white;
+                                      }
+                                      return Colors.white;
+                                    }),
+                                    dialTextColor: Colors.white,
+                                    hourMinuteColor:
+                                        MaterialStateColor.resolveWith(
+                                            (states) {
+                                      if (states
+                                          .contains(MaterialState.selected)) {
+                                        return Colors.grey[800]!;
+                                      }
+                                      return Colors.grey[700]!;
+                                    }),
+                                  ),
+                                  textButtonTheme: TextButtonThemeData(
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Colors.red,
+                                    ),
+                                  ),
+                                ),
                                 child: child!,
                               );
                             },

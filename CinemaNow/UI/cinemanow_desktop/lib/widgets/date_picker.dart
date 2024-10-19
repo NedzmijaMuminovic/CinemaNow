@@ -27,7 +27,21 @@ class _DatePickerState extends State<DatePicker> {
       lastDate: DateTime(2101),
       builder: (BuildContext context, Widget? child) {
         return Theme(
-          data: buildDarkTheme(context),
+          data: buildDarkTheme(context).copyWith(
+            dialogBackgroundColor: Colors.grey[900],
+            colorScheme: ColorScheme.dark(
+              primary: Colors.grey[700]!,
+              surface: Colors.grey[800]!,
+            ),
+            buttonBarTheme: ButtonBarThemeData(
+              buttonTextTheme: ButtonTextTheme.primary,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+            ),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

@@ -289,6 +289,9 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
       backgroundColor: Colors.grey[900],
       appBar: AppBar(
         backgroundColor: Colors.grey[850],
+        iconTheme: IconThemeData(
+          color: Colors.white70,
+        ),
       ),
       body: _isLoading
           ? const Center(

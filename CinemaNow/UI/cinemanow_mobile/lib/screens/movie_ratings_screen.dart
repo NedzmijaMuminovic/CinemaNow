@@ -88,7 +88,7 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
   Widget build(BuildContext context) {
     return PopScope(
         canPop: false,
-        onPopInvokedWithResult: (didPop, result) async {
+        onPopInvoked: (didPop) async {
           if (didPop) {
             return;
           }
@@ -434,61 +434,61 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
                 onPressed: () => Navigator.of(context).pop(),
               ),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: rating > 0 ? Colors.red : Colors.grey,
-                ),
-                onPressed: rating > 0
-                    ? () async {
-                        final ratingProvider = context.read<RatingProvider>();
-                        final userProvider = context.read<UserProvider>();
-                        final userId = AuthProvider.userId;
-                        final user = await userProvider.getUserById(userId!);
-                        final updatedRating = Rating(
-                          id: ratingId,
-                          movieId: widget.movieId,
-                          userId: AuthProvider.userId,
-                          value: rating,
-                          comment: comment.isNotEmpty ? comment : null,
-                          user: user,
-                        );
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: rating > 0 ? Colors.white : Colors.grey,
+                    backgroundColor: rating > 0 ? Colors.red : Colors.grey[700],
+                  ),
+                  onPressed: rating > 0
+                      ? () async {
+                          final ratingProvider = context.read<RatingProvider>();
+                          final userProvider = context.read<UserProvider>();
+                          final userId = AuthProvider.userId;
+                          final user = await userProvider.getUserById(userId!);
+                          final updatedRating = Rating(
+                            id: ratingId,
+                            movieId: widget.movieId,
+                            userId: AuthProvider.userId,
+                            value: rating,
+                            comment: comment.isNotEmpty ? comment : null,
+                            user: user,
+                          );
 
-                        try {
-                          if (ratingId != null) {
-                            await ratingProvider.updateRating(
-                                ratingId, updatedRating);
-                          } else {
-                            await ratingProvider.addRating(updatedRating);
+                          try {
+                            if (ratingId != null) {
+                              await ratingProvider.updateRating(
+                                  ratingId, updatedRating);
+                            } else {
+                              await ratingProvider.addRating(updatedRating);
+                            }
+
+                            Navigator.of(context).pop();
+                            _refreshRatings();
+                            _refreshUserRatingStatus();
+                            setState(() {
+                              _hasChanges = true;
+                            });
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(ratingId != null
+                                    ? 'You have successfully updated the rating!'
+                                    : 'You have successfully added the rating!'),
+                              ),
+                            );
+                          } catch (e) {
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
                           }
-
-                          Navigator.of(context).pop();
-                          _refreshRatings();
-                          _refreshUserRatingStatus();
-                          setState(() {
-                            _hasChanges = true;
-                          });
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(ratingId != null
-                                  ? 'You have successfully updated the rating!'
-                                  : 'You have successfully added the rating!'),
-                            ),
-                          );
-                        } catch (e) {
-                          Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(e.toString())),
-                          );
                         }
-                      }
-                    : null,
-                child: Text(
-                  'Submit',
-                  style: TextStyle(
-                      color: rating > 0 ? Colors.white : Colors.transparent),
-                ),
-              ),
+                      : null,
+                  child: Text(
+                    'Submit',
+                    style: TextStyle(
+                      color: rating > 0 ? Colors.white : Colors.grey[400],
+                    ),
+                  )),
             ],
           );
         });

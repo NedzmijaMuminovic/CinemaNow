@@ -19,7 +19,12 @@ class MasterScreenState extends State<MasterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[900],
-      appBar: AppBar(backgroundColor: Colors.grey[850]),
+      appBar: AppBar(
+        backgroundColor: Colors.grey[850],
+        iconTheme: const IconThemeData(
+          color: Colors.grey,
+        ),
+      ),
       drawer: Drawer(
         backgroundColor: Colors.grey[850],
         child: ListView(

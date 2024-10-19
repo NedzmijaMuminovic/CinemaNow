@@ -221,7 +221,7 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
             [];
 
     if (filteredScreenings.isEmpty) {
-      return _buildNoScreeningsView();
+      return Expanded(child: Center(child: _buildNoScreeningsView()));
     }
 
     return Expanded(

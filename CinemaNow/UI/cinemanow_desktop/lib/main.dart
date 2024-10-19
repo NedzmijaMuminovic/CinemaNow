@@ -32,10 +32,30 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
-        useMaterial3: true,
+        primaryColor: const Color(0xFF1C1C1E),
+        dialogTheme: DialogTheme(
+          backgroundColor: Colors.grey[900],
+          contentTextStyle: const TextStyle(color: Colors.white),
+        ),
+        textSelectionTheme: const TextSelectionThemeData(
+          selectionColor: Color(0xFF4A4A4A),
+          cursorColor: Color(0xFF4A4A4A),
+        ),
+        colorScheme: ColorScheme.dark(
+          primary: const Color(0xFF1C1C1E),
+          secondary: Colors.grey[700]!,
+          surface: const Color(0xFF2C2C2E),
+          background: const Color(0xFF1C1C1E),
+          error: Colors.red,
+        ),
+        snackBarTheme: SnackBarThemeData(
+          backgroundColor: const Color(0xFF323232),
+          contentTextStyle: const TextStyle(
+            color: Colors.white,
+          ),
+          actionTextColor: Colors.white,
+        ),
       ),
       home: const LoginPage(),
     );
