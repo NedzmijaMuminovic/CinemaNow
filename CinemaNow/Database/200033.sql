@@ -176,16 +176,16 @@ VALUES
 
 INSERT INTO Movie (Title, Duration, Synopsis, Image)
 VALUES 
-('The Shawshank Redemption', 142, 'Two imprisoned men bond over a number of years...', NULL),
-('The Godfather', 175, 'The aging patriarch of an organized crime dynasty...', NULL),
-('The Dark Knight', 152, 'When the menace known as the Joker wreaks havoc...', NULL),
-('Inception', 148, 'A thief who enters the dreams of others to steal secrets from their subconscious...', NULL),
-('The Matrix', 136, 'A computer hacker learns from mysterious rebels about the true nature of his reality...', NULL),
-('Fight Club', 139, 'An insomniac office worker and a soap salesman build a global organization to help vent male aggression...', NULL),
-('Pulp Fiction', 154, 'The lives of two mob hitmen, a boxer, a gangster’s wife, and a pair of diner bandits intertwine...', NULL),
-('Forrest Gump', 142, 'The presidencies of Kennedy and Johnson, the Vietnam War, the Watergate scandal and other historical events unfold...', NULL),
-('The Lord of the Rings: The Return of the King', 201, 'Gandalf and Aragorn lead the World of Men against Sauron''s army to end his reign over Middle-earth...', NULL),
-('The Silence of the Lambs', 118, 'A young F.B.I. cadet must confide in an incarcerated and manipulative killer to receive his help on catching another serial killer...', NULL),
+('The Shawshank Redemption', 142, 'A banker convicted of uxoricide forms a friendship over a quarter century with a hardened convict, while maintaining his innocence and trying to remain hopeful through simple compassion.', NULL),
+('The Godfather', 175, 'The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.', NULL),
+('The Dark Knight', 152, 'When a menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman, James Gordon and Harvey Dent must work together to put an end to the madness.', NULL),
+('Inception', 148, 'A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O., but his tragic past may doom the project and his team to disaster.', NULL),
+('The Matrix', 136, 'When a beautiful stranger leads computer hacker Neo to a forbidding underworld, he discovers the shocking truth--the life he knows is the elaborate deception of an evil cyber-intelligence.', NULL),
+('Fight Club', 139, 'An insomniac office worker and a devil-may-care soap maker form an underground fight club that evolves into much more.', NULL),
+('Pulp Fiction', 154, 'The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.', NULL),
+('Forrest Gump', 142, 'The history of the United States from the 1950s to the ''70s unfolds from the perspective of an Alabama man with an IQ of 75, who yearns to be reunited with his childhood sweetheart.', NULL),
+('The Lord of the Rings: The Return of the King', 201, 'Gandalf and Aragorn lead the World of Men against Sauron''s army to draw his gaze from Frodo and Sam as they approach Mount Doom with the One Ring.', NULL),
+('The Silence of the Lambs', 118, 'A young F.B.I. cadet must receive the help of an incarcerated and manipulative cannibal killer to help catch another serial killer, a madman who skins his victims.', NULL),
 ('10 Things I Hate About You', 97, 'A high-school boy, Cameron, cannot date Bianca until her anti-social older sister, Kat, has a boyfriend. So, Cameron pays a mysterious boy, Patrick, to charm Kat.', NULL),
 ('Titanic', 194, 'A seventeen-year-old aristocrat falls in love with a kind but poor artist aboard the luxurious, ill-fated R.M.S. Titanic.', NULL),
 ('Shutter Island', 138, 'Teddy Daniels and Chuck Aule, two US marshals, are sent to an asylum on a remote island in order to investigate the disappearance of a patient, where Teddy uncovers a shocking truth about the place.', NULL),
@@ -320,7 +320,17 @@ VALUES
 (2, 3, 7, '2024-12-22 15:30:00', 17.50, 'draft'),
 (3, 4, 8, '2024-12-23 19:00:00', 16.50, 'active'),
 (4, 5, 1, '2024-12-25 14:00:00', 11.50, 'active'),
-(5, 6, 2, '2024-12-27 17:30:00', 13.00, 'hidden');
+(5, 6, 2, '2024-12-27 17:30:00', 13.00, 'hidden'),
+(11, 1, 1, '2024-12-05 14:00:00', 10.50, 'active'),
+(12, 2, 2, '2024-12-07 16:30:00', 13.00, 'active'),
+(13, 3, 3, '2024-12-08 19:00:00', 15.50, 'active'),
+(14, 4, 4, '2024-12-09 15:00:00', 18.00, 'active'),
+(15, 5, 5, '2024-12-11 18:30:00', 14.50, 'active'),
+(11, 2, 3, '2024-12-06 19:00:00', 11.50, 'active'),
+(12, 3, 4, '2024-12-08 20:30:00', 14.00, 'active'),
+(13, 4, 5, '2024-12-09 18:00:00', 17.50, 'active'),
+(14, 5, 6, '2024-12-10 17:00:00', 16.00, 'active'),
+(15, 6, 7, '2024-12-12 21:30:00', 17.50, 'active');
 
 INSERT INTO Seat (Name)
 VALUES 
@@ -347,7 +357,7 @@ BEGIN
     IF @StateMachine = 'active'
     BEGIN
         INSERT INTO ScreeningSeat (ScreeningID, SeatID, IsReserved)
-        SELECT TOP 15
+        SELECT TOP 20
             @ScreeningID,
             Seat.ID,
             1
@@ -357,7 +367,7 @@ BEGIN
             NEWID();
 
         INSERT INTO ScreeningSeat (ScreeningID, SeatID, IsReserved)
-        SELECT TOP 33
+        SELECT TOP 28
             @ScreeningID,
             Seat.ID,
             0
@@ -443,4 +453,9 @@ VALUES
 (7, 7, 4, 'Very engaging and well-executed.'),
 (4, 8, 5, 'Epic conclusion to the trilogy!'),
 (5, 9, 4, 'Visually stunning and gripping story.'),
-(6, 10, 3, 'Good thriller, but a bit predictable.');
+(6, 10, 3, 'Good thriller, but a bit predictable.'),
+(1, 11, 5, 'Great movie!'),
+(1, 12, 5, 'Great movie!'),
+(1, 13, 5, 'Great movie!'),
+(1, 14, 5, 'Great movie!'),
+(1, 15, 5, 'Great movie!');
