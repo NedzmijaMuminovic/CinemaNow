@@ -48,7 +48,7 @@ class PaymentProvider extends BaseProvider {
             shadow:
                 PaymentSheetShadowParams(color: Colors.black.withOpacity(0.5)),
           ),
-          primaryButton: PaymentSheetPrimaryButtonAppearance(
+          primaryButton: const PaymentSheetPrimaryButtonAppearance(
             colors: PaymentSheetPrimaryButtonTheme(
               dark: PaymentSheetPrimaryButtonThemeColors(
                 background: Colors.red,

@@ -5,106 +5,148 @@ Widget buildInputField(
     {TextEditingController? controller,
     bool readOnly = false,
     VoidCallback? onTap,
-    MouseCursor? cursor}) {
+    MouseCursor? cursor,
+    String? errorMessage}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0),
-    child: Row(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 120,
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 18,
-              color: Colors.white,
+        Row(
+          children: [
+            SizedBox(
+              width: 120,
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
+                ),
+              ),
             ),
-          ),
-        ),
-        Expanded(
-          child: MouseRegion(
-            cursor: cursor ?? SystemMouseCursors.text,
-            child: GestureDetector(
-              onTap: onTap,
-              child: AbsorbPointer(
-                absorbing: readOnly,
-                child: TextSelectionTheme(
-                  data: const TextSelectionThemeData(
-                    selectionColor: Colors.red,
-                  ),
-                  child: TextFormField(
-                    controller: controller,
-                    readOnly: readOnly,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.grey[800],
-                      hintText: placeholder,
-                      hintStyle: const TextStyle(color: Colors.white70),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide.none,
+            Expanded(
+              child: MouseRegion(
+                cursor: cursor ?? SystemMouseCursors.text,
+                child: GestureDetector(
+                  onTap: onTap,
+                  child: AbsorbPointer(
+                    absorbing: readOnly,
+                    child: TextSelectionTheme(
+                      data: const TextSelectionThemeData(
+                        selectionColor: Colors.red,
                       ),
-                      prefixIcon: Icon(icon, color: Colors.white),
+                      child: TextFormField(
+                        controller: controller,
+                        readOnly: readOnly,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.grey[800],
+                          hintText: placeholder,
+                          hintStyle: const TextStyle(color: Colors.white70),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          prefixIcon: Icon(icon, color: Colors.white),
+                          contentPadding:
+                              const EdgeInsets.symmetric(vertical: 16.0),
+                        ),
+                        cursorColor: Colors.red,
+                        style: const TextStyle(color: Colors.white),
+                      ),
                     ),
-                    cursorColor: Colors.red,
-                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
+        if (errorMessage != null)
+          Padding(
+            padding: const EdgeInsets.only(left: 120, top: 4.0),
+            child: Text(
+              errorMessage,
+              style: const TextStyle(color: Colors.red),
+            ),
+          ),
       ],
     ),
   );
 }
 
 Widget buildDateTimeField(
-    BuildContext context,
-    String label,
-    String placeholder,
-    IconData icon,
-    TextEditingController controller,
-    VoidCallback onTap) {
+  BuildContext context,
+  String label,
+  String placeholder,
+  IconData icon,
+  TextEditingController controller,
+  VoidCallback onTap, {
+  String? errorMessage,
+}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0),
-    child: Row(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 120,
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 18,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        Expanded(
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onTap: onTap,
-              child: AbsorbPointer(
-                child: TextField(
-                  controller: controller,
-                  readOnly: true,
-                  onTap: onTap,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.grey[800],
-                    hintText: placeholder,
-                    hintStyle: const TextStyle(color: Colors.white70),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    prefixIcon: Icon(icon, color: Colors.white),
-                  ),
-                  style: const TextStyle(color: Colors.white),
+        Row(
+          children: [
+            SizedBox(
+              width: 120,
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
                 ),
               ),
             ),
-          ),
+            Expanded(
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: onTap,
+                  child: AbsorbPointer(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextField(
+                          controller: controller,
+                          readOnly: true,
+                          onTap: onTap,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.grey[800],
+                            hintText: placeholder,
+                            hintStyle: const TextStyle(color: Colors.white70),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: Icon(icon, color: Colors.white),
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 16.0),
+                          ),
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        if (errorMessage != null)
+                          Row(
+                            children: [
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  errorMessage,
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     ),

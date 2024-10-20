@@ -62,7 +62,7 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
           movieTitle,
           style: const TextStyle(color: Colors.white70),
         ),
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: Colors.white70,
         ),
         backgroundColor: Colors.grey[850],
@@ -106,9 +106,9 @@ class _ReservationDetailsScreenState extends State<ReservationDetailsScreen> {
                               ),
                               elevation: 5,
                             ),
-                            child: Row(
+                            child: const Row(
                               mainAxisSize: MainAxisSize.min,
-                              children: const [
+                              children: [
                                 Icon(Icons.qr_code, size: 24),
                                 SizedBox(width: 8),
                                 Text(

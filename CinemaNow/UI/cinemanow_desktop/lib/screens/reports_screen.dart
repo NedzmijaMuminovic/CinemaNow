@@ -2,6 +2,7 @@ import 'package:cinemanow_desktop/models/movie_reservation_seat_count.dart';
 import 'package:cinemanow_desktop/models/movie_revenue.dart';
 import 'package:cinemanow_desktop/models/top_customer.dart';
 import 'package:cinemanow_desktop/utilities/pdf_exporter.dart';
+import 'package:cinemanow_desktop/utilities/report_selection.dart';
 import 'package:cinemanow_desktop/utilities/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -131,51 +132,104 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
     }
   }
 
-  Future<void> _exportToPDF() async {
+  Future<void> _showReportSelectionDialog() async {
+    final result = await showDialog<Set<ReportType>>(
+      context: context,
+      builder: (context) => ReportSelectionDialog(
+        onConfirm: (selectedReports) async {
+          await _exportSelectedReports(selectedReports);
+        },
+      ),
+    );
+  }
+
+  Future<void> _exportSelectedReports(Set<ReportType> selectedReports) async {
     setState(() {
       _isExporting = true;
     });
 
     setState(() {
-      userCount = null;
-      totalIncome = null;
-      top5Movies = null;
-      movieRevenues = null;
-      top5Customers = null;
+      if (selectedReports.contains(ReportType.userCount)) {
+        userCount = null;
+      }
+      if (selectedReports.contains(ReportType.cinemaIncome)) {
+        totalIncome = null;
+      }
+      if (selectedReports.contains(ReportType.movieWatched)) {
+        top5Movies = null;
+      }
+      if (selectedReports.contains(ReportType.movieRevenue)) {
+        movieRevenues = null;
+      }
+      if (selectedReports.contains(ReportType.topCustomers)) {
+        top5Customers = null;
+      }
     });
 
-    await _fetchAllData();
+    List<Future> futures = [];
+    if (selectedReports.contains(ReportType.userCount)) {
+      futures.add(fetchUserCount());
+    }
+    if (selectedReports.contains(ReportType.cinemaIncome)) {
+      futures.add(fetchTotalIncome());
+    }
+    if (selectedReports.contains(ReportType.movieWatched)) {
+      futures.add(fetchTop5WatchedMovies());
+    }
+    if (selectedReports.contains(ReportType.movieRevenue)) {
+      futures.add(fetchMovieRevenues());
+    }
+    if (selectedReports.contains(ReportType.topCustomers)) {
+      futures.add(fetchTop5Customers());
+    }
 
-    if (userCount != null &&
-        totalIncome != null &&
-        top5Movies != null &&
-        movieRevenues != null &&
-        top5Customers != null) {
+    await Future.wait(futures);
+
+    bool canExport = true;
+    if (selectedReports.contains(ReportType.userCount) && userCount == null) {
+      canExport = false;
+    }
+    if (selectedReports.contains(ReportType.cinemaIncome) &&
+        totalIncome == null) {
+      canExport = false;
+    }
+    if (selectedReports.contains(ReportType.movieWatched) &&
+        top5Movies == null) {
+      canExport = false;
+    }
+    if (selectedReports.contains(ReportType.movieRevenue) &&
+        movieRevenues == null) {
+      canExport = false;
+    }
+    if (selectedReports.contains(ReportType.topCustomers) &&
+        top5Customers == null) {
+      canExport = false;
+    }
+
+    if (canExport) {
       String result = await PdfExporter.exportToPDF(
         context,
-        userCount!,
-        totalIncome!,
-        top5Movies!,
-        movieRevenues!,
-        top5Customers!,
+        userCount ?? -1,
+        totalIncome ?? -1,
+        top5Movies ?? [],
+        movieRevenues ?? [],
+        top5Customers ?? [],
         sharedColors,
+        selectedReports,
       );
-      if (result == 'success') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('PDF exported successfully!'),
-            duration: Duration(seconds: 3),
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            result == 'success'
+                ? 'PDF exported successfully!'
+                : 'Failed to export PDF. Please try again.',
           ),
-        );
-      } else if (result == 'error') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to export PDF. Please try again.'),
-            duration: Duration(seconds: 3),
-          ),
-        );
-      }
+          duration: const Duration(seconds: 3),
+        ),
+      );
     }
+
     setState(() {
       _isExporting = false;
     });
@@ -200,7 +254,8 @@ class _ReportsScreenContentState extends State<_ReportsScreenContent> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                      onPressed: _isExporting ? null : _exportToPDF,
+                      onPressed:
+                          _isExporting ? null : _showReportSelectionDialog,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         padding: const EdgeInsets.symmetric(

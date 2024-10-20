@@ -18,12 +18,21 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _isLoading = false;
 
+  void _showErrorSnackbar(String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 3),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   void _login() async {
     String username = _usernameController.text.trim();
     String password = _passwordController.text.trim();
 
     if (username.isEmpty || password.isEmpty) {
-      _showErrorDialog("Username and password cannot be empty.");
+      _showErrorSnackbar("Username and password cannot be empty.");
       return;
     }
 
@@ -37,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
       final response = await authProvider.login(username, password);
 
       if (response == null) {
-        _showErrorDialog("Wrong username or password.");
+        _showErrorSnackbar("Wrong username or password.");
       } else {
         AuthProvider.username = username;
         AuthProvider.password = password;
@@ -47,11 +56,11 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => const MasterScreen(ScreeningListScreen())));
         } else {
-          _showErrorDialog("You do not have permission to access this area.");
+          _showErrorSnackbar("You do not have permission to access this area.");
         }
       }
     } on Exception catch (e) {
-      _showErrorDialog(e.toString().contains("Unauthorized")
+      _showErrorSnackbar(e.toString().contains("Unauthorized")
           ? "Wrong username or password."
           : e.toString());
     } finally {
@@ -64,23 +73,6 @@ class _LoginPageState extends State<LoginPage> {
   bool _isAdmin(User user) {
     final roles = user.roles;
     return roles != null && roles.any((role) => role.name == 'Admin');
-  }
-
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        title: const Text("Error", style: TextStyle(color: Colors.white)),
-        content: Text(message, style: const TextStyle(color: Colors.white)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("OK", style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
   }
 
   @override

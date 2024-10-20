@@ -33,7 +33,7 @@ class _DatePickerState extends State<DatePicker> {
               primary: Colors.grey[700]!,
               surface: Colors.grey[800]!,
             ),
-            buttonBarTheme: ButtonBarThemeData(
+            buttonBarTheme: const ButtonBarThemeData(
               buttonTextTheme: ButtonTextTheme.primary,
             ),
             textButtonTheme: TextButtonThemeData(

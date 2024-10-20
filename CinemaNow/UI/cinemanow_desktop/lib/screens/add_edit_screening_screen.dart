@@ -17,12 +17,14 @@ class AddEditScreeningScreen extends StatefulWidget {
   final int? screeningId;
   final VoidCallback? onScreeningAdded;
   final VoidCallback? onScreeningUpdated;
+  final int? currentTabIndex;
 
   const AddEditScreeningScreen({
     super.key,
     this.screeningId,
     this.onScreeningAdded,
     this.onScreeningUpdated,
+    this.currentTabIndex,
   });
 
   @override
@@ -33,6 +35,9 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+  String? _dateErrorMessage;
+  String? _priceErrorMessage;
+
   List<Movie> _movies = [];
   List<Hall> _halls = [];
   List<ViewMode> _viewModes = [];
@@ -139,25 +144,28 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
       );
 
       if (dateTime.isBefore(DateTime.now())) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-                'Cannot insert a screening with a date in the past or present. Please choose a future date.'),
-          ),
-        );
+        setState(() {
+          _dateErrorMessage = 'Please choose a future date or time.';
+        });
         return;
+      } else {
+        setState(() {
+          _dateErrorMessage = null;
+        });
       }
 
       final priceText = _priceController.text.replaceAll(',', '.');
       final price = double.tryParse(priceText);
 
       if (price == null || price <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Price must be a positive number.'),
-          ),
-        );
+        setState(() {
+          _priceErrorMessage = 'Price must be a positive number.';
+        });
         return;
+      } else {
+        setState(() {
+          _priceErrorMessage = null;
+        });
       }
 
       final screeningProvider =
@@ -194,7 +202,14 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
 
       widget.onScreeningAdded?.call();
       widget.onScreeningUpdated?.call();
-      Navigator.of(context).pop();
+
+      if (_isEditing) {
+        widget.onScreeningUpdated?.call();
+        Navigator.of(context).pop(widget.currentTabIndex);
+      } else {
+        widget.onScreeningAdded?.call();
+        Navigator.of(context).pop(2);
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -264,7 +279,7 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
                                     primary: Colors.grey[700]!,
                                     surface: Colors.grey[800]!,
                                   ),
-                                  buttonBarTheme: ButtonBarThemeData(
+                                  buttonBarTheme: const ButtonBarThemeData(
                                     buttonTextTheme: ButtonTextTheme.primary,
                                   ),
                                   textButtonTheme: TextButtonThemeData(
@@ -282,9 +297,11 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
                             setState(() {
                               _dateController.text =
                                   DateFormat('dd/MM/yyyy').format(pickedDate);
+                              _dateErrorMessage = null;
                             });
                           }
                         },
+                        errorMessage: _dateErrorMessage,
                       ),
                       buildDateTimeField(
                         context,
@@ -372,6 +389,7 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
                         'Enter price',
                         Icons.attach_money,
                         controller: _priceController,
+                        errorMessage: _priceErrorMessage,
                       ),
                       const SizedBox(height: 20),
                       Center(

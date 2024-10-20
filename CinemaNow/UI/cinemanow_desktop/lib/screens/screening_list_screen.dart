@@ -89,13 +89,20 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
             bottom: 16,
             right: 16,
             child: FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context).push(
+              onPressed: () async {
+                final resultIndex = await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => AddEditScreeningScreen(
-                        onScreeningAdded: _fetchScreenings),
+                      onScreeningAdded: _fetchScreenings,
+                      onScreeningUpdated: _fetchScreenings,
+                      currentTabIndex: _tabController.index,
+                    ),
                   ),
                 );
+
+                if (resultIndex != null && resultIndex is int) {
+                  _tabController.animateTo(resultIndex);
+                }
               },
               backgroundColor: Colors.grey[850],
               child: Icon(

@@ -29,6 +29,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool _isLoading = false;
 
+  void _showErrorSnackbar(String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 3),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   void _validateName(String text) {
     setState(() {
       _nameError = Validator.validateName(text);
@@ -144,7 +153,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     borderRadius: BorderRadius.circular(8.0),
                                     borderSide: BorderSide.none,
                                   ),
-                                  prefixIcon: const Icon(Icons.person,
+                                  prefixIcon: const Icon(Icons.person_outline,
                                       color: Colors.white70),
                                 ),
                                 cursorColor: Colors.red,
@@ -309,24 +318,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 _usernameController.text.isEmpty ||
                                 _passwordController.text.isEmpty ||
                                 _passwordConfirmationController.text.isEmpty) {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  backgroundColor: Colors.grey[900],
-                                  title: const Text("Error",
-                                      style: TextStyle(color: Colors.white)),
-                                  content: const Text(
-                                      "Please fill in all fields.",
-                                      style: TextStyle(color: Colors.white)),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: const Text("OK",
-                                          style: TextStyle(color: Colors.red)),
-                                    ),
-                                  ],
-                                ),
-                              );
+                              _showErrorSnackbar("Please fill in all fields.");
                               return;
                             }
 
@@ -344,24 +336,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 _usernameError != null ||
                                 _passwordError != null ||
                                 _passwordConfirmationError != null) {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  backgroundColor: Colors.grey[900],
-                                  title: const Text("Error",
-                                      style: TextStyle(color: Colors.white)),
-                                  content: const Text(
-                                      "Please fix the errors in the form.",
-                                      style: TextStyle(color: Colors.white)),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: const Text("OK",
-                                          style: TextStyle(color: Colors.red)),
-                                    ),
-                                  ],
-                                ),
-                              );
+                              _showErrorSnackbar(
+                                  "Please fix the errors in the form.");
                               return;
                             }
 
@@ -395,24 +371,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               );
                               Navigator.of(context).pop();
                             } else if (userExists) {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  backgroundColor: Colors.grey[900],
-                                  title: const Text("Error",
-                                      style: TextStyle(color: Colors.white)),
-                                  content: const Text(
-                                      "Username already exists. Please choose a different one.",
-                                      style: TextStyle(color: Colors.white)),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: const Text("OK",
-                                          style: TextStyle(color: Colors.red)),
-                                    ),
-                                  ],
-                                ),
-                              );
+                              _showErrorSnackbar(
+                                  "Username already exists. Please choose a different one.");
                               return;
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(

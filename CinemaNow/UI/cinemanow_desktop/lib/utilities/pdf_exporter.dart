@@ -1,6 +1,7 @@
 import 'package:cinemanow_desktop/models/movie_reservation_seat_count.dart';
 import 'package:cinemanow_desktop/models/movie_revenue.dart';
 import 'package:cinemanow_desktop/models/top_customer.dart';
+import 'package:cinemanow_desktop/utilities/report_selection.dart';
 import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -17,80 +18,102 @@ class PdfExporter {
     List<MovieRevenue> movieRevenues,
     List<TopCustomer> top5Customers,
     List<Color> sharedColors,
+    Set<ReportType> selectedReports,
   ) async {
     final pdf = pw.Document();
     final font = await PdfGoogleFonts.robotoRegular();
     final boldFont = await PdfGoogleFonts.robotoBold();
 
     try {
-      final pieChartImage =
-          await _capturePieChartImage(context, top5Movies, sharedColors);
-      final barChartImage =
-          await _captureBarChartImage(context, movieRevenues, sharedColors);
+      final pieChartImage = selectedReports.contains(ReportType.movieWatched)
+          ? await _capturePieChartImage(context, top5Movies, sharedColors)
+          : null;
+      final barChartImage = selectedReports.contains(ReportType.movieRevenue)
+          ? await _captureBarChartImage(context, movieRevenues, sharedColors)
+          : null;
 
       pdf.addPage(
         pw.MultiPage(
-            theme: pw.ThemeData.withFont(
-              base: font,
-              bold: boldFont,
-            ),
-            build: (context) => [
-                  pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.center,
-                    children: [
-                      pw.Text('Cinema Report',
-                          style: pw.TextStyle(font: font, fontSize: 24)),
-                      pw.SizedBox(height: 20),
-                      pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildPdfCard(
-                              'App Users',
-                              userCount == -1 ? 'Error' : '$userCount',
-                              font,
-                              boldFont),
-                          _buildPdfCard(
-                              'Cinema Income',
-                              totalIncome == -1
-                                  ? 'Error'
-                                  : '\$${totalIncome.toStringAsFixed(2)}',
-                              font,
-                              boldFont),
-                        ],
-                      ),
-                      pw.SizedBox(height: 50),
-                      pw.Text('Top 5 Watched Movies',
-                          style: pw.TextStyle(font: font, fontSize: 18)),
-                      pieChartImage != null
-                          ? pw.Image(pieChartImage)
-                          : pw.Container(),
-                      pw.SizedBox(height: 20),
-                      ..._buildLegendPdf(font, top5Movies, sharedColors),
-                    ],
-                  ),
-                ]),
-      );
-
-      pdf.addPage(
-        pw.Page(
+          theme: pw.ThemeData.withFont(
+            base: font,
+            bold: boldFont,
+          ),
           build: (context) {
-            return pw.Column(
-              children: [
+            List<pw.Widget> widgets = [
+              pw.Text('Cinema Report',
+                  style: pw.TextStyle(font: boldFont, fontSize: 24)),
+              pw.SizedBox(height: 20),
+            ];
+
+            if (selectedReports.contains(ReportType.userCount) ||
+                selectedReports.contains(ReportType.cinemaIncome)) {
+              widgets.add(
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
+                  children: [
+                    if (selectedReports.contains(ReportType.userCount))
+                      _buildPdfCard(
+                        'App Users',
+                        userCount == -1 ? 'Error' : '$userCount',
+                        font,
+                        boldFont,
+                      ),
+                    if (selectedReports.contains(ReportType.cinemaIncome))
+                      _buildPdfCard(
+                        'Cinema Income',
+                        totalIncome == -1
+                            ? 'Error'
+                            : '\$${totalIncome.toStringAsFixed(2)}',
+                        font,
+                        boldFont,
+                      ),
+                  ],
+                ),
+              );
+              widgets.add(pw.SizedBox(height: 30));
+            }
+
+            if (selectedReports.contains(ReportType.movieWatched) &&
+                pieChartImage != null) {
+              widgets.addAll([
+                pw.Text('Top 5 Watched Movies',
+                    style: pw.TextStyle(font: boldFont, fontSize: 18)),
+                pw.SizedBox(height: 10),
+                pw.Image(pieChartImage),
+                pw.SizedBox(height: 10),
+                ..._buildLegendPdf(font, top5Movies, sharedColors),
+                pw.SizedBox(height: 30),
+              ]);
+            }
+
+            if (selectedReports.contains(ReportType.movieRevenue) &&
+                barChartImage != null) {
+              widgets.addAll([
                 pw.Text('Revenue by Movie',
-                    style: pw.TextStyle(font: font, fontSize: 18)),
-                pw.SizedBox(height: 20),
-                barChartImage != null
-                    ? pw.Image(barChartImage, width: 200, height: 200)
-                    : pw.Container(),
-                pw.SizedBox(height: 20),
+                    style: pw.TextStyle(font: boldFont, fontSize: 18)),
+                pw.SizedBox(height: 10),
+                pw.Image(barChartImage),
+                pw.SizedBox(height: 10),
                 ..._buildRevenueInfoPdf(font, movieRevenues, sharedColors),
-                pw.SizedBox(height: 50),
+                pw.SizedBox(height: 30),
+              ]);
+            }
+
+            if (selectedReports.contains(ReportType.topCustomers)) {
+              widgets.addAll([
                 pw.Text('Top 5 Customers',
-                    style: pw.TextStyle(font: font, fontSize: 18)),
-                pw.SizedBox(height: 20),
+                    style: pw.TextStyle(font: boldFont, fontSize: 18)),
+                pw.SizedBox(height: 10),
                 ..._buildTopCustomersPdf(font, top5Customers),
-              ],
-            );
+              ]);
+            }
+
+            return [
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
+                children: widgets,
+              )
+            ];
           },
         ),
       );
@@ -99,11 +122,7 @@ class PdfExporter {
           onLayout: (PdfPageFormat format) async => pdf.save(),
           name: 'Cinema Report');
 
-      if (result) {
-        return 'success';
-      } else {
-        return 'cancelled';
-      }
+      return result ? 'success' : 'cancelled';
     } catch (error) {
       return 'error';
     }

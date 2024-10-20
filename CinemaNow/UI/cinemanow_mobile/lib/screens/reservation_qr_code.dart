@@ -27,11 +27,11 @@ class _ReservationQRCodeScreenState extends State<ReservationQRCodeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Your Movie Ticket',
-          style: const TextStyle(color: Colors.white70),
+          style: TextStyle(color: Colors.white70),
         ),
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: Colors.white70,
         ),
         backgroundColor: Colors.grey[850],
@@ -46,16 +46,16 @@ class _ReservationQRCodeScreenState extends State<ReservationQRCodeScreen> {
                 future: _qrCodeFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
+                    return const Center(
                         child: CircularProgressIndicator(color: Colors.red));
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}',
-                        style: TextStyle(color: Colors.white));
+                        style: const TextStyle(color: Colors.white));
                   } else if (snapshot.hasData) {
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           width: 300,
                           child: Text(
                             'Thank you for purchasing your movie ticket with us. We hope you enjoy your movie experience.',
@@ -67,21 +67,21 @@ class _ReservationQRCodeScreenState extends State<ReservationQRCodeScreen> {
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Image.memory(
                           base64Decode(snapshot.data!),
                           width: 250,
                           height: 250,
                         ),
-                        SizedBox(height: 20),
-                        Text(
+                        const SizedBox(height: 20),
+                        const Text(
                           'Scan this QR code at the cinema.',
                           style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                       ],
                     );
                   } else {
-                    return Text('No QR code available',
+                    return const Text('No QR code available',
                         style: TextStyle(color: Colors.white));
                   }
                 },
@@ -100,13 +100,13 @@ class _ReservationQRCodeScreenState extends State<ReservationQRCodeScreen> {
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,
                   backgroundColor: Colors.red,
-                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
                   elevation: 5,
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.home, size: 24),

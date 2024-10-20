@@ -84,7 +84,7 @@ class _ScreeningBookingScreenState extends State<ScreeningBookingScreen> {
           movieTitle,
           style: const TextStyle(color: Colors.white70),
         ),
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: Colors.white70,
         ),
         backgroundColor: Colors.grey[850],

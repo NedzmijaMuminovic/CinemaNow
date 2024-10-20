@@ -120,7 +120,7 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
           widget.movieTitle,
           style: const TextStyle(color: Colors.white70),
         ),
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: Colors.white70,
         ),
         backgroundColor: Colors.grey[850],
@@ -141,7 +141,7 @@ class _ScreeningCheckoutScreenState extends State<ScreeningCheckoutScreen> {
               _buildPaymentMethodSelector(),
               const SizedBox(height: 20),
               _isLoading
-                  ? Center(
+                  ? const Center(
                       child: CircularProgressIndicator(
                       color: Colors.red,
                     ))

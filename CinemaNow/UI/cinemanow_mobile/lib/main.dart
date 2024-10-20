@@ -71,9 +71,9 @@ class MyApp extends StatelessWidget {
           background: const Color(0xFF1C1C1E),
           error: Colors.red,
         ),
-        snackBarTheme: SnackBarThemeData(
-          backgroundColor: const Color(0xFF323232),
-          contentTextStyle: const TextStyle(
+        snackBarTheme: const SnackBarThemeData(
+          backgroundColor: Color(0xFF323232),
+          contentTextStyle: TextStyle(
             color: Colors.white,
           ),
           actionTextColor: Colors.white,

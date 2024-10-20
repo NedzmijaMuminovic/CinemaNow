@@ -28,6 +28,8 @@ class AddEditActorScreen extends StatefulWidget {
 class _AddEditActorScreenState extends State<AddEditActorScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
+  String? _nameError;
+  String? _surnameError;
   bool _isLoading = true;
   bool _isEditing = false;
   File? _selectedImage;
@@ -75,12 +77,31 @@ class _AddEditActorScreenState extends State<AddEditActorScreen> {
     final nameError = Validator.validateName(_nameController.text);
     final surnameError = Validator.validateSurname(_surnameController.text);
 
+    setState(() {
+      _nameError = null;
+      _surnameError = null;
+    });
+
     if (_nameController.text.isEmpty || _surnameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill in all fields.'),
         ),
       );
+      return;
+    }
+
+    if (nameError != null) {
+      setState(() {
+        _nameError = nameError;
+      });
+      return;
+    }
+
+    if (surnameError != null) {
+      setState(() {
+        _surnameError = surnameError;
+      });
       return;
     }
 
@@ -171,6 +192,7 @@ class _AddEditActorScreenState extends State<AddEditActorScreen> {
                         'Enter name',
                         Icons.person,
                         controller: _nameController,
+                        errorMessage: _nameError,
                       ),
                       buildInputField(
                         context,
@@ -178,6 +200,7 @@ class _AddEditActorScreenState extends State<AddEditActorScreen> {
                         'Enter surname',
                         Icons.person_outline,
                         controller: _surnameController,
+                        errorMessage: _surnameError,
                       ),
                       GestureDetector(
                         onTap: _pickImage,

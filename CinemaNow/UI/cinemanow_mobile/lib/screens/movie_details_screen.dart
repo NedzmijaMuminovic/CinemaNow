@@ -73,7 +73,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Movie ID is null. Cannot load details.')),
+        const SnackBar(content: Text('Movie ID is null. Cannot load details.')),
       );
     }
   }
@@ -161,7 +161,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                           content:
                               Text('Selected movie does not have a valid ID.')),
                     );
@@ -289,7 +289,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
       backgroundColor: Colors.grey[900],
       appBar: AppBar(
         backgroundColor: Colors.grey[850],
-        iconTheme: IconThemeData(
+        iconTheme: const IconThemeData(
           color: Colors.white70,
         ),
       ),
