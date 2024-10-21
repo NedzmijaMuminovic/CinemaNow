@@ -192,9 +192,11 @@ class _ActorListScreenState extends State<ActorListScreen> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           int crossAxisCount;
-          if (constraints.maxWidth > 1200) {
+          if (constraints.maxWidth > 1450) {
+            crossAxisCount = 4;
+          } else if (constraints.maxWidth > 1100) {
             crossAxisCount = 3;
-          } else if (constraints.maxWidth > 800) {
+          } else if (constraints.maxWidth > 750) {
             crossAxisCount = 2;
           } else {
             crossAxisCount = 1;
@@ -204,7 +206,7 @@ class _ActorListScreenState extends State<ActorListScreen> {
               crossAxisCount: crossAxisCount,
               crossAxisSpacing: 16.0,
               mainAxisSpacing: 16.0,
-              childAspectRatio: 1,
+              childAspectRatio: 0.7,
             ),
             itemCount: result?.result.length,
             itemBuilder: (context, index) {

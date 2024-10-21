@@ -12,7 +12,7 @@ class BaseCard extends StatelessWidget {
     required this.imageUrl,
     required this.content,
     required this.actions,
-    this.imageHeight = 250,
+    this.imageHeight = 400,
   });
 
   @override
@@ -58,7 +58,7 @@ class BaseCard extends StatelessWidget {
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: content,
@@ -67,21 +67,81 @@ class BaseCard extends StatelessWidget {
           ),
           Container(
             padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            decoration: BoxDecoration(
-              color: Colors.grey[850],
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            decoration: const BoxDecoration(
               borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(16.0)),
+                  BorderRadius.vertical(bottom: Radius.circular(16.0)),
             ),
-            child: Row(
-              mainAxisAlignment: actions.length == 1
-                  ? MainAxisAlignment.center
-                  : MainAxisAlignment.spaceBetween,
-              children: actions,
-            ),
+            child: _buildActionButtons(),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    if (actions.isEmpty) return const SizedBox.shrink();
+
+    if (actions.length == 1) {
+      return Center(
+        child: SizedBox(
+          width: 120,
+          child: actions[0],
+        ),
+      );
+    }
+
+    if (actions.length == 3) {
+      return Column(
+        children: [
+          Center(
+            child: SizedBox(
+              width: 120,
+              child: actions[0],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 120,
+                child: actions[1],
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 120,
+                child: actions[2],
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+
+    final rows = (actions.length / 2).ceil();
+    return Column(
+      children: List.generate(rows, (rowIndex) {
+        final startIndex = rowIndex * 2;
+        final endIndex = (startIndex + 2).clamp(0, actions.length);
+        final rowButtons = actions.sublist(startIndex, endIndex);
+
+        return Padding(
+          padding: EdgeInsets.only(top: rowIndex > 0 ? 8.0 : 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < rowButtons.length; i++) ...[
+                if (i > 0) const SizedBox(width: 8),
+                SizedBox(
+                  width: 120,
+                  child: rowButtons[i],
+                ),
+              ],
+            ],
+          ),
+        );
+      }),
     );
   }
 }

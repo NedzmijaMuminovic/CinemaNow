@@ -226,6 +226,23 @@ class _AddEditActorScreenState extends State<AddEditActorScreen> {
                             ),
                           ),
                         ),
+                        const SizedBox(height: 10),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _imageBase64 = null;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey[850],
+                            ),
+                            child: const Text(
+                              'Remove Image',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
                       ],
                       const SizedBox(height: 20),
                       Center(

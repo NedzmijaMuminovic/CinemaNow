@@ -39,6 +39,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final ValueNotifier<bool> _isEditingUsername = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _isEditingPassword = ValueNotifier<bool>(false);
   final ValueNotifier<bool> _isImageSelected = ValueNotifier<bool>(false);
+  bool _isRemovingImage = false;
 
   File? _selectedImage;
   String? _imageBase64;
@@ -155,7 +156,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           if (errors.isEmpty) {
                             await onSave();
                           } else {
-                            controller.text = _getOriginalValue(icon);
+                            if (icon == Icons.lock) {
+                              controller.text = '';
+                              if (confirmationController != null) {
+                                confirmationController.text = '';
+                              }
+                            } else {
+                              controller.text = _getOriginalValue(icon);
+                            }
                           }
                         },
                       ),
@@ -450,6 +458,91 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _originalPassword = '';
   }
 
+  void _showRemoveImageDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[900],
+          title: const Text(
+            'Remove Profile Picture',
+            style: TextStyle(color: Colors.white),
+          ),
+          content: const Text(
+            'Are you sure you want to remove your profile picture?',
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Remove',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _removeProfilePicture();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _removeProfilePicture() async {
+    try {
+      setState(() {
+        _isRemovingImage = true;
+      });
+
+      if (AuthProvider.userId == null) return;
+
+      final roleIds = await _getRoleIds(context);
+      if (roleIds == null) return;
+
+      final userProvider = UserProvider();
+      await userProvider.updateUser(
+        AuthProvider.userId!,
+        _nameController.text,
+        _surnameController.text,
+        _emailController.text,
+        _usernameController.text,
+        null,
+        null,
+        '',
+        roleIds,
+      );
+
+      setState(() {
+        _imageBase64 = '';
+        _selectedImage = null;
+      });
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Profile picture removed successfully!'),
+        ),
+      );
+    } catch (e) {
+      _handleUpdateError(context, e);
+    } finally {
+      setState(() {
+        _isRemovingImage = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -500,8 +593,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         radius: 100,
                         backgroundImage: _selectedImage != null
                             ? FileImage(_selectedImage!)
-                            : (user.imageBase64 != null
-                                ? MemoryImage(base64Decode(user.imageBase64!))
+                            : (_imageBase64 != null && _imageBase64!.isNotEmpty
+                                ? MemoryImage(base64Decode(_imageBase64!))
                                 : const AssetImage(
                                     'assets/images/user.png')) as ImageProvider,
                         backgroundColor: Colors.white,
@@ -515,6 +608,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             return Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
+                                if (_imageBase64 != null &&
+                                    _imageBase64!.isNotEmpty &&
+                                    !isImageSelected)
+                                  GestureDetector(
+                                    onTap: () =>
+                                        _showRemoveImageDialog(context),
+                                    child: MouseRegion(
+                                      cursor: SystemMouseCursors.click,
+                                      child: CircleAvatar(
+                                        radius: 30,
+                                        backgroundColor: Colors.grey[700],
+                                        child: const Icon(
+                                          Icons.delete,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 if (isImageSelected)
                                   GestureDetector(
                                     onTap: () {
@@ -537,7 +648,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                       ),
                                     ),
                                   ),
-                                const SizedBox(width: 80),
+                                const SizedBox(
+                                    width:
+                                        80),
                                 GestureDetector(
                                   onTap:
                                       isImageSelected ? _saveImage : _pickImage,

@@ -26,7 +26,7 @@ class ActorCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return BaseCard(
       imageUrl: imageUrl,
-      imageHeight: 280,
+      imageHeight: 400,
       content: [
         Text(
           '$name $surname',

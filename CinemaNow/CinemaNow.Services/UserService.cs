@@ -225,6 +225,10 @@ namespace CinemaNow.Services
             {
                 entity.Image = Convert.FromBase64String(request.ImageBase64);
             }
+            else
+            {
+                entity.Image = null;
+            }
         }
 
         public Models.User Login(string username, string password)

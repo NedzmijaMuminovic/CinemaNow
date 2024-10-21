@@ -36,6 +36,7 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
   final TextEditingController _timeController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   String? _dateErrorMessage;
+  String? _timeErrorMessage;
   String? _priceErrorMessage;
 
   List<Movie> _movies = [];
@@ -122,11 +123,11 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
     }
 
     try {
-      final DateTime date =
+      final DateTime selectedDate =
           DateFormat('dd/MM/yyyy').parseStrict(_dateController.text);
-      final TimeOfDay? time = parseTimeOfDay(_timeController.text);
+      final TimeOfDay? selectedTime = parseTimeOfDay(_timeController.text);
 
-      if (time == null) {
+      if (selectedTime == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Invalid time format.'),
@@ -135,24 +136,38 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
         return;
       }
 
-      final DateTime dateTime = DateTime(
-        date.year,
-        date.month,
-        date.day,
-        time.hour,
-        time.minute,
+      final DateTime now = DateTime.now();
+      final DateTime selectedDateTime = DateTime(
+        selectedDate.year,
+        selectedDate.month,
+        selectedDate.day,
+        selectedTime.hour,
+        selectedTime.minute,
       );
 
-      if (dateTime.isBefore(DateTime.now())) {
+      if (DateTime(selectedDate.year, selectedDate.month, selectedDate.day)
+          .isBefore(DateTime(now.year, now.month, now.day))) {
         setState(() {
-          _dateErrorMessage = 'Please choose a future date or time.';
+          _dateErrorMessage = 'Please choose a future date.';
+          _timeErrorMessage = null;
         });
         return;
-      } else {
+      }
+
+      if (DateTime(selectedDate.year, selectedDate.month, selectedDate.day)
+              .isAtSameMomentAs(DateTime(now.year, now.month, now.day)) &&
+          selectedDateTime.isBefore(now)) {
         setState(() {
           _dateErrorMessage = null;
+          _timeErrorMessage = 'Please choose a future time.';
         });
+        return;
       }
+
+      setState(() {
+        _dateErrorMessage = null;
+        _timeErrorMessage = null;
+      });
 
       final priceText = _priceController.text.replaceAll(',', '.');
       final price = double.tryParse(priceText);
@@ -177,7 +192,7 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
           _selectedMovie!,
           _selectedHall!,
           _selectedViewMode!,
-          dateTime,
+          selectedDateTime,
           price,
         );
         ScaffoldMessenger.of(context).showSnackBar(
@@ -190,7 +205,7 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
           _selectedMovie!,
           _selectedHall!,
           _selectedViewMode!,
-          dateTime,
+          selectedDateTime,
           price,
         );
         ScaffoldMessenger.of(context).showSnackBar(
@@ -353,9 +368,11 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
                           if (pickedTime != null) {
                             setState(() {
                               _timeController.text = pickedTime.format(context);
+                              _timeErrorMessage = null;
                             });
                           }
                         },
+                        errorMessage: _timeErrorMessage,
                       ),
                       buildDropdown<Hall>(
                         label: 'Hall',

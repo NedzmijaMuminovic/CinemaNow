@@ -139,6 +139,10 @@ namespace CinemaNow.Services
             {
                 entity.Image = Convert.FromBase64String(request.ImageBase64);
             }
+            else
+            {
+                entity.Image = null;
+            }
 
             Context.Entry(entity).Collection(e => e.Actors).Load();
             Context.Entry(entity).Collection(e => e.Genres).Load();

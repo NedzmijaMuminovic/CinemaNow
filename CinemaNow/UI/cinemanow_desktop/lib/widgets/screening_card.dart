@@ -314,22 +314,20 @@ class ScreeningCard extends StatelessWidget {
     required Color color,
     required VoidCallback onPressed,
   }) {
-    return Flexible(
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
-          ),
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(6.0),
         ),
-        icon: Icon(icon, color: Colors.white),
-        label: Text(
-          label,
-          style: const TextStyle(color: Colors.white),
-          overflow: TextOverflow.ellipsis,
-        ),
+      ),
+      icon: Icon(icon, color: Colors.white, size: 18),
+      label: Text(
+        label,
+        style: const TextStyle(color: Colors.white, fontSize: 14),
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
@@ -348,21 +346,25 @@ class InfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
         decoration: BoxDecoration(
           color: Colors.grey[800],
           borderRadius: BorderRadius.circular(8.0),
         ),
         child: Row(
           children: [
-            Icon(icon, color: Colors.red, size: 20),
+            Icon(icon, color: Colors.red, size: 22),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 text,
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  height: 1.3,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),

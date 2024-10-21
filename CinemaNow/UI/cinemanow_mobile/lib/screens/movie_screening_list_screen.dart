@@ -232,21 +232,21 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
                   const BorderRadius.vertical(top: Radius.circular(20)),
               child: SizedBox(
                 width: double.infinity,
-                height: 200,
+                height: 300,
                 child: movie.imageBase64 != null
                     ? Image.memory(
                         base64Decode(movie.imageBase64!),
                         width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.fitWidth,
-                        alignment: Alignment.topCenter,
+                        height: 300,
+                        fit: BoxFit.cover,
+                        alignment: Alignment.center,
                       )
                     : Image.asset(
                         'assets/images/default.jpg',
                         width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.fitWidth,
-                        alignment: Alignment.topCenter,
+                        height: 300,
+                        fit: BoxFit.cover,
+                        alignment: Alignment.center,
                       ),
               ),
             ),

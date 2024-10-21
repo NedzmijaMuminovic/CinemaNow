@@ -193,9 +193,11 @@ class _MovieListScreenState extends State<MovieListScreen> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           int crossAxisCount;
-          if (constraints.maxWidth > 1200) {
+          if (constraints.maxWidth > 1300) {
+            crossAxisCount = 4;
+          } else if (constraints.maxWidth > 1000) {
             crossAxisCount = 3;
-          } else if (constraints.maxWidth > 800) {
+          } else if (constraints.maxWidth > 650) {
             crossAxisCount = 2;
           } else {
             crossAxisCount = 1;
@@ -205,7 +207,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
               crossAxisCount: crossAxisCount,
               crossAxisSpacing: 16.0,
               mainAxisSpacing: 16.0,
-              childAspectRatio: 1,
+              childAspectRatio: 0.6,
             ),
             itemCount: result?.result.length,
             itemBuilder: (context, index) {

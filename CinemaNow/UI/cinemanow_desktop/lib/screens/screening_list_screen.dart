@@ -236,18 +236,21 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
         builder: (context, constraints) {
           int crossAxisCount;
           if (constraints.maxWidth > 1200) {
+            crossAxisCount = 4;
+          } else if (constraints.maxWidth > 900) {
             crossAxisCount = 3;
-          } else if (constraints.maxWidth > 800) {
+          } else if (constraints.maxWidth > 600) {
             crossAxisCount = 2;
           } else {
             crossAxisCount = 1;
           }
+
           return GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount,
               crossAxisSpacing: 16.0,
               mainAxisSpacing: 16.0,
-              childAspectRatio: 1,
+              childAspectRatio: 0.45,
             ),
             itemCount: filteredScreenings.length,
             itemBuilder: (context, index) {

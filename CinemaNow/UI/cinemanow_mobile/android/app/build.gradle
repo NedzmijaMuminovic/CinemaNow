@@ -32,6 +32,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:deprecation"
+    }
+
     kotlinOptions {
         jvmTarget = '1.8'
     }

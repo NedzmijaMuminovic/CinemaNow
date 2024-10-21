@@ -33,6 +33,7 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
   final TextEditingController _synopsisController = TextEditingController();
+  String? _durationErrorMessage;
   bool _isLoading = true;
   bool _isEditing = false;
   File? _selectedImage;
@@ -131,12 +132,14 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
       final duration = int.tryParse(_durationController.text);
 
       if (duration == null || duration <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Duration must be a positive number.'),
-          ),
-        );
+        setState(() {
+          _durationErrorMessage = 'Duration must be a positive number.';
+        });
         return;
+      } else {
+        setState(() {
+          _durationErrorMessage = null;
+        });
       }
 
       final movieProvider = Provider.of<MovieProvider>(context, listen: false);
@@ -221,13 +224,10 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
                         Icons.movie,
                         controller: _titleController,
                       ),
-                      buildInputField(
-                        context,
-                        'Duration',
-                        'Enter duration in minutes',
-                        Icons.timer,
-                        controller: _durationController,
-                      ),
+                      buildInputField(context, 'Duration',
+                          'Enter duration in minutes', Icons.timer,
+                          controller: _durationController,
+                          errorMessage: _durationErrorMessage),
                       buildInputField(
                         context,
                         'Synopsis',
@@ -251,7 +251,6 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
                       const SizedBox(height: 10),
                       _buildGenreSelection(),
                       if (_imageBase64 != null && _imageBase64!.isNotEmpty) ...[
-                        const SizedBox(height: 20),
                         Center(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12.0),
@@ -260,6 +259,23 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
                               width: 200,
                               height: 200,
                               fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _imageBase64 = null;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey[850],
+                            ),
+                            child: const Text(
+                              'Remove Image',
+                              style: TextStyle(color: Colors.white),
                             ),
                           ),
                         ),
