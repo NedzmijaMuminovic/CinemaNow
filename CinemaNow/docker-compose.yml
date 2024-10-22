@@ -12,6 +12,9 @@ services:
       - 1401:1433
     expose:
       - 1433
+    volumes:
+      - ./Database:/docker-entrypoint-initdb.d
+    command: bash -c "/opt/mssql/bin/sqlservr & sleep 30 && for f in /docker-entrypoint-initdb.d/*.sql; do echo \"Processing $$f\" && /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P QWElkj132! -i \"$$f\"; done & wait"
     networks:
       - cinemanownet
 
@@ -20,11 +23,10 @@ services:
     build:
       context: .
     environment:
-      - ConnectionStrings__CinemaNowConnection=Server=cinemanow-sql,1433;Database=CinemaNow;User=sa;Password=QWElkj132!;ConnectRetryCount=0; TrustServerCertificate=True
+      - ConnectionStrings__CinemaNowConnection=Server=cinemanow-sql,1433;Database=IB200033;User=sa;Password=QWElkj132!;ConnectRetryCount=0; TrustServerCertificate=True
       - ASPNETCORE_ENVIRONMENT=Development
-      - USE_HTTPS=false
     ports:
-      - 7102:7102
+      - 5199:5199
     networks:
       - cinemanownet
     links:
@@ -34,4 +36,4 @@ services:
       
 networks:
   cinemanownet:
-    driver: bridge      
+    driver: bridge

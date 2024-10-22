@@ -103,12 +103,12 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-using (var scope = app.Services.CreateScope())
-{
-    var dataContext = scope.ServiceProvider.GetRequiredService<Ib200033Context>();
-    //dataContext.Database.EnsureCreated();
+//using (var scope = app.Services.CreateScope())
+//{
+//    var dataContext = scope.ServiceProvider.GetRequiredService<Ib200033Context>();
+//    //dataContext.Database.EnsureCreated();
 
-    //dataContext.Database.Migrate();
-}
+//    dataContext.Database.Migrate();
+//}
 
 app.Run();
