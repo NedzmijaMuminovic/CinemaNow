@@ -1,6 +1,5 @@
 version: '3'
 services:
-#mssql docker
   cinemanow-sql:
     image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu
     restart: unless-stopped
@@ -17,6 +16,12 @@ services:
     command: bash -c "/opt/mssql/bin/sqlservr & sleep 30 && for f in /docker-entrypoint-initdb.d/*.sql; do echo \"Processing $$f\" && /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P QWElkj132! -i \"$$f\"; done & wait"
     networks:
       - cinemanownet
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "QWElkj132!" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
 
   cinemanow-api:
     restart: unless-stopped
@@ -32,7 +37,12 @@ services:
     links:
       - cinemanow-sql
     depends_on:
-      - cinemanow-sql
+      cinemanow-sql:
+        condition: service_healthy
+    volumes:
+      - type: bind
+        source: ./CinemaNow.API/Images
+        target: /app/Images
       
 networks:
   cinemanownet:

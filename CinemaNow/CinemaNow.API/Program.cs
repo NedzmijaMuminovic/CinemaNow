@@ -5,6 +5,7 @@ using CinemaNow.Services;
 using CinemaNow.Services.Database;
 using CinemaNow.Services.MachineLearning;
 using CinemaNow.Services.ScreeningStateMachine;
+using CinemaNow.Services.Seeders;
 using DotNetEnv;
 using Mapster;
 using Microsoft.AspNetCore.Authentication;
@@ -46,6 +47,16 @@ builder.Services.AddTransient<InitialScreeningState>();
 builder.Services.AddTransient<DraftScreeningState>();
 builder.Services.AddTransient<ActiveScreeningState>();
 builder.Services.AddTransient<HiddenScreeningState>();
+
+builder.Services.AddTransient<IAdminUserSeeder, AdminUserSeeder>();
+builder.Services.AddTransient<IMovieActorImageSeeder>(sp =>
+{
+    var env = sp.GetRequiredService<IWebHostEnvironment>();
+    var imageFolderPath = Path.Combine(env.ContentRootPath, "Images");
+    var context = sp.GetRequiredService<Ib200033Context>();
+    return new MovieActorImageSeeder(context, imageFolderPath);
+});
+
 
 builder.Services.AddHttpContextAccessor();
 
@@ -103,12 +114,26 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-//using (var scope = app.Services.CreateScope())
-//{
-//    var dataContext = scope.ServiceProvider.GetRequiredService<Ib200033Context>();
-//    //dataContext.Database.EnsureCreated();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<Ib200033Context>();
+        context.Database.Migrate();
 
-//    dataContext.Database.Migrate();
-//}
+        var adminSeeder = services.GetRequiredService<IAdminUserSeeder>();
+        await adminSeeder.SeedAdminUsers();
+
+        var imageSeeder = services.GetRequiredService<IMovieActorImageSeeder>();
+        await imageSeeder.SeedMovieActorImages();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+        throw;
+    }
+}
 
 app.Run();
