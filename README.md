@@ -1,10 +1,10 @@
 # CinemaNow
 
-This repository contains the code for a cinema app developed as part of the Software Development II course at the Faculty of Information Technologies. The app is currently in development and is being implemented using .NET for the backend and Flutter for the frontend.
+This repository contains the code for a cinema app developed as part of the Software Development II course at the Faculty of Information Technologies.
 
 ## Overview
 
-- **Backend**: Developed using .NET, providing a robust API for managing cinema-related data.
+- **Backend**: Developed using .NET, providing a comprehensive API for managing cinema-related data.
 - **Frontend**: Built with Flutter, with separate interfaces for desktop (admin) and mobile (user) applications.
 
 ## Getting Started
@@ -17,13 +17,25 @@ To get the app up and running, follow these steps:
     git clone https://github.com/NedzmijaMuminovic/CinemaNow
     ```
 
-2. Set up the database:
-   - Navigate to the Database folder (CinemaNow/CinemaNow/Database).
-   - Execute the SQL file inside this folder to set up the database.
+2. Configure Environment Variables:
 
-3. Run the backend:
-   - Open the CinemaNow.sln file in Visual Studio (CinemaNow/CinemaNow).
-   - Build and run the backend project.
+   - Set up your Stripe Secret key in your environment with this command:
+
+       ```bash
+       set STRIPE_SECRET_KEY=YourSecretKey
+       ```
+
+    - Alternatively, use .env files:
+        - For the backend, place the .env file in CinemaNow/CinemaNow.
+        - For the frontend (mobile app), place it in CinemaNow/CinemaNow/UI/cinemanow_mobile/assets.
+
+3. Run the backend and services using Docker:
+
+    - In the project's root directory (CinemaNow/CinemaNow), use the following command:
+      
+       ```bash
+       docker-compose up --build
+       ```
 
 4. Run the frontend:
 
@@ -55,6 +67,27 @@ To get the app up and running, follow these steps:
        ```bash
        flutter run
        ```
+
+## Login Credentials
+
+- **Admin (Desktop app):**
+  - Username: desktop
+  - Password: test
+        
+- **User (Mobile app):**
+  - Username: mobile
+  - Password: test
+
+## Payment Information (for Stripe Testing)
+Use the following information for testing Stripe payments:
+
+- **Card Number:** 4242 4242 4242 4242
+- **Expiration Date:** Any future date
+- **CVC:** Any three-digit number
+- **ZIP Code:** Any five-digit number
+
+## Additional Notes
+- **Email Notifications:** The app uses RabbitMQ to send an email after successful user registration.
     
 ## License
 
