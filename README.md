@@ -64,9 +64,16 @@ To get the app up and running, follow these steps:
      - Connect a physical device or start an emulator.
      - Run the Flutter app for mobile:
        
-       ```bash
-       flutter run
-       ```
+       - If you have an `.env` file configured, simply use:
+         
+         ```bash
+         flutter run
+         ```
+       - Or, if you prefer to specify your Stripe Publishable Key directly, use:
+         
+         ```bash
+         flutter run --dart-define=STRIPE_PUBLISHABLE_KEY=YourPublishableKey
+         ```
 
 ## Login Credentials
 
