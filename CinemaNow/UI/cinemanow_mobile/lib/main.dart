@@ -18,10 +18,18 @@ void main() async {
 
   await dotenv.load(fileName: 'assets/.env');
 
-  String? stripePublishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'];
+  String? stripePublishableKey = const String.fromEnvironment(
+    'STRIPE_PUBLISHABLE_KEY',
+    defaultValue: '',
+  );
+
+  if (stripePublishableKey.isEmpty) {
+    stripePublishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'];
+  }
 
   if (stripePublishableKey == null || stripePublishableKey.isEmpty) {
-    throw Exception('Stripe publishable key is missing from the .env file');
+    throw Exception(
+        'Stripe publishable key is missing from both dart-define and .env file');
   }
 
   Stripe.publishableKey = stripePublishableKey;
