@@ -2,6 +2,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 EXPOSE 5199
 ENV ASPNETCORE_URLS=http://+:5199
+ENV STRIPE_SECRET_KEY=""
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src

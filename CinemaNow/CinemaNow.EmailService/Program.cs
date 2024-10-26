@@ -14,6 +14,13 @@ public class Program
             {
                 services.AddHostedService<Worker>();
             })
+            .ConfigureAppConfiguration((hostContext, config) =>
+            {
+                config.SetBasePath(Directory.GetCurrentDirectory());
+                config.AddJsonFile("appsettings.json", optional: false);
+                config.AddJsonFile($"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json", optional: true);
+                config.AddEnvironmentVariables();
+            })
             .Build();
 
         await host.RunAsync();

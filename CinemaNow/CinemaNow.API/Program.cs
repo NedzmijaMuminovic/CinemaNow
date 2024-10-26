@@ -19,9 +19,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 var stripeSecretKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
 
-builder.Services.AddSingleton<IConnectionFactory>(sp => new ConnectionFactory()
+builder.Services.AddSingleton<IConnectionFactory>(sp =>
 {
-    HostName = "localhost"
+    var hostname = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost";
+    return new ConnectionFactory()
+    {
+        HostName = hostname,
+        RequestedHeartbeat = TimeSpan.FromSeconds(60),
+        AutomaticRecoveryEnabled = true
+    };
 });
 
 // Add services to the container.

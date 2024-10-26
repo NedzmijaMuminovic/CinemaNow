@@ -30,6 +30,8 @@ services:
     environment:
       - ConnectionStrings__CinemaNowConnection=Server=cinemanow-sql,1433;Database=IB200033;User=sa;Password=QWElkj132!;ConnectRetryCount=0; TrustServerCertificate=True
       - ASPNETCORE_ENVIRONMENT=Development
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - RABBITMQ_HOST=rabbitmq
     ports:
       - 5199:5199
     networks:
@@ -39,11 +41,55 @@ services:
     depends_on:
       cinemanow-sql:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     volumes:
       - type: bind
         source: ./CinemaNow.API/Images
         target: /app/Images
-      
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - cinemanownet
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  email-service:
+    build:
+      context: .
+      dockerfile: CinemaNow.EmailService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+    networks:
+      - cinemanownet
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "dotnet", "CinemaNow.EmailService.dll", "--health-check"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
 networks:
   cinemanownet:
     driver: bridge

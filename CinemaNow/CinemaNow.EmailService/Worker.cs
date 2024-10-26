@@ -22,14 +22,38 @@ namespace CinemaNow.EmailService
         {
             _logger = logger;
             _configuration = configuration;
-            var factory = new ConnectionFactory() { HostName = "localhost" };
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
-            _channel.QueueDeclare(queue: "user-registration",
-                                 durable: false,
-                                 exclusive: false,
-                                 autoDelete: false,
-                                 arguments: null);
+
+            var factory = new ConnectionFactory()
+            {
+                HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "rabbitmq",
+                RequestedHeartbeat = TimeSpan.FromSeconds(60),
+                AutomaticRecoveryEnabled = true
+            };
+
+            int retryCount = 0;
+            const int maxRetries = 5;
+            while (retryCount < maxRetries)
+            {
+                try
+                {
+                    _connection = factory.CreateConnection();
+                    _channel = _connection.CreateModel();
+                    _channel.QueueDeclare(queue: "user-registration",
+                                        durable: false,
+                                        exclusive: false,
+                                        autoDelete: false,
+                                        arguments: null);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    retryCount++;
+                    if (retryCount == maxRetries)
+                        throw;
+                    _logger.LogWarning(ex, "Failed to connect to RabbitMQ. Attempt {RetryCount} of {MaxRetries}. Retrying in 5 seconds...", retryCount, maxRetries);
+                    Thread.Sleep(5000);
+                }
+            }
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
