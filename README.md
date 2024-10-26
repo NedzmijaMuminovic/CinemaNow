@@ -88,6 +88,8 @@ Use the following information for testing Stripe payments:
 
 ## Additional Notes
 - **Email Notifications:** The app uses RabbitMQ to send an email after successful user registration.
+- **Recommender System:** A content-based recommender system is implemented on the movie details screen to display similar movies based on the selected title's attributes.
+- **Seed Data:** The seed data includes only 2 sample images to speed up the `docker-compose up` process.
     
 ## License
 
