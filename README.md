@@ -19,10 +19,14 @@ To get the app up and running, follow these steps:
 
 2. Configure Environment Variables:
 
-   - Set up your Stripe Secret key in your environment with this command:
+   - Set up your Stripe Secret key in your environment with one of these commands:
 
        ```bash
+       # Command Prompt
        set STRIPE_SECRET_KEY=YourSecretKey
+
+       # PowerShell
+       $env:STRIPE_SECRET_KEY = "YourSecretKey"
        ```
 
     - Alternatively, use .env files:
@@ -64,9 +68,16 @@ To get the app up and running, follow these steps:
      - Connect a physical device or start an emulator.
      - Run the Flutter app for mobile:
        
-       ```bash
-       flutter run
-       ```
+       - If you have an `.env` file configured, simply use:
+         
+         ```bash
+         flutter run
+         ```
+       - Or, if you prefer to specify your Stripe Publishable Key directly, use:
+         
+         ```bash
+         flutter run --dart-define=STRIPE_PUBLISHABLE_KEY=YourPublishableKey
+         ```
 
 ## Login Credentials
 
