@@ -1,4 +1,5 @@
 ﻿using CinemaNow.Models;
+using CinemaNow.Models.Exceptions;
 using CinemaNow.Models.Requests;
 using CinemaNow.Models.SearchObjects;
 using CinemaNow.Services;
@@ -20,26 +21,38 @@ namespace CinemaNow.API.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [Authorize(Roles = "User")]
         public override Rating Insert(RatingInsertRequest request)
         {
-            return _service.Insert(request);
+            if (User.IsInRole("User"))
+            {
+                return _service.Insert(request);
+            }
+            throw new ForbidException("Only users with the 'User' role can insert ratings.");
         }
 
         [HttpPut("{id}")]
         [AllowAnonymous]
-        [Authorize(Roles = "User")]
         public override Rating Update(int id, RatingUpdateRequest request)
         {
-            return _service.Update(id, request);
+            if (User.IsInRole("User"))
+            {
+                return _service.Update(id, request);
+            }
+            throw new ForbidException("Only users with the 'User' role can update ratings.");
         }
 
         [HttpDelete("{id}")]
         [AllowAnonymous]
-        [Authorize(Roles = "User")]
         public override void Delete(int id)
         {
-            _service.Delete(id);
+            if (User.IsInRole("User"))
+            {
+                _service.Delete(id);
+            }
+            else
+            {
+                throw new ForbidException("Only users with the 'User' role can delete ratings.");
+            }
         }
 
         [HttpGet("average/{movieId}")]

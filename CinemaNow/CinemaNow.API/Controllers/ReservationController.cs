@@ -1,5 +1,6 @@
 ﻿using CinemaNow.Models;
 using CinemaNow.Models.DTOs;
+using CinemaNow.Models.Exceptions;
 using CinemaNow.Models.Requests;
 using CinemaNow.Models.SearchObjects;
 using CinemaNow.Services;
@@ -33,10 +34,13 @@ namespace CinemaNow.API.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [Authorize(Roles = "User")]
         public override Reservation Insert(ReservationInsertRequest request)
         {
-            return _service.Insert(request);
+            if (User.IsInRole("User"))
+            {
+                return _service.Insert(request);
+            }
+            throw new ForbidException("Only users with the 'User' role can insert reservations.");
         }
 
         [HttpPut("{id}")]
@@ -49,10 +53,16 @@ namespace CinemaNow.API.Controllers
 
         [HttpDelete("{id}")]
         [AllowAnonymous]
-        [Authorize(Roles = "User")]
         public override void Delete(int id)
         {
-            _service.Delete(id);
+            if (User.IsInRole("User"))
+            {
+                _service.Delete(id);
+            }
+            else
+            {
+                throw new ForbidException("Only users with the 'User' role can delete reservations.");
+            }
         }
 
         [HttpGet("user/{userId}")]
