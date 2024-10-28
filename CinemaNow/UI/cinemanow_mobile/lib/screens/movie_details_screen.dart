@@ -128,7 +128,7 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -361,15 +361,24 @@ class _MovieDetailsScreenState extends State<MovieDetailsScreen> {
                         const SizedBox(height: 8),
                         Wrap(
                           spacing: 8,
-                          children: _movie.genres
-                                  ?.map((genre) => Chip(
-                                        label: Text(genre.name ?? '',
-                                            style: const TextStyle(
-                                                color: Colors.white)),
-                                        backgroundColor: Colors.grey[800],
-                                      ))
-                                  .toList() ??
-                              [],
+                          children:
+                              _movie.genres != null && _movie.genres!.isNotEmpty
+                                  ? _movie.genres!
+                                      .map((genre) => Chip(
+                                            label: Text(
+                                              genre.name ?? '',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            backgroundColor: Colors.grey[800],
+                                          ))
+                                      .toList()
+                                  : [
+                                      const Text(
+                                        'No genres available',
+                                      ),
+                                    ],
                         ),
                         const SizedBox(height: 16),
                         if (_movie.actors != null &&

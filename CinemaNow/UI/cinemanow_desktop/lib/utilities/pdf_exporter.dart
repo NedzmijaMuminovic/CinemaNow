@@ -40,8 +40,12 @@ class PdfExporter {
           ),
           build: (context) {
             List<pw.Widget> widgets = [
-              pw.Text('Cinema Report',
-                  style: pw.TextStyle(font: boldFont, fontSize: 24)),
+              pw.Center(
+                child: pw.Text(
+                  'Cinema Report',
+                  style: pw.TextStyle(font: boldFont, fontSize: 24),
+                ),
+              ),
               pw.SizedBox(height: 20),
             ];
 
@@ -52,21 +56,24 @@ class PdfExporter {
                   mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
                   children: [
                     if (selectedReports.contains(ReportType.userCount))
-                      _buildPdfCard(
-                        'App Users',
-                        userCount == -1 ? 'Error' : '$userCount',
-                        font,
-                        boldFont,
+                      pw.Expanded(
+                        child: _buildPdfCard(
+                            'App Users',
+                            userCount == -1 ? 'Error' : '$userCount',
+                            font,
+                            boldFont),
                       ),
+                    pw.SizedBox(width: 50),
                     if (selectedReports.contains(ReportType.cinemaIncome))
-                      _buildPdfCard(
-                        'Cinema Income',
-                        totalIncome == -1
-                            ? 'Error'
-                            : '\$${totalIncome.toStringAsFixed(2)}',
-                        font,
-                        boldFont,
-                      ),
+                      pw.Expanded(
+                        child: _buildPdfCard(
+                            'Cinema Income',
+                            totalIncome == -1
+                                ? 'Error'
+                                : '\$${totalIncome.toStringAsFixed(2)}',
+                            font,
+                            boldFont),
+                      )
                   ],
                 ),
               );
@@ -76,12 +83,21 @@ class PdfExporter {
             if (selectedReports.contains(ReportType.movieWatched) &&
                 pieChartImage != null) {
               widgets.addAll([
-                pw.Text('Top 5 Watched Movies',
-                    style: pw.TextStyle(font: boldFont, fontSize: 18)),
-                pw.SizedBox(height: 10),
-                pw.Image(pieChartImage),
-                pw.SizedBox(height: 10),
-                ..._buildLegendPdf(font, top5Movies, sharedColors),
+                pw.Wrap(
+                  alignment: pw.WrapAlignment.center,
+                  children: [
+                    pw.Center(
+                      child: pw.Text(
+                        'Top 5 Watched Movies',
+                        style: pw.TextStyle(font: boldFont, fontSize: 18),
+                      ),
+                    ),
+                    pw.SizedBox(height: 10),
+                    pw.Image(pieChartImage),
+                    pw.SizedBox(height: 10),
+                    ..._buildLegendPdf(font, top5Movies, sharedColors),
+                  ],
+                ),
                 pw.SizedBox(height: 30),
               ]);
             }
@@ -89,22 +105,40 @@ class PdfExporter {
             if (selectedReports.contains(ReportType.movieRevenue) &&
                 barChartImage != null) {
               widgets.addAll([
-                pw.Text('Revenue by Movie',
-                    style: pw.TextStyle(font: boldFont, fontSize: 18)),
-                pw.SizedBox(height: 10),
-                pw.Image(barChartImage),
-                pw.SizedBox(height: 10),
-                ..._buildRevenueInfoPdf(font, movieRevenues, sharedColors),
+                pw.Wrap(
+                  alignment: pw.WrapAlignment.center,
+                  children: [
+                    pw.Center(
+                      child: pw.Text(
+                        'Revenue by Movie',
+                        style: pw.TextStyle(font: boldFont, fontSize: 18),
+                      ),
+                    ),
+                    pw.SizedBox(height: 10),
+                    pw.Image(barChartImage),
+                    pw.SizedBox(height: 10),
+                    ..._buildRevenueInfoPdf(font, movieRevenues, sharedColors),
+                  ],
+                ),
                 pw.SizedBox(height: 30),
               ]);
             }
 
             if (selectedReports.contains(ReportType.topCustomers)) {
               widgets.addAll([
-                pw.Text('Top 5 Customers',
-                    style: pw.TextStyle(font: boldFont, fontSize: 18)),
-                pw.SizedBox(height: 10),
-                ..._buildTopCustomersPdf(font, top5Customers),
+                pw.Wrap(
+                  alignment: pw.WrapAlignment.center,
+                  children: [
+                    pw.Center(
+                      child: pw.Text(
+                        'Top 5 Customers',
+                        style: pw.TextStyle(font: boldFont, fontSize: 18),
+                      ),
+                    ),
+                    pw.SizedBox(height: 10),
+                    ..._buildTopCustomersPdf(font, top5Customers),
+                  ],
+                ),
               ]);
             }
 
@@ -112,7 +146,7 @@ class PdfExporter {
               pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.center,
                 children: widgets,
-              )
+              ),
             ];
           },
         ),
@@ -138,19 +172,22 @@ class PdfExporter {
       final pdfColor = PdfColor.fromInt(flutterColor.value);
 
       revenueInfo.add(
-        pw.Row(
-          children: [
-            pw.Container(
-              width: 10,
-              height: 10,
-              color: pdfColor,
-            ),
-            pw.SizedBox(width: 5),
-            pw.Text(movieRevenue.movieTitle, style: pw.TextStyle(font: font)),
-            pw.Spacer(),
-            pw.Text('\$${movieRevenue.totalRevenue.toStringAsFixed(2)}',
-                style: pw.TextStyle(font: font)),
-          ],
+        pw.Padding(
+          padding: const pw.EdgeInsets.only(bottom: 5),
+          child: pw.Row(
+            children: [
+              pw.Container(
+                width: 10,
+                height: 10,
+                color: pdfColor,
+              ),
+              pw.SizedBox(width: 5),
+              pw.Text(movieRevenue.movieTitle, style: pw.TextStyle(font: font)),
+              pw.Spacer(),
+              pw.Text('\$${movieRevenue.totalRevenue.toStringAsFixed(2)}',
+                  style: pw.TextStyle(font: font)),
+            ],
+          ),
         ),
       );
       revenueInfo.add(pw.SizedBox(height: 5));
@@ -200,19 +237,22 @@ class PdfExporter {
           (movie.reservationSeatCount / totalReservations) * 100;
 
       legend.add(
-        pw.Row(
-          children: [
-            pw.Container(
-              width: 10,
-              height: 10,
-              color: pdfColor,
-            ),
-            pw.SizedBox(width: 5),
-            pw.Text(movie.movieTitle, style: pw.TextStyle(font: font)),
-            pw.Spacer(),
-            pw.Text('${percentage.toStringAsFixed(1)}%',
-                style: pw.TextStyle(font: font)),
-          ],
+        pw.Padding(
+          padding: const pw.EdgeInsets.only(bottom: 5),
+          child: pw.Row(
+            children: [
+              pw.Container(
+                width: 10,
+                height: 10,
+                color: pdfColor,
+              ),
+              pw.SizedBox(width: 5),
+              pw.Text(movie.movieTitle, style: pw.TextStyle(font: font)),
+              pw.Spacer(),
+              pw.Text('${percentage.toStringAsFixed(1)}%',
+                  style: pw.TextStyle(font: font)),
+            ],
+          ),
         ),
       );
       legend.add(pw.SizedBox(height: 5));
@@ -352,14 +392,17 @@ class PdfExporter {
       final customer = top5Customers[i];
 
       customerInfo.add(
-        pw.Row(
-          children: [
-            pw.Text('${customer.name} ${customer.surname}',
-                style: pw.TextStyle(font: font)),
-            pw.Spacer(),
-            pw.Text('\$${customer.totalSpent.toStringAsFixed(2)}',
-                style: pw.TextStyle(font: font)),
-          ],
+        pw.Padding(
+          padding: const pw.EdgeInsets.only(bottom: 5),
+          child: pw.Row(
+            children: [
+              pw.Text('${customer.name} ${customer.surname}',
+                  style: pw.TextStyle(font: font)),
+              pw.Spacer(),
+              pw.Text('\$${customer.totalSpent.toStringAsFixed(2)}',
+                  style: pw.TextStyle(font: font)),
+            ],
+          ),
         ),
       );
       customerInfo.add(pw.SizedBox(height: 5));

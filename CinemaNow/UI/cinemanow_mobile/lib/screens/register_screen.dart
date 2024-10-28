@@ -81,10 +81,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF1C1C1E),
-      body: SingleChildScrollView(
-        child: Stack(
-          children: [
-            Center(
+      body: Stack(
+        children: [
+          Center(
+            child: SingleChildScrollView(
               child: SizedBox(
                 width: 400,
                 child: Padding(
@@ -431,14 +431,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
             ),
-            if (_isLoading)
-              const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.red,
-                ),
+          ),
+          if (_isLoading)
+            const Center(
+              child: CircularProgressIndicator(
+                color: Colors.red,
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }

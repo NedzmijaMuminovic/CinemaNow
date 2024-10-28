@@ -14,7 +14,7 @@ class ScreeningCard extends StatelessWidget {
   final String price;
   final int screeningId;
   final VoidCallback onDelete;
-  final VoidCallback onScreeningUpdated;
+  final Function(int) onScreeningUpdated;
   final String stateMachine;
 
   const ScreeningCard({
@@ -113,7 +113,7 @@ class ScreeningCard extends StatelessWidget {
                   const SnackBar(
                       content: Text('Screening successfully hidden!')),
                 );
-                onScreeningUpdated();
+                onScreeningUpdated(1);
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Failed to hide screening')),
@@ -166,7 +166,7 @@ class ScreeningCard extends StatelessWidget {
                   const SnackBar(
                       content: Text('Screening successfully activated!')),
                 );
-                onScreeningUpdated();
+                onScreeningUpdated(0);
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Failed to activate screening')),
@@ -220,7 +220,7 @@ class ScreeningCard extends StatelessWidget {
                     const SnackBar(
                         content: Text('Screening successfully hidden!')),
                   );
-                  onScreeningUpdated();
+                  onScreeningUpdated(1);
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Failed to hide screening')),
@@ -243,7 +243,15 @@ class ScreeningCard extends StatelessWidget {
             MaterialPageRoute(
               builder: (context) => AddEditScreeningScreen(
                 screeningId: screeningId,
-                onScreeningUpdated: onScreeningUpdated,
+                onScreeningUpdated: () {
+                  if (stateMachine == 'draft') {
+                    onScreeningUpdated(2);
+                  } else if (stateMachine == 'hidden') {
+                    onScreeningUpdated(1);
+                  } else {
+                    onScreeningUpdated(0);
+                  }
+                },
               ),
             ),
           );

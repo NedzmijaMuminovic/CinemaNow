@@ -274,7 +274,10 @@ class _ScreeningListScreenState extends State<ScreeningListScreen>
                     : 'Unknown Price',
                 screeningId: screening.id ?? 0,
                 onDelete: _fetchScreenings,
-                onScreeningUpdated: _fetchScreenings,
+                onScreeningUpdated: (tabIndex) {
+                  _tabController.animateTo(tabIndex);
+                  _fetchScreenings();
+                },
                 stateMachine: screening.stateMachine ?? 'unknown',
               );
             },
