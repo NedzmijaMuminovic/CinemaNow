@@ -19,6 +19,7 @@ using RabbitMQ.Client;
 using CinemaNow.Models.Messages;
 using System.Text.Json;
 using System.Xml.Linq;
+using Mapster;
 
 namespace CinemaNow.Services
 {
@@ -59,18 +60,47 @@ namespace CinemaNow.Services
 
         public override Models.PagedResult<Models.User> GetPaged(UserSearchObject search)
         {
-            var pagedData = base.GetPaged(search);
+            var query = Context.Users.AsQueryable();
 
-            foreach (var user in pagedData.ResultList)
+            query = AddFilter(search, query);
+
+            int count = query.Count();
+
+            if (search?.Page.HasValue == true && search?.PageSize.HasValue == true)
             {
-                var dbUser = Context.Set<Database.User>().Find(user.Id);
-                if (dbUser != null)
-                {
-                    user.ImageBase64 = dbUser.Image != null ? Convert.ToBase64String(dbUser.Image) : null;
-                }
+                query = query.Skip(search.Page.Value * search.PageSize.Value).Take(search.PageSize.Value);
             }
 
-            return pagedData;
+            if (!string.IsNullOrWhiteSpace(search?.OrderBy))
+            {
+                query = query.OrderBy(search.OrderBy);
+            }
+
+            var entities = query.ToList();
+
+            var models = entities.Select(entity =>
+            {
+                var model = entity.Adapt<Models.User>();
+
+                if (search?.IsRoleIncluded == true)
+                {
+                    model.Roles = entity.Roles?.Select(r => r.Adapt<Models.Role>()).ToList();
+                }
+                else
+                {
+                    model.Roles = null;
+                }
+
+                model.ImageBase64 = entity.Image != null ? Convert.ToBase64String(entity.Image) : null;
+
+                return model;
+            }).ToList();
+
+            return new Models.PagedResult<Models.User>
+            {
+                ResultList = models,
+                Count = count
+            };
         }
 
         public override Models.User GetByID(int id)

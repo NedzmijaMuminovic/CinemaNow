@@ -26,21 +26,47 @@ namespace CinemaNow.Services
 
         public override Models.PagedResult<Models.Rating> GetPaged(RatingSearchObject search)
         {
-            var pagedData = base.GetPaged(search);
+            var query = Context.Set<Database.Rating>().AsQueryable();
+            query = AddFilter(search, query);
 
-            foreach (var rating in pagedData.ResultList)
+            int count = query.Count();
+
+            if (search?.Page.HasValue == true && search?.PageSize.HasValue == true)
+                query = query.Skip(search.Page.Value * search.PageSize.Value).Take(search.PageSize.Value);
+
+            if (!string.IsNullOrWhiteSpace(search?.OrderBy))
+                query = query.OrderBy(search.OrderBy);
+
+            var list = query.ToList();
+            var result = Mapper.Map<List<Models.Rating>>(list);
+
+            foreach (var rating in result)
             {
                 if (search?.IsUserIncluded == true)
                 {
-                    var dbRating = Context.Ratings.Include(u => u.User).FirstOrDefault(r => r.Id == rating.Id);
+                    var dbRating = list.FirstOrDefault(r => r.Id == rating.Id);
                     if (dbRating?.User != null)
                     {
-                        rating.User.ImageBase64 = dbRating.User.Image != null ? Convert.ToBase64String(dbRating.User.Image) : null;
+                        rating.User.ImageBase64 = dbRating.User.Image != null ?
+                            Convert.ToBase64String(dbRating.User.Image) : null;
                     }
+                }
+                else
+                {
+                    rating.User = null;
+                }
+
+                if (search?.IsMovieIncluded != true)
+                {
+                    rating.Movie = null;
                 }
             }
 
-            return pagedData;
+            return new Models.PagedResult<Models.Rating>
+            {
+                ResultList = result,
+                Count = count
+            };
         }
 
         public override IQueryable<Database.Rating> AddFilter(RatingSearchObject search, IQueryable<Database.Rating> query)

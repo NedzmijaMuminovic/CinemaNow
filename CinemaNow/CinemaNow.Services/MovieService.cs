@@ -38,27 +38,52 @@ namespace CinemaNow.Services
 
         public override Models.PagedResult<Models.Movie> GetPaged(MovieSearchObject search)
         {
-            var pagedData = base.GetPaged(search);
+            var query = Context.Set<Database.Movie>().AsQueryable();
+            query = AddFilter(search, query);
 
-            foreach (var movie in pagedData.ResultList)
+            int count = query.Count();
+
+            if (search?.Page.HasValue == true && search?.PageSize.HasValue == true)
+                query = query.Skip(search.Page.Value * search.PageSize.Value).Take(search.PageSize.Value);
+
+            if (!string.IsNullOrWhiteSpace(search?.OrderBy))
+                query = query.OrderBy(search.OrderBy);
+
+            var list = query.ToList();
+            var result = Mapper.Map<List<Models.Movie>>(list);
+
+            foreach (var movie in result)
             {
-                var dbMovie = Context.Set<Database.Movie>().Find(movie.Id);
-                if (dbMovie != null)
-                {
-                    movie.ImageBase64 = dbMovie.Image != null ? Convert.ToBase64String(dbMovie.Image) : null;
+                var dbMovie = list.First(x => x.Id == movie.Id);
+                movie.ImageBase64 = dbMovie.Image != null ? Convert.ToBase64String(dbMovie.Image) : null;
 
+                if (search?.IsActorIncluded == true && movie.Actors != null)
+                {
                     foreach (var actor in movie.Actors)
                     {
-                        var dbActor = dbMovie.Actors.FirstOrDefault(a => a.Id == actor.Id);
+                        var dbActor = dbMovie.Actors?.FirstOrDefault(a => a.Id == actor.Id);
                         if (dbActor != null)
                         {
                             actor.ImageBase64 = dbActor.Image != null ? Convert.ToBase64String(dbActor.Image) : null;
                         }
                     }
                 }
+                else
+                {
+                    movie.Actors = new List<Models.Actor>();
+                }
+
+                if (search?.IsGenreIncluded != true)
+                {
+                    movie.Genres = new List<Models.Genre>();
+                }
             }
 
-            return pagedData;
+            return new Models.PagedResult<Models.Movie>
+            {
+                ResultList = result,
+                Count = count
+            };
         }
 
         public override Models.Movie GetByID(int id)

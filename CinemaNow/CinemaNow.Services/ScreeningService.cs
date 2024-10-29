@@ -37,8 +37,7 @@ namespace CinemaNow.Services
 
             if (search?.IsMovieIncluded == true)
             {
-                filteredQuery = filteredQuery.Include(x => x.Movie)
-                                             .ThenInclude(movie => movie.Genres);
+                filteredQuery = filteredQuery.Include(x => x.Movie);
             }
 
             if (search?.IsHallIncluded == true)

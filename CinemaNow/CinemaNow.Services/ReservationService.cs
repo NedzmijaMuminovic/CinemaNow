@@ -78,11 +78,32 @@ namespace CinemaNow.Services
                 query = query.Skip(search.Page.Value * search.PageSize.Value).Take(search.PageSize.Value);
             }
 
+            if (!string.IsNullOrWhiteSpace(search?.OrderBy))
+            {
+                query = query.OrderBy(search.OrderBy);
+            }
+
             var entities = query.ToList();
 
             var models = entities.Select(entity =>
             {
                 var model = entity.Adapt<Models.Reservation>();
+
+                if (search?.IsUserIncluded == true)
+                {
+                    model.User = entity.User != null ? new Models.User
+                    {
+                        Id = entity.User.Id,
+                        Name = entity.User.Name,
+                        Surname = entity.User.Surname,
+                        Email = entity.User.Email,
+                        Username = entity.User.Username,
+                    } : null;
+                }
+                else
+                {
+                    model.User = null;
+                }
 
                 if (search?.AreSeatsIncluded == true)
                 {
@@ -93,6 +114,12 @@ namespace CinemaNow.Services
                         Seat = rs.Seat.Adapt<Models.Seat>()
                     }).ToList();
                 }
+
+                if (search?.IsScreeningIncluded == true)
+                {
+                    model.Screening = entity.Screening?.Adapt<Models.Screening>();
+                }
+
                 return model;
             }).ToList();
 
