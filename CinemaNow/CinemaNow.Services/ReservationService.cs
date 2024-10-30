@@ -248,9 +248,9 @@ namespace CinemaNow.Services
                 int currentUserId = _userService.GetCurrentUserId();
                 request.UserId = currentUserId;
 
-                ValidateSeatsAvailability(request.ScreeningId.Value, request.SeatIds);
+                ValidateSeatsAvailability(request.ScreeningId, request.SeatIds);
 
-                var screening = GetScreeningById(request.ScreeningId.Value);
+                var screening = GetScreeningById(request.ScreeningId);
 
                 if (screening.StateMachine != "active")
                 {
@@ -272,7 +272,7 @@ namespace CinemaNow.Services
 
                 if (request.SeatIds != null && request.SeatIds.Any())
                 {
-                    ReserveSeatsForReservation(request.SeatIds, request.ScreeningId.Value, reservation.Id);
+                    ReserveSeatsForReservation(request.SeatIds, request.ScreeningId, reservation.Id);
                 }
 
                 var fullEntity = GetFullReservationById(reservation.Id);

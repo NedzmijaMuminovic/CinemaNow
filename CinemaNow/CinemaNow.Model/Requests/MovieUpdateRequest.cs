@@ -7,14 +7,14 @@ namespace CinemaNow.Models.Requests
     public partial class MovieUpdateRequest
     {
 
-        public string? Title { get; set; }
+        public string Title { get; set; }
 
-        public int? Duration { get; set; }
+        public int Duration { get; set; }
 
-        public string? Synopsis { get; set; }
+        public string Synopsis { get; set; }
         public string? ImageBase64 { get; set; }
-        public List<int>? ActorIds { get; set; }
-        public List<int>? GenreIds { get; set; }
+        public List<int> ActorIds { get; set; }
+        public List<int> GenreIds { get; set; }
     }
 
 }

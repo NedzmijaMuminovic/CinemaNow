@@ -6,9 +6,9 @@ namespace CinemaNow.Models.Requests
 {
     public class ReservationInsertRequest
     {
-        public int? UserId { get; set; }
-        public int? ScreeningId { get; set; }
-        public List<int>? SeatIds { get; set; } = new List<int>();
+        public int UserId { get; set; }
+        public int ScreeningId { get; set; }
+        public List<int> SeatIds { get; set; } = new List<int>();
         public string? StripePaymentIntentId { get; set; }
     }
 }

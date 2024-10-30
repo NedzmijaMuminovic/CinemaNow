@@ -151,12 +151,12 @@ namespace CinemaNow.Services
 
         public override Models.Rating Update(int id, RatingUpdateRequest request)
         {
-            if (request.Value.HasValue && (request.Value.Value < 1 || request.Value.Value > 5))
+            if (request.Value < 1 || request.Value > 5)
             {
                 throw new ArgumentOutOfRangeException(nameof(request.Value), "Rating value must be between 1 and 5.");
             }
 
-            var rating = Context.Ratings.Find(id);
+            var rating = Context.Ratings.Include(r => r.Movie).FirstOrDefault(r => r.Id == id);
             if (rating == null)
             {
                 throw new Exception("Rating not found");
@@ -168,7 +168,10 @@ namespace CinemaNow.Services
                 throw new UnauthorizedAccessException("You can only update your own ratings.");
             }
 
-            return base.Update(id, request);
+            var updatedRating = base.Update(id, request);
+            updatedRating.Movie = Mapper.Map<Models.Movie>(rating.Movie);
+
+            return updatedRating;
         }
 
         public bool HasUserRatedMovie(int userId, int movieId)
@@ -193,10 +196,14 @@ namespace CinemaNow.Services
             var rating = base.Insert(request);
 
             var user = Context.Users.Find(currentUserId);
+            var movie = Context.Movies.Find(request.MovieId);
+
             if (user?.Image != null)
             {
                 rating.User.ImageBase64 = Convert.ToBase64String(user.Image);
             }
+
+            rating.Movie = Mapper.Map<Models.Movie>(movie);
 
             return rating;
         }

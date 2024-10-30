@@ -6,7 +6,6 @@ namespace CinemaNow.Models.Requests
 {
     public partial class MovieInsertRequest
     {
-
         public string Title { get; set; }
 
         public int Duration { get; set; }
@@ -16,5 +15,4 @@ namespace CinemaNow.Models.Requests
         public List<int> ActorIds { get; set; } = new List<int>();
         public List<int> GenreIds { get; set; } = new List<int>();
     }
-
 }
