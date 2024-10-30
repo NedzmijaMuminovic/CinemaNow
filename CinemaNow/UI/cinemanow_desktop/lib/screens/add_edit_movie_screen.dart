@@ -119,7 +119,9 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
   Future<void> _submitMovie() async {
     if (_titleController.text.isEmpty ||
         _durationController.text.isEmpty ||
-        _synopsisController.text.isEmpty) {
+        _synopsisController.text.isEmpty ||
+        _selectedActors.isEmpty ||
+        _selectedGenres.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill in all fields.'),

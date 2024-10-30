@@ -142,6 +142,7 @@ namespace CinemaNow.Services
             .ThenInclude(s => s.ViewMode)
                 .Include(r => r.ReservationSeats)
                     .ThenInclude(rs => rs.Seat)
+                .Include(r => r.Payment)
                 .FirstOrDefault(r => r.Id == id);
 
             if (entity != null)
@@ -194,6 +195,15 @@ namespace CinemaNow.Services
                         Name = entity.Screening.ViewMode.Name
                     } : null
 
+                } : null;
+
+                model.Payment = entity.Payment != null ? new Models.Payment
+                {
+                    Id = entity.Payment.Id,
+                    Provider = entity.Payment.Provider,
+                    TransactionId = entity.Payment.TransactionId,
+                    Amount = entity.Payment.Amount,
+                    DateTime = entity.Payment.DateTime,
                 } : null;
 
                 return model;

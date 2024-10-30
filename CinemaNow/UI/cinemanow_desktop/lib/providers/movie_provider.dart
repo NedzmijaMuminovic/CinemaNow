@@ -29,16 +29,16 @@ class MovieProvider extends BaseProvider<Movie> {
     int duration,
     String synopsis,
     String? imageBase64,
-    List<Actor>? actors,
-    List<Genre>? genres,
+    List<Actor> actors,
+    List<Genre> genres,
   ) async {
     final newMovie = {
       'title': title,
       'duration': duration,
       'synopsis': synopsis,
       'imageBase64': imageBase64,
-      'actorIds': actors?.map((actor) => actor.id).toList() ?? [],
-      'genreIds': genres?.map((genre) => genre.id).toList() ?? [],
+      'actorIds': actors.map((actor) => actor.id).toList(),
+      'genreIds': genres.map((genre) => genre.id).toList(),
     };
 
     await insert(newMovie);
@@ -50,16 +50,16 @@ class MovieProvider extends BaseProvider<Movie> {
     int duration,
     String synopsis,
     String? imageBase64,
-    List<Actor>? actors,
-    List<Genre>? genres,
+    List<Actor> actors,
+    List<Genre> genres,
   ) async {
     final updatedMovie = {
       'title': title,
       'duration': duration,
       'synopsis': synopsis,
       'imageBase64': imageBase64,
-      'actorIds': actors?.map((actor) => actor.id).toList() ?? [],
-      'genreIds': genres?.map((genre) => genre.id).toList() ?? [],
+      'actorIds': actors.map((actor) => actor.id).toList(),
+      'genreIds': genres.map((genre) => genre.id).toList(),
     };
 
     await update(id, updatedMovie);

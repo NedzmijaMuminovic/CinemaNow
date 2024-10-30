@@ -13,8 +13,8 @@ namespace CinemaNow.Models.Requests
 
         public string Synopsis { get; set; }
         public string? ImageBase64 { get; set; }
-        public List<int>? ActorIds { get; set; } = new List<int>();
-        public List<int>? GenreIds { get; set; } = new List<int>();
+        public List<int> ActorIds { get; set; } = new List<int>();
+        public List<int> GenreIds { get; set; } = new List<int>();
     }
 
 }
