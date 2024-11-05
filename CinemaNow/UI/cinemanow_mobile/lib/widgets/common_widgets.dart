@@ -251,12 +251,20 @@ class NoScreeningsView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            message,
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 16,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Text(
+                  message,
+                  style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
           ),
         ],
       ),

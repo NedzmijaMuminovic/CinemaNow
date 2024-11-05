@@ -52,7 +52,15 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
     try {
       final ratingProvider = context.read<RatingProvider>();
       final ratings = await ratingProvider.getByMovieId(widget.movieId);
-      return ratings..sort((a, b) => b.id!.compareTo(a.id!));
+      final currentUserId = AuthProvider.userId;
+
+      ratings.sort((a, b) {
+        if (a.userId == currentUserId) return -1;
+        if (b.userId == currentUserId) return 1;
+        return b.id!.compareTo(a.id!);
+      });
+
+      return ratings;
     } catch (e) {
       return [];
     }
@@ -200,16 +208,26 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(children: [
-                                  Text(
-                                    '${rating.user?.name ?? ''} ${rating.user?.surname ?? ''}',
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const Spacer(),
-                                  _buildStarRating(rating.value ?? 0),
-                                ]),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        '${rating.user?.name ?? ''} ${rating.user?.surname ?? ''}',
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 100,
+                                      child:
+                                          _buildStarRating(rating.value ?? 0),
+                                    ),
+                                  ],
+                                ),
                                 if (rating.comment != null &&
                                     rating.comment!.isNotEmpty) ...[
                                   const SizedBox(height: 8),
@@ -375,57 +393,76 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
       int? ratingId}) async {
     int rating = initialRating;
     String comment = initialComment;
+    TextEditingController commentController =
+        TextEditingController(text: initialComment);
 
     await showDialog(
       context: context,
       builder: (BuildContext context) {
+        double screenWidth = MediaQuery.of(context).size.width;
+        double starSize = (screenWidth < 360) ? 30 : 40;
+        double dialogPadding = (screenWidth < 360) ? 8.0 : 24.0;
+
         return StatefulBuilder(builder: (context, setState) {
+          if (commentController.text.isEmpty && initialComment.isNotEmpty) {
+            commentController.text = initialComment;
+          }
           return AlertDialog(
             backgroundColor: Colors.grey[850],
             title: Text(
               ratingId != null ? 'Edit your rating' : 'Rate this movie',
               style: const TextStyle(color: Colors.white),
             ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(5, (index) {
-                    return IconButton(
-                      icon: Icon(
-                        index < rating ? Icons.star : Icons.star_border,
-                        color: Colors.red,
-                        size: 40,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          rating = index + 1;
-                        });
-                      },
-                    );
-                  }),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    hintText: 'Add a comment (optional)',
-                    hintStyle: TextStyle(color: Colors.white54),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red),
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: dialogPadding, vertical: 20),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(5, (index) {
+                        return IconButton(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          constraints: BoxConstraints(
+                              minWidth: starSize, minHeight: starSize),
+                          icon: Icon(
+                            index < rating ? Icons.star : Icons.star_border,
+                            color: Colors.red,
+                            size: 40,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              rating = index + 1;
+                            });
+                          },
+                        );
+                      }),
                     ),
                   ),
-                  cursorColor: Colors.red,
-                  controller: TextEditingController(text: initialComment),
-                  onChanged: (value) {
-                    comment = value;
-                  },
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  TextField(
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      hintText: 'Add a comment (optional)',
+                      hintStyle: TextStyle(color: Colors.white54),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                      ),
+                    ),
+                    cursorColor: Colors.red,
+                    controller: commentController,
+                    onChanged: (value) {
+                      comment = value;
+                    },
+                  ),
+                ],
+              ),
             ),
             actions: [
               TextButton(

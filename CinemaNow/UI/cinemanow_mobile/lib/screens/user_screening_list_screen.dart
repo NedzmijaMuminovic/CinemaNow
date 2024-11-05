@@ -33,10 +33,12 @@ class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
         child: Column(
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Expanded(
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.4,
                   child: _buildToggleButtons(
-                    ['Upcoming', 'Past'],
+                    ['Future', 'Past'],
                     [_isUpcomingSelected, !_isUpcomingSelected],
                     (index) {
                       setState(() {
@@ -45,7 +47,8 @@ class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
                     },
                   ),
                 ),
-                Expanded(
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.4,
                   child: _buildToggleButtons(
                     ['Stripe', 'Cash'],
                     [_isStripeSelected, !_isStripeSelected],
@@ -115,35 +118,37 @@ class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
 
   Widget _buildToggleButtons(
       List<String> labels, List<bool> isSelected, Function(int) onPressed) {
-    return Center(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: ToggleButtons(
+        isSelected: isSelected,
+        onPressed: onPressed,
+        color: Colors.white,
+        selectedColor: Colors.white,
+        fillColor: Colors.red,
+        borderColor: Colors.red,
+        selectedBorderColor: Colors.red,
+        borderRadius: BorderRadius.circular(8),
+        constraints: BoxConstraints.expand(
+          width: MediaQuery.of(context).size.width * 0.19,
+          height: 35,
         ),
-        child: ToggleButtons(
-          isSelected: isSelected,
-          onPressed: onPressed,
-          color: Colors.white,
-          selectedColor: Colors.white,
-          fillColor: Colors.red,
-          borderColor: Colors.red,
-          selectedBorderColor: Colors.red,
-          borderRadius: BorderRadius.circular(8),
-          children: labels
-              .map(
-                (label) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+        children: labels
+            .map(
+              (label) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              )
-              .toList(),
-        ),
+              ),
+            )
+            .toList(),
       ),
     );
   }
@@ -195,7 +200,7 @@ class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
                     reservation.movieTitle ?? 'Unknown Title',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 24,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -203,14 +208,14 @@ class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
                   Row(
                     children: [
                       const Icon(Icons.calendar_today,
-                          color: Colors.white, size: 20),
+                          color: Colors.white, size: 16),
                       const SizedBox(width: 10),
                       Text(
                         DateFormat('MMM d, yyyy')
                             .format(reservation.screeningDate.toLocal()),
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 14,
                         ),
                       ),
                     ],
@@ -219,13 +224,13 @@ class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
                   Row(
                     children: [
                       const Icon(Icons.access_time,
-                          color: Colors.white, size: 20),
+                          color: Colors.white, size: 16),
                       const SizedBox(width: 10),
                       Text(
                         '${reservation.screeningDate.toLocal().hour.toString().padLeft(2, '0')}:${reservation.screeningDate.toLocal().minute.toString().padLeft(2, '0')}',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 14,
                         ),
                       ),
                     ],
@@ -292,14 +297,14 @@ class _UserScreeningListScreenState extends State<UserScreeningListScreen> {
                             vertical: 12, horizontal: 50),
                         backgroundColor: Colors.red,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       child: const Text(
                         'Cancel',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 12,
                         ),
                       ),
                     )
