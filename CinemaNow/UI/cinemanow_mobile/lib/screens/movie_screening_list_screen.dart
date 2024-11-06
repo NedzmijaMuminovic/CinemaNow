@@ -291,21 +291,34 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
                 ],
               ),
             ),
-            ExpansionTile(
-              title: const Text(
-                'View Screenings',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.red,
-                  fontWeight: FontWeight.w600,
+            Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 1.0,
+                  color: Colors.grey,
                 ),
-              ),
-              iconColor: Colors.red,
-              collapsedIconColor: Colors.red,
-              children: screenings
-                  .map((screening) => _buildScreeningTile(screening))
-                  .toList(),
-            ),
+                Theme(
+                  data: Theme.of(context)
+                      .copyWith(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    title: const Text(
+                      'View Screenings',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.red,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    iconColor: Colors.red,
+                    collapsedIconColor: Colors.red,
+                    children: screenings
+                        .map((screening) => _buildScreeningTile(screening))
+                        .toList(),
+                  ),
+                ),
+              ],
+            )
           ],
         ),
       ),
