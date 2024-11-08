@@ -28,6 +28,7 @@ class _ScreeningBookingScreenState extends State<ScreeningBookingScreen> {
   String movieTitle = 'Loading...';
   String? errorMessage;
   Screening? screeningDetails;
+  bool showWarning = false;
 
   @override
   void initState() {
@@ -114,6 +115,12 @@ class _ScreeningBookingScreenState extends State<ScreeningBookingScreen> {
                     children: [
                       _buildSeatSelector(),
                       const SizedBox(height: 20),
+                      if (showWarning)
+                        const Text(
+                          'Please select at least one seat to proceed.',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      const SizedBox(height: 20),
                       buildButton(
                         text: 'Checkout',
                         onPressed: () {
@@ -130,12 +137,9 @@ class _ScreeningBookingScreenState extends State<ScreeningBookingScreen> {
                               ),
                             );
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                    'Please select at least one seat to proceed.'),
-                              ),
-                            );
+                            setState(() {
+                              showWarning = true;
+                            });
                           }
                         },
                       ),
@@ -213,6 +217,7 @@ class _ScreeningBookingScreenState extends State<ScreeningBookingScreen> {
                         } else {
                           selectedSeats.add(seat);
                         }
+                        showWarning = false;
                       });
                     },
               child: Container(

@@ -33,7 +33,6 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _durationController = TextEditingController();
   final TextEditingController _synopsisController = TextEditingController();
-  String? _durationErrorMessage;
   bool _isLoading = true;
   bool _isEditing = false;
   File? _selectedImage;
@@ -42,10 +41,60 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
   List<Actor> _selectedActors = [];
   List<Genre> _allGenres = [];
   List<Genre> _selectedGenres = [];
+  String? _titleError;
+  String? _durationError;
+  String? _synopsisError;
+  String? _actorsError;
+  String? _genresError;
+  bool _submitted = false;
 
   @override
   void initState() {
     super.initState();
+
+    _titleController.addListener(() {
+      if (_submitted && _titleController.text.isEmpty) {
+        setState(() {
+          _titleError = 'Please fill in this field.';
+        });
+      } else {
+        setState(() {
+          _titleError = null;
+        });
+      }
+    });
+
+    _durationController.addListener(() {
+      final duration = int.tryParse(_durationController.text);
+      if (_submitted) {
+        if (_durationController.text.isEmpty) {
+          setState(() {
+            _durationError = 'Please fill in this field.';
+          });
+        } else if (duration == null || duration <= 0) {
+          setState(() {
+            _durationError = 'Duration must be a positive number.';
+          });
+        } else {
+          setState(() {
+            _durationError = null;
+          });
+        }
+      }
+    });
+
+    _synopsisController.addListener(() {
+      if (_submitted && _synopsisController.text.isEmpty) {
+        setState(() {
+          _synopsisError = 'Please fill in this field.';
+        });
+      } else {
+        setState(() {
+          _synopsisError = null;
+        });
+      }
+    });
+
     _fetchAllActors();
     _fetchAllGenres();
     if (widget.movieId != null) {
@@ -117,33 +166,39 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
   }
 
   Future<void> _submitMovie() async {
-    if (_titleController.text.isEmpty ||
-        _durationController.text.isEmpty ||
-        _synopsisController.text.isEmpty ||
-        _selectedActors.isEmpty ||
-        _selectedGenres.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all fields.'),
-        ),
-      );
+    setState(() {
+      _submitted = true;
+      _titleError =
+          _titleController.text.isEmpty ? 'Please fill in this field.' : null;
+      _synopsisError = _synopsisController.text.isEmpty
+          ? 'Please fill in this field.'
+          : null;
+      _actorsError =
+          _selectedActors.isEmpty ? 'Please select at least one actor.' : null;
+      _genresError =
+          _selectedGenres.isEmpty ? 'Please select at least one genre.' : null;
+
+      if (_durationController.text.isEmpty) {
+        _durationError = 'Please fill in this field.';
+      } else {
+        final duration = int.tryParse(_durationController.text);
+        if (duration == null || duration <= 0) {
+          _durationError = 'Duration must be a positive number.';
+        } else {
+          _durationError = null;
+        }
+      }
+    });
+
+    if (_titleError != null ||
+        _durationError != null ||
+        _synopsisError != null ||
+        _actorsError != null ||
+        _genresError != null) {
       return;
     }
 
     try {
-      final duration = int.tryParse(_durationController.text);
-
-      if (duration == null || duration <= 0) {
-        setState(() {
-          _durationErrorMessage = 'Duration must be a positive number.';
-        });
-        return;
-      } else {
-        setState(() {
-          _durationErrorMessage = null;
-        });
-      }
-
       final movieProvider = Provider.of<MovieProvider>(context, listen: false);
 
       if (_isEditing) {
@@ -151,13 +206,14 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
           throw Exception('Movie ID is null');
         }
         await movieProvider.updateMovie(
-            widget.movieId!,
-            _titleController.text,
-            duration,
-            _synopsisController.text,
-            _imageBase64,
-            _selectedActors,
-            _selectedGenres);
+          widget.movieId!,
+          _titleController.text,
+          int.parse(_durationController.text),
+          _synopsisController.text,
+          _imageBase64,
+          _selectedActors,
+          _selectedGenres,
+        );
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -167,12 +223,13 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
         widget.onMovieUpdated?.call();
       } else {
         await movieProvider.addMovie(
-            _titleController.text,
-            duration,
-            _synopsisController.text,
-            _imageBase64,
-            _selectedActors,
-            _selectedGenres);
+          _titleController.text,
+          int.parse(_durationController.text),
+          _synopsisController.text,
+          _imageBase64,
+          _selectedActors,
+          _selectedGenres,
+        );
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -225,17 +282,19 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
                         'Enter title',
                         Icons.movie,
                         controller: _titleController,
+                        errorMessage: _titleError,
                       ),
                       buildInputField(context, 'Duration',
                           'Enter duration in minutes', Icons.timer,
                           controller: _durationController,
-                          errorMessage: _durationErrorMessage),
+                          errorMessage: _durationError),
                       buildInputField(
                         context,
                         'Synopsis',
                         'Enter synopsis',
                         Icons.description,
                         controller: _synopsisController,
+                        errorMessage: _synopsisError,
                       ),
                       GestureDetector(
                         onTap: _pickImage,
@@ -330,44 +389,88 @@ class _AddEditMovieScreenState extends State<AddEditMovieScreen> {
   }
 
   Widget _buildActorSelection() {
-    return MultiSelectSection<Actor>(
-      allItems: _allActors,
-      selectedItems: _selectedActors,
-      title: 'Select Actors',
-      buttonText: 'Choose Actors',
-      labelText: 'Actors',
-      onConfirm: (selected) {
-        setState(() {
-          _selectedActors = selected;
-        });
-      },
-      itemLabel: (actor) => '${actor.name} ${actor.surname}',
-      onItemTap: (actor) {
-        setState(() {
-          _selectedActors.remove(actor);
-        });
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MultiSelectSection<Actor>(
+          allItems: _allActors,
+          selectedItems: _selectedActors,
+          title: 'Select Actors',
+          buttonText: 'Choose Actors',
+          labelText: 'Actors',
+          onConfirm: (selected) {
+            setState(() {
+              _selectedActors = selected;
+              _actorsError = _selectedActors.isEmpty
+                  ? 'Please select at least one actor.'
+                  : null;
+            });
+          },
+          itemLabel: (actor) => '${actor.name} ${actor.surname}',
+          onItemTap: (actor) {
+            setState(() {
+              _selectedActors.remove(actor);
+              _actorsError = _selectedActors.isEmpty
+                  ? 'Please select at least one actor.'
+                  : null;
+            });
+          },
+        ),
+        if (_actorsError != null)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(width: 120.0),
+              Text(
+                _actorsError!,
+                style: const TextStyle(color: Colors.red, fontSize: 14),
+              ),
+            ],
+          ),
+      ],
     );
   }
 
   Widget _buildGenreSelection() {
-    return MultiSelectSection<Genre>(
-      allItems: _allGenres,
-      selectedItems: _selectedGenres,
-      title: 'Select Genres',
-      buttonText: 'Choose Genres',
-      labelText: 'Genres',
-      onConfirm: (selected) {
-        setState(() {
-          _selectedGenres = selected;
-        });
-      },
-      itemLabel: (genre) => '${genre.name}',
-      onItemTap: (genre) {
-        setState(() {
-          _selectedGenres.remove(genre);
-        });
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        MultiSelectSection<Genre>(
+          allItems: _allGenres,
+          selectedItems: _selectedGenres,
+          title: 'Select Genres',
+          buttonText: 'Choose Genres',
+          labelText: 'Genres',
+          onConfirm: (selected) {
+            setState(() {
+              _selectedGenres = selected;
+              _genresError = _selectedGenres.isEmpty
+                  ? 'Please select at least one genre.'
+                  : null;
+            });
+          },
+          itemLabel: (genre) => '${genre.name}',
+          onItemTap: (genre) {
+            setState(() {
+              _selectedGenres.remove(genre);
+              _genresError = _selectedGenres.isEmpty
+                  ? 'Please select at least one genre.'
+                  : null;
+            });
+          },
+        ),
+        if (_genresError != null)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(width: 120.0),
+              Text(
+                _genresError!,
+                style: const TextStyle(color: Colors.red, fontSize: 14),
+              ),
+            ],
+          ),
+      ],
     );
   }
 }

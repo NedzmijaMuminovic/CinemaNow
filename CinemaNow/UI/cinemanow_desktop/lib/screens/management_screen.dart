@@ -340,7 +340,7 @@ class _ManagementScreenState extends State<ManagementScreen> {
                               Navigator.of(context).pop();
                             } else {
                               setState(() {
-                                errorMessage = "Please fill in this field";
+                                errorMessage = "Please fill in this field.";
                               });
                             }
                           },

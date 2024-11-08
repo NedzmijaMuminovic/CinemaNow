@@ -16,22 +16,57 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
 
   bool _isLoading = false;
+  bool _submitted = false;
+  String? _usernameError;
+  String? _passwordError;
 
-  void _showErrorSnackbar(String message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      duration: const Duration(seconds: 3),
-    );
+  @override
+  void initState() {
+    super.initState();
 
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    _usernameController.addListener(() {
+      if (_submitted && _usernameController.text.isEmpty) {
+        setState(() {
+          _usernameError = 'Please fill in this field.';
+        });
+      } else {
+        setState(() {
+          _usernameError = null;
+        });
+      }
+    });
+
+    _passwordController.addListener(() {
+      if (_submitted && _passwordController.text.isEmpty) {
+        setState(() {
+          _passwordError = 'Please fill in this field.';
+        });
+      } else {
+        setState(() {
+          _passwordError = null;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   void _login() async {
     String username = _usernameController.text.trim();
     String password = _passwordController.text.trim();
 
-    if (username.isEmpty || password.isEmpty) {
-      _showErrorSnackbar("Username and password cannot be empty.");
+    setState(() {
+      _submitted = true;
+      _usernameError = username.isEmpty ? 'Please fill in this field.' : null;
+      _passwordError = password.isEmpty ? 'Please fill in this field.' : null;
+    });
+
+    if (_usernameError != null || _passwordError != null) {
       return;
     }
 
@@ -45,7 +80,9 @@ class _LoginPageState extends State<LoginPage> {
       final response = await authProvider.login(username, password);
 
       if (response == null) {
-        _showErrorSnackbar("Wrong username or password.");
+        setState(() {
+          _passwordError = "Wrong username or password.";
+        });
       } else {
         AuthProvider.username = username;
         AuthProvider.password = password;
@@ -57,13 +94,15 @@ class _LoginPageState extends State<LoginPage> {
             (Route<dynamic> route) => false,
           );
         } else {
-          _showErrorSnackbar("You do not have permission to access this area.");
+          setState(() {
+            _passwordError = "You do not have permission to access this area.";
+          });
         }
       }
     } on Exception catch (e) {
-      _showErrorSnackbar(e.toString().contains("Unauthorized")
+      _passwordError = e.toString().contains("Unauthorized")
           ? "Wrong username or password."
-          : e.toString());
+          : e.toString();
     } finally {
       setState(() {
         _isLoading = false;
@@ -106,23 +145,29 @@ class _LoginPageState extends State<LoginPage> {
                             data: const TextSelectionThemeData(
                               selectionColor: Colors.red,
                             ),
-                            child: TextField(
-                              controller: _usernameController,
-                              style: const TextStyle(color: Colors.white),
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: const Color(0xFF2C2C2E),
-                                hintText: 'Username',
-                                hintStyle:
-                                    const TextStyle(color: Colors.white70),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  borderSide: BorderSide.none,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextField(
+                                  controller: _usernameController,
+                                  style: const TextStyle(color: Colors.white),
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: const Color(0xFF2C2C2E),
+                                    hintText: 'Username',
+                                    hintStyle:
+                                        const TextStyle(color: Colors.white70),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    prefixIcon: const Icon(Icons.person,
+                                        color: Colors.white70),
+                                    errorText: _usernameError,
+                                  ),
+                                  cursorColor: Colors.red,
                                 ),
-                                prefixIcon: const Icon(Icons.person,
-                                    color: Colors.white70),
-                              ),
-                              cursorColor: Colors.red,
+                              ],
                             ),
                           ),
                           const SizedBox(height: 20.0),
@@ -130,24 +175,30 @@ class _LoginPageState extends State<LoginPage> {
                             data: const TextSelectionThemeData(
                               selectionColor: Colors.red,
                             ),
-                            child: TextField(
-                              controller: _passwordController,
-                              style: const TextStyle(color: Colors.white),
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: const Color(0xFF2C2C2E),
-                                hintText: 'Password',
-                                hintStyle:
-                                    const TextStyle(color: Colors.white70),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  borderSide: BorderSide.none,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextField(
+                                  controller: _passwordController,
+                                  style: const TextStyle(color: Colors.white),
+                                  obscureText: true,
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: const Color(0xFF2C2C2E),
+                                    hintText: 'Password',
+                                    hintStyle:
+                                        const TextStyle(color: Colors.white70),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    prefixIcon: const Icon(Icons.lock,
+                                        color: Colors.white70),
+                                    errorText: _passwordError,
+                                  ),
+                                  cursorColor: Colors.red,
                                 ),
-                                prefixIcon: const Icon(Icons.lock,
-                                    color: Colors.white70),
-                              ),
-                              cursorColor: Colors.red,
+                              ],
                             ),
                           ),
                           const SizedBox(height: 20.0),

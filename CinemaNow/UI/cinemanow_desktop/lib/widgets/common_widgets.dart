@@ -129,16 +129,12 @@ Widget buildDateTimeField(
                           style: const TextStyle(color: Colors.white),
                         ),
                         if (errorMessage != null)
-                          Row(
-                            children: [
-                              const SizedBox(width: 4),
-                              Expanded(
-                                child: Text(
-                                  errorMessage,
-                                  style: const TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ],
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(
+                              errorMessage,
+                              style: const TextStyle(color: Colors.red),
+                            ),
                           ),
                       ],
                     ),

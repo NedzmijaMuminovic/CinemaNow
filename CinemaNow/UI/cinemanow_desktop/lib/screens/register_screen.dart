@@ -28,43 +28,81 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? _passwordConfirmationError;
 
   bool _isLoading = false;
-
-  void _showErrorSnackbar(String message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      duration: const Duration(seconds: 3),
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  bool _showErrors = false;
+  String? _formErrorMessage;
 
   void _validateName(String text) {
     setState(() {
       _nameError = Validator.validateName(text);
+
+      if (_nameError == null &&
+          _surnameError == null &&
+          _emailError == null &&
+          _usernameError == null &&
+          _passwordError == null &&
+          _passwordConfirmationError == null) {
+        _formErrorMessage = null;
+      }
     });
   }
 
   void _validateSurname(String text) {
     setState(() {
       _surnameError = Validator.validateSurname(text);
+
+      if (_nameError == null &&
+          _surnameError == null &&
+          _emailError == null &&
+          _usernameError == null &&
+          _passwordError == null &&
+          _passwordConfirmationError == null) {
+        _formErrorMessage = null;
+      }
     });
   }
 
   void _validateEmail(String text) {
     setState(() {
       _emailError = Validator.validateEmail(text);
+
+      if (_nameError == null &&
+          _surnameError == null &&
+          _emailError == null &&
+          _usernameError == null &&
+          _passwordError == null &&
+          _passwordConfirmationError == null) {
+        _formErrorMessage = null;
+      }
     });
   }
 
   void _validateUsername(String text) {
     setState(() {
       _usernameError = Validator.validateUsername(text);
+
+      if (_nameError == null &&
+          _surnameError == null &&
+          _emailError == null &&
+          _usernameError == null &&
+          _passwordError == null &&
+          _passwordConfirmationError == null) {
+        _formErrorMessage = null;
+      }
     });
   }
 
   void _validatePassword(String text) {
     setState(() {
       _passwordError = Validator.validatePassword(text);
+
+      if (_nameError == null &&
+          _surnameError == null &&
+          _emailError == null &&
+          _usernameError == null &&
+          _passwordError == null &&
+          _passwordConfirmationError == null) {
+        _formErrorMessage = null;
+      }
     });
   }
 
@@ -74,6 +112,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _passwordController.text,
         text,
       );
+
+      if (_nameError == null &&
+          _surnameError == null &&
+          _emailError == null &&
+          _usernameError == null &&
+          _passwordError == null &&
+          _passwordConfirmationError == null) {
+        _formErrorMessage = null;
+      }
     });
   }
 
@@ -132,15 +179,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       onChanged: _validateName,
                                     ),
                                   ),
-                                  if (_nameError != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(
-                                        _nameError!,
-                                        style: const TextStyle(
-                                            color: Colors.red, fontSize: 12.0),
+                                  if (_showErrors) ...[
+                                    if (_nameController.text.isEmpty)
+                                      const Padding(
+                                        padding: EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          'Please fill in this field.',
+                                          style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12.0),
+                                        ),
+                                      )
+                                    else if (_nameError != null)
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          _nameError!,
+                                          style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12.0),
+                                        ),
                                       ),
-                                    ),
+                                  ],
                                   const SizedBox(height: 20.0),
                                   TextSelectionTheme(
                                     data: const TextSelectionThemeData(
@@ -169,15 +230,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       onChanged: _validateSurname,
                                     ),
                                   ),
-                                  if (_surnameError != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(
-                                        _surnameError!,
-                                        style: const TextStyle(
-                                            color: Colors.red, fontSize: 12.0),
+                                  if (_showErrors) ...[
+                                    if (_surnameController.text.isEmpty)
+                                      const Padding(
+                                        padding: EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          'Please fill in this field.',
+                                          style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12.0),
+                                        ),
+                                      )
+                                    else if (_surnameError != null)
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          _surnameError!,
+                                          style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12.0),
+                                        ),
                                       ),
-                                    ),
+                                  ],
                                   const SizedBox(height: 20.0),
                                   TextSelectionTheme(
                                     data: const TextSelectionThemeData(
@@ -205,15 +280,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       onChanged: _validateEmail,
                                     ),
                                   ),
-                                  if (_emailError != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(
-                                        _emailError!,
-                                        style: const TextStyle(
-                                            color: Colors.red, fontSize: 12.0),
+                                  if (_showErrors) ...[
+                                    if (_emailController.text.isEmpty)
+                                      const Padding(
+                                        padding: EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          'Please fill in this field.',
+                                          style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12.0),
+                                        ),
+                                      )
+                                    else if (_emailError != null)
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          _emailError!,
+                                          style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12.0),
+                                        ),
                                       ),
-                                    ),
+                                  ],
                                   const SizedBox(height: 20.0),
                                   TextSelectionTheme(
                                     data: const TextSelectionThemeData(
@@ -242,15 +331,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       onChanged: _validateUsername,
                                     ),
                                   ),
-                                  if (_usernameError != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(
-                                        _usernameError!,
-                                        style: const TextStyle(
-                                            color: Colors.red, fontSize: 12.0),
+                                  if (_showErrors) ...[
+                                    if (_usernameController.text.isEmpty)
+                                      const Padding(
+                                        padding: EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          'Please fill in this field.',
+                                          style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12.0),
+                                        ),
+                                      )
+                                    else if (_usernameError != null)
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          _usernameError!,
+                                          style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12.0),
+                                        ),
                                       ),
-                                    ),
+                                  ],
                                   const SizedBox(height: 20.0),
                                   TextSelectionTheme(
                                     data: const TextSelectionThemeData(
@@ -279,15 +382,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       onChanged: _validatePassword,
                                     ),
                                   ),
-                                  if (_passwordError != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(
-                                        _passwordError!,
-                                        style: const TextStyle(
-                                            color: Colors.red, fontSize: 12.0),
+                                  if (_showErrors) ...[
+                                    if (_passwordController.text.isEmpty)
+                                      const Padding(
+                                        padding: EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          'Please fill in this field.',
+                                          style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12.0),
+                                        ),
+                                      )
+                                    else if (_passwordError != null)
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          _passwordError!,
+                                          style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12.0),
+                                        ),
                                       ),
-                                    ),
+                                  ],
                                   const SizedBox(height: 20.0),
                                   TextSelectionTheme(
                                     data: const TextSelectionThemeData(
@@ -317,11 +434,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       onChanged: _validatePasswordConfirmation,
                                     ),
                                   ),
-                                  if (_passwordConfirmationError != null)
+                                  if (_showErrors) ...[
+                                    if (_passwordConfirmationController
+                                        .text.isEmpty)
+                                      const Padding(
+                                        padding: EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          'Please fill in this field.',
+                                          style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12.0),
+                                        ),
+                                      )
+                                    else if (_passwordConfirmationError != null)
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          _passwordConfirmationError!,
+                                          style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12.0),
+                                        ),
+                                      ),
+                                  ],
+                                  if (_showErrors && _formErrorMessage != null)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 8.0),
                                       child: Text(
-                                        _passwordConfirmationError!,
+                                        _formErrorMessage!,
                                         style: const TextStyle(
                                             color: Colors.red, fontSize: 12.0),
                                       ),
@@ -331,6 +472,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               const SizedBox(height: 20.0),
                               ElevatedButton(
                                 onPressed: () async {
+                                  setState(() {
+                                    _showErrors = true;
+                                  });
+
                                   if (_nameController.text.isEmpty ||
                                       _surnameController.text.isEmpty ||
                                       _emailController.text.isEmpty ||
@@ -338,8 +483,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       _passwordController.text.isEmpty ||
                                       _passwordConfirmationController
                                           .text.isEmpty) {
-                                    _showErrorSnackbar(
-                                        "Please fill in all fields.");
                                     return;
                                   }
 
@@ -357,8 +500,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       _usernameError != null ||
                                       _passwordError != null ||
                                       _passwordConfirmationError != null) {
-                                    _showErrorSnackbar(
-                                        "Please fix the errors in the form.");
+                                    _formErrorMessage =
+                                        'Please fix the errors in the form.';
+                                    return;
+                                  }
+
+                                  final userExists = await _registrationProvider
+                                      .isUsernameTaken(
+                                          _usernameController.text);
+
+                                  if (userExists) {
+                                    _usernameError =
+                                        "Username already exists. Please choose a different one.";
+                                    setState(() {});
                                     return;
                                   }
 
@@ -381,21 +535,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     _isLoading = false;
                                   });
 
-                                  final userExists = await _registrationProvider
-                                      .isUsernameTaken(
-                                          _usernameController.text);
-
                                   if (success) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content: Text(
-                                              'Registration successful! Your account has been created. Please log in with your username and password.')),
+                                              'Registration successful! Please log in with your username and password.')),
                                     );
                                     Navigator.of(context).pop();
-                                  } else if (userExists) {
-                                    _showErrorSnackbar(
-                                        "Username already exists. Please choose a different one.");
-                                    return;
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(

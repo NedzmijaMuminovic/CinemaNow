@@ -34,10 +34,15 @@ class _AddEditActorScreenState extends State<AddEditActorScreen> {
   bool _isEditing = false;
   File? _selectedImage;
   String? _imageBase64;
+  bool _isFormSubmitted = false;
 
   @override
   void initState() {
     super.initState();
+
+    _nameController.addListener(_clearNameError);
+    _surnameController.addListener(_clearSurnameError);
+
     if (widget.actorId != null) {
       _isEditing = true;
       _fetchActorDetails();
@@ -46,6 +51,33 @@ class _AddEditActorScreenState extends State<AddEditActorScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  void _clearNameError() {
+    if (_isFormSubmitted) {
+      setState(() {
+        _nameError = _nameController.text.isEmpty
+            ? 'Please fill in this field.'
+            : Validator.validateName(_nameController.text);
+      });
+    }
+  }
+
+  void _clearSurnameError() {
+    if (_isFormSubmitted) {
+      setState(() {
+        _surnameError = _surnameController.text.isEmpty
+            ? 'Please fill in this field.'
+            : Validator.validateSurname(_surnameController.text);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _surnameController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchActorDetails() async {
@@ -74,43 +106,17 @@ class _AddEditActorScreenState extends State<AddEditActorScreen> {
   }
 
   Future<void> _submitActor() async {
-    final nameError = Validator.validateName(_nameController.text);
-    final surnameError = Validator.validateSurname(_surnameController.text);
-
     setState(() {
-      _nameError = null;
-      _surnameError = null;
+      _isFormSubmitted = true;
+      _nameError = _nameController.text.isEmpty
+          ? 'Please fill in this field.'
+          : Validator.validateName(_nameController.text);
+      _surnameError = _surnameController.text.isEmpty
+          ? 'Please fill in this field.'
+          : Validator.validateSurname(_surnameController.text);
     });
 
-    if (_nameController.text.isEmpty || _surnameController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all fields.'),
-        ),
-      );
-      return;
-    }
-
-    if (nameError != null) {
-      setState(() {
-        _nameError = nameError;
-      });
-      return;
-    }
-
-    if (surnameError != null) {
-      setState(() {
-        _surnameError = surnameError;
-      });
-      return;
-    }
-
-    if (nameError != null || surnameError != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(nameError ?? surnameError!),
-        ),
-      );
+    if (_nameError != null || _surnameError != null) {
       return;
     }
 

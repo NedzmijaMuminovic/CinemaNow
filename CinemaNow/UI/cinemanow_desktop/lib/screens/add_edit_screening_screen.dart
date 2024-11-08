@@ -38,6 +38,9 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
   String? _dateErrorMessage;
   String? _timeErrorMessage;
   String? _priceErrorMessage;
+  String? _movieErrorMessage;
+  String? _hallErrorMessage;
+  String? _viewModeErrorMessage;
 
   List<Movie> _movies = [];
   List<Hall> _halls = [];
@@ -47,6 +50,8 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
   ViewMode? _selectedViewMode;
   bool _isLoading = true;
   bool _isEditing = false;
+  bool _isPriceError = false;
+  bool _hasAttemptedSubmit = false;
 
   @override
   void initState() {
@@ -57,6 +62,42 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
     } else {
       _fetchData();
     }
+
+    _priceController.addListener(_validatePrice);
+  }
+
+  void _validatePrice() {
+    // Skip validation if the user hasn't attempted to submit
+    if (!_hasAttemptedSubmit) return;
+
+    final priceText = _priceController.text.replaceAll(',', '.');
+
+    if (priceText.isEmpty) {
+      setState(() {
+        _isPriceError = true;
+        _priceErrorMessage = 'Please fill in this field.';
+      });
+    } else {
+      final price = double.tryParse(priceText);
+      if (price == null || price <= 0) {
+        setState(() {
+          _isPriceError = true;
+          _priceErrorMessage = 'Price must be a positive number.';
+        });
+      } else {
+        setState(() {
+          _isPriceError = false;
+          _priceErrorMessage = null;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _priceController.removeListener(_validatePrice);
+    _priceController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchData() async {
@@ -108,17 +149,28 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
   }
 
   Future<void> _submitScreening() async {
-    if (_selectedMovie == null ||
-        _selectedHall == null ||
-        _selectedViewMode == null ||
-        _dateController.text.isEmpty ||
-        _timeController.text.isEmpty ||
-        _priceController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill in all fields.'),
-        ),
-      );
+    setState(() {
+      _hasAttemptedSubmit = true;
+      _movieErrorMessage =
+          _selectedMovie == null ? 'Please select a movie.' : null;
+      _hallErrorMessage =
+          _selectedHall == null ? 'Please select a hall.' : null;
+      _viewModeErrorMessage =
+          _selectedViewMode == null ? 'Please select a view mode.' : null;
+      _dateErrorMessage =
+          _dateController.text.isEmpty ? 'Please select a date.' : null;
+      _timeErrorMessage =
+          _timeController.text.isEmpty ? 'Please select a time.' : null;
+      final priceText = _priceController.text.replaceAll(',', '.');
+      _validatePrice();
+    });
+
+    if (_movieErrorMessage != null ||
+        _hallErrorMessage != null ||
+        _viewModeErrorMessage != null ||
+        _dateErrorMessage != null ||
+        _timeErrorMessage != null ||
+        _priceErrorMessage != null) {
       return;
     }
 
@@ -269,11 +321,26 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
                         onChanged: (movie) {
                           setState(() {
                             _selectedMovie = movie;
+                            _movieErrorMessage = null;
                           });
                         },
                         icon: Icons.movie,
                         placeholder: 'Select a movie',
                       ),
+                      if (_movieErrorMessage != null)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const SizedBox(
+                              width: 120,
+                            ),
+                            Text(
+                              _movieErrorMessage!,
+                              style: const TextStyle(
+                                  color: Colors.red, fontSize: 14),
+                            ),
+                          ],
+                        ),
                       buildDateTimeField(
                         context,
                         'Date',
@@ -382,11 +449,26 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
                         onChanged: (hall) {
                           setState(() {
                             _selectedHall = hall;
+                            _hallErrorMessage = null;
                           });
                         },
                         icon: Icons.location_on,
                         placeholder: 'Select a hall',
                       ),
+                      if (_hallErrorMessage != null)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const SizedBox(
+                              width: 120,
+                            ),
+                            Text(
+                              _hallErrorMessage!,
+                              style: const TextStyle(
+                                  color: Colors.red, fontSize: 14),
+                            ),
+                          ],
+                        ),
                       buildDropdown<ViewMode>(
                         label: 'View Mode',
                         selectedValue: _selectedViewMode,
@@ -395,18 +477,33 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
                         onChanged: (viewMode) {
                           setState(() {
                             _selectedViewMode = viewMode;
+                            _viewModeErrorMessage = null;
                           });
                         },
                         icon: Icons.video_call,
                         placeholder: 'Select view mode',
                       ),
+                      if (_viewModeErrorMessage != null)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const SizedBox(
+                              width: 120,
+                            ),
+                            Text(
+                              _viewModeErrorMessage!,
+                              style: const TextStyle(
+                                  color: Colors.red, fontSize: 14),
+                            ),
+                          ],
+                        ),
                       buildInputField(
                         context,
                         'Price',
                         'Enter price',
                         Icons.attach_money,
                         controller: _priceController,
-                        errorMessage: _priceErrorMessage,
+                        errorMessage: _isPriceError ? _priceErrorMessage : null,
                       ),
                       const SizedBox(height: 20),
                       Center(

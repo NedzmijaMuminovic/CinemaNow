@@ -648,9 +648,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                       ),
                                     ),
                                   ),
-                                const SizedBox(
-                                    width:
-                                        80),
+                                const SizedBox(width: 80),
                                 GestureDetector(
                                   onTap:
                                       isImageSelected ? _saveImage : _pickImage,
@@ -869,25 +867,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       if (_isEditingPassword.value) {
         if (_passwordController.text.isEmpty &&
             _passwordConfirmationController.text.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text(
-                    'Password fields are empty. Please fill out both fields.')),
-          );
+          _passwordError.value =
+              'Password fields are empty. Please fill in both fields.';
           return;
         } else if (_passwordController.text.isEmpty &&
             _passwordConfirmationController.text.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text(
-                    'Password field is empty. Please fill out both fields.')),
-          );
+          _passwordError.value =
+              'Password field is empty. Please fill in both fields.';
           return;
         } else if (_passwordController.text.isNotEmpty &&
             _passwordConfirmationController.text.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please confirm your password.')),
-          );
+          _passwordConfirmationError.value = 'Please confirm your password.';
           return;
         }
       }
