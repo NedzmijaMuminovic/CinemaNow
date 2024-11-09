@@ -958,7 +958,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   void _handleUpdateError(BuildContext context, dynamic error) {
-    if (error.toString().contains('Unauthorized')) {
+    final errorMessage = error.toString().replaceFirst('Exception:', '').trim();
+
+    if (errorMessage.contains('Username is already taken')) {
+      _usernameError.value = "Username is already taken by another user.";
+      _usernameController.text = originalUsername!;
+    } else if (errorMessage.contains('Unauthorized')) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Unauthorized access. Please log in again.'),
@@ -966,13 +971,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       );
       _handleLogoutAndRedirect(context);
     } else {
-      final errorMessage =
-          error.toString().replaceFirst('Exception:', '').trim();
-
-      if (errorMessage.contains('Username is already taken')) {
-        _usernameController.text = originalUsername!;
-      }
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage)),
       );
