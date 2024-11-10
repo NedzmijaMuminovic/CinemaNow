@@ -67,7 +67,6 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
   }
 
   void _validatePrice() {
-    // Skip validation if the user hasn't attempted to submit
     if (!_hasAttemptedSubmit) return;
 
     final priceText = _priceController.text.replaceAll(',', '.');
@@ -180,12 +179,14 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
       final TimeOfDay? selectedTime = parseTimeOfDay(_timeController.text);
 
       if (selectedTime == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Invalid time format.'),
-          ),
-        );
+        setState(() {
+          _timeErrorMessage = 'Invalid time format.';
+        });
         return;
+      } else {
+        setState(() {
+          _timeErrorMessage = null;
+        });
       }
 
       final DateTime now = DateTime.now();
@@ -434,7 +435,15 @@ class _AddEditScreeningScreenState extends State<AddEditScreeningScreen> {
 
                           if (pickedTime != null) {
                             setState(() {
-                              _timeController.text = pickedTime.format(context);
+                              _timeController.text =
+                                  DateFormat('HH:mm').format(DateTime(
+                                DateTime.now().year,
+                                DateTime.now().month,
+                                DateTime.now().day,
+                                pickedTime.hour,
+                                pickedTime.minute,
+                              ));
+
                               _timeErrorMessage = null;
                             });
                           }
