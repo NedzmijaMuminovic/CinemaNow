@@ -19,14 +19,16 @@ To get the app up and running, follow these steps:
 
 2. Configure Environment Variables:
 
-   - Set up your Stripe Secret key in your environment with one of these commands:
+   - Set up your Stripe Secret key and email app password in your environment with one of these commands:
 
        ```bash
        # Command Prompt
        set STRIPE_SECRET_KEY=YourSecretKey
+       set EMAIL_PASSWORD=YourEmailAppPassword
 
        # PowerShell
        $env:STRIPE_SECRET_KEY = "YourSecretKey"
+       $env:EMAIL_PASSWORD = "YourEmailAppPassword"
        ```
 
     - Alternatively, use .env files:
