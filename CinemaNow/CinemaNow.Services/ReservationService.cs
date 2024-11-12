@@ -222,11 +222,11 @@ namespace CinemaNow.Services
             var qrCodeContent = $"Reservation ID: {reservation.Id}\n" +
                                 $"User: {reservation.User?.Username} ({reservation.User?.Name} {reservation.User?.Surname})\n" +
                                 $"Movie: {reservation.Screening?.Movie?.Title}\n" +
-                                $"Date: {reservation.Screening?.DateTime}\n" +
+                                $"Date: {reservation.Screening?.DateTime:dd-MM-yyyy HH:mm}\n" +
                                 $"Hall: {reservation.Screening?.Hall?.Name}\n" +
                                 $"View Mode: {reservation.Screening?.ViewMode?.Name}\n" +
                                 $"Ticket Price: {reservation.Screening?.Price}\n" +
-                                $"Reservation Date: {reservation.DateTime}\n" +
+                                $"Reservation Date: {reservation.DateTime:dd-MM-yyyy HH:mm}\n" +
                                 $"Seats: {string.Join(", ", reservation.Seats.Select(s => s.Seat.Name))}\n" +
                                 $"Total Price: {reservation.TotalPrice}\n" +
                                 $"Payment Type: {reservation.PaymentType}\n";
