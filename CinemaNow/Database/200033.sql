@@ -343,52 +343,17 @@ VALUES
 
 DECLARE @ScreeningID INT = 1;
 DECLARE @MaxScreeningID INT;
-
 SELECT @MaxScreeningID = MAX(ID) FROM Screening;
-
 WHILE @ScreeningID <= @MaxScreeningID
 BEGIN
-    DECLARE @StateMachine VARCHAR(50);
+    INSERT INTO ScreeningSeat (ScreeningID, SeatID, IsReserved)
+    SELECT
+        @ScreeningID,
+        Seat.ID,
+        0
+    FROM 
+        Seat;
     
-    SELECT @StateMachine = StateMachine
-    FROM Screening
-    WHERE ID = @ScreeningID;
-
-    IF @StateMachine = 'active'
-    BEGIN
-        INSERT INTO ScreeningSeat (ScreeningID, SeatID, IsReserved)
-        SELECT TOP 20
-            @ScreeningID,
-            Seat.ID,
-            1
-        FROM 
-            Seat
-        ORDER BY 
-            NEWID();
-
-        INSERT INTO ScreeningSeat (ScreeningID, SeatID, IsReserved)
-        SELECT TOP 28
-            @ScreeningID,
-            Seat.ID,
-            0
-        FROM 
-            Seat
-        WHERE 
-            Seat.ID NOT IN (SELECT SeatID FROM ScreeningSeat WHERE ScreeningID = @ScreeningID)
-        ORDER BY 
-            NEWID();
-    END
-    ELSE
-    BEGIN
-        INSERT INTO ScreeningSeat (ScreeningID, SeatID, IsReserved)
-        SELECT
-            @ScreeningID,
-            Seat.ID,
-            0
-        FROM 
-            Seat;
-    END
-
     SET @ScreeningID = @ScreeningID + 1;
 END
 
@@ -409,14 +374,14 @@ INSERT INTO Reservation (UserID, ScreeningID, DateTime, NumberOfTickets, TotalPr
 VALUES 
 (1, 1, '2024-09-10 14:00:00', 2, 21.00, 1, 'Stripe', NULL),
 (2, 1, '2024-09-10 14:00:00', 1, 10.50, 2, 'Stripe', NULL),
-(3, 3, '2024-09-10 16:30:00', 4, 52.00, NULL, 'Cash', NULL),
-(1, 3, '2024-09-10 16:30:00', 3, 39.00, 4, 'Stripe', NULL),
-(4, 4, '2024-09-10 19:00:00', 1, 15.50, NULL, 'Cash', NULL),
-(5, 6, '2024-09-10 19:00:00', 2, 31.00, 6, 'Stripe', NULL),
-(6, 8, '2024-09-11 15:00:00', 5, 90.00, 7, 'Stripe', NULL),
-(7, 9, '2024-09-11 18:30:00', 1, 14.50, NULL, 'Cash', NULL),
-(8, 11, '2024-09-12 17:00:00', 3, 33.00, 9, 'Stripe', NULL),
-(9, 13, '2024-09-12 17:00:00', 4, 44.00, NULL, 'Cash', NULL);
+(3, 3, '2024-09-10 16:30:00', 3, 46.50, NULL, 'Cash', NULL),
+(1, 3, '2024-09-10 16:30:00', 1, 15.50, 4, 'Stripe', NULL),
+(4, 4, '2024-09-10 19:00:00', 1, 18.00, NULL, 'Cash', NULL),
+(5, 6, '2024-09-10 19:00:00', 4, 44.00, 6, 'Stripe', NULL),
+(6, 8, '2024-09-11 15:00:00', 1, 16.00, 7, 'Stripe', NULL),
+(7, 9, '2024-09-11 18:30:00', 2, 38.00, NULL, 'Cash', NULL),
+(8, 11, '2024-09-12 17:00:00', 2, 28.00, 9, 'Stripe', NULL),
+(9, 13, '2024-09-12 17:00:00', 4, 66.00, NULL, 'Cash', NULL);
 
 INSERT INTO ReservationSeat (ReservationID, SeatID, ReservedAt)
 VALUES 
@@ -441,6 +406,37 @@ VALUES
 (10, 13, GETDATE()),
 (10, 14, GETDATE()),
 (10, 15, GETDATE());
+
+MERGE ScreeningSeat AS target
+USING (VALUES 
+    (1, 1, 1),  
+    (1, 2, 1),  
+    (1, 3, 1),  
+    (3, 4, 1),  
+    (3, 5, 1),  
+    (3, 6, 1),  
+    (3, 7, 1),  
+    (4, 8, 1),  
+    (6, 9, 1),  
+    (6, 10, 1), 
+    (6, 11, 1), 
+    (6, 12, 1), 
+    (8, 12, 1), 
+    (9, 12, 1), 
+    (9, 13, 1), 
+    (11, 12, 1),
+    (11, 13, 1),
+    (13, 12, 1),
+    (13, 13, 1),
+    (13, 14, 1),
+    (13, 15, 1) 
+) AS source (ScreeningID, SeatID, IsReserved)
+ON (target.ScreeningID = source.ScreeningID AND target.SeatID = source.SeatID)
+WHEN MATCHED THEN 
+    UPDATE SET IsReserved = source.IsReserved
+WHEN NOT MATCHED THEN 
+    INSERT (ScreeningID, SeatID, IsReserved) 
+    VALUES (source.ScreeningID, source.SeatID, source.IsReserved);
 
 INSERT INTO Rating (UserID, MovieID, Value, Comment)
 VALUES 

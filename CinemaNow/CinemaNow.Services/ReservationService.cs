@@ -484,6 +484,87 @@ namespace CinemaNow.Services
 
             return reservations;
         }
-    }
 
+        public List<Models.Reservation> GetReservationsByScreeningId(int screeningId)
+        {
+            var reservations = _context.Reservations
+                .Include(r => r.User)
+                .Include(r => r.Screening)
+                    .ThenInclude(s => s.Movie)
+                .Include(r => r.ReservationSeats)
+                    .ThenInclude(rs => rs.Seat)
+                .Include(r => r.Payment)
+                .Where(r => r.ScreeningId == screeningId)
+                .ToList();
+
+            var reservationModels = reservations.Select(r => new Models.Reservation
+            {
+                Id = r.Id,
+                UserId = r.UserId,
+                ScreeningId = r.ScreeningId,
+                DateTime = r.DateTime,
+                NumberOfTickets = r.NumberOfTickets,
+                TotalPrice = r.TotalPrice,
+                PaymentId = r.PaymentId,
+                PaymentType = r.PaymentType,
+                Seats = r.ReservationSeats.Select(rs => new Models.ReservationSeat
+                {
+                    ReservationId = rs.ReservationId,
+                    SeatId = rs.SeatId,
+                    Seat = rs.Seat != null ? new Models.Seat
+                    {
+                        Id = rs.Seat.Id,
+                        Name = rs.Seat.Name
+                    } : null
+                }).ToList(),
+                User = r.User != null ? new Models.User
+                {
+                    Id = r.User.Id,
+                    Name = r.User.Name,
+                    Surname = r.User.Surname,
+                    Email = r.User.Email,
+                    Username = r.User.Username
+                } : null,
+                Screening = r.Screening != null ? new Models.Screening
+                {
+                    Id = r.Screening.Id,
+                    MovieId = r.Screening.MovieId,
+                    HallId = r.Screening.HallId,
+                    ViewModeId = r.Screening.ViewModeId,
+                    DateTime = r.Screening.DateTime,
+                    Price = r.Screening.Price,
+                    Movie = r.Screening.Movie != null ? new Models.Movie
+                    {
+                        Id = r.Screening.Movie.Id,
+                        Title = r.Screening.Movie.Title,
+                        Duration = r.Screening.Movie.Duration,
+                        Synopsis = r.Screening.Movie.Synopsis,
+                        ImageBase64 = r.Screening.Movie.Image != null ? Convert.ToBase64String(r.Screening.Movie.Image) : null,
+                        Actors = r.Screening.Movie.Actors.Select(a => new Models.Actor
+                        {
+                            Id = a.Id,
+                            Name = a.Name
+                        }).ToList(),
+                        Genres = r.Screening.Movie.Genres.Select(g => new Models.Genre
+                        {
+                            Id = g.Id,
+                            Name = g.Name
+                        }).ToList()
+                    } : null
+                } : null,
+                Payment = r.Payment != null ? new Models.Payment
+                {
+                    Id = r.Payment.Id,
+                    Provider = r.Payment.Provider,
+                    TransactionId = r.Payment.TransactionId,
+                    Amount = r.Payment.Amount,
+                    DateTime = r.Payment.DateTime
+                } : null
+            }).ToList();
+
+            return reservationModels;
+        }
+
+
+    }
 }

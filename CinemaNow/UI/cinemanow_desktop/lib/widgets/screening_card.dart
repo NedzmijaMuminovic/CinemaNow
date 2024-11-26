@@ -1,5 +1,6 @@
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
 import 'package:cinemanow_desktop/screens/add_edit_screening_screen.dart';
+import 'package:cinemanow_desktop/screens/screening_reservations_screen.dart';
 import 'package:cinemanow_desktop/widgets/base_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -69,58 +70,115 @@ class ScreeningCard extends StatelessWidget {
     List<Widget> actions = [];
 
     if (stateMachine == 'active') {
-      actions.add(_buildButton(
-          context: context,
-          label: 'Hide',
-          icon: Icons.visibility_off,
-          color: Colors.orange[700]!,
-          onPressed: () async {
-            final shouldHide = await showDialog<bool>(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text(
-                    'Confirm Hide',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  content: const Text(
-                    'Are you sure you want to hide this screening?',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  backgroundColor: Colors.grey[900],
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child:
-                          const Text('No', style: TextStyle(color: Colors.red)),
+      actions.add(
+        Column(
+          children: [
+            Container(
+              width: 300,
+              height: 40,
+              margin: const EdgeInsets.only(bottom: 12),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => ScreeningReservationsScreen(
+                        movieTitle: title,
+                        screeningId: screeningId,
+                      ),
                     ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text('Yes',
-                          style: TextStyle(color: Colors.red)),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[800],
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(
+                      color: Colors.amber,
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.movie,
+                      color: Colors.amber,
+                      size: 24,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      'View Reservations',
+                      style: TextStyle(
+                        color: Colors.amber,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
-                );
-              },
-            );
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 120,
+              child: _buildButton(
+                  context: context,
+                  label: 'Hide',
+                  icon: Icons.visibility_off,
+                  color: Colors.orange[700]!,
+                  onPressed: () async {
+                    final shouldHide = await showDialog<bool>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text(
+                            'Confirm Hide',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          content: const Text(
+                            'Are you sure you want to hide this screening?',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Colors.grey[900],
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: const Text('No',
+                                  style: TextStyle(color: Colors.red)),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: const Text('Yes',
+                                  style: TextStyle(color: Colors.red)),
+                            ),
+                          ],
+                        );
+                      },
+                    );
 
-            if (shouldHide == true) {
-              try {
-                final provider =
-                    Provider.of<ScreeningProvider>(context, listen: false);
-                await provider.hideScreening(screeningId);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Screening successfully hidden!')),
-                );
-                onScreeningUpdated(1);
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Failed to hide screening')),
-                );
-              }
-            }
-          }));
+                    if (shouldHide == true) {
+                      try {
+                        final provider = Provider.of<ScreeningProvider>(context,
+                            listen: false);
+                        await provider.hideScreening(screeningId);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Screening successfully hidden!')),
+                        );
+                        onScreeningUpdated(1);
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Failed to hide screening')),
+                        );
+                      }
+                    }
+                  }),
+            ),
+          ],
+        ),
+      );
     } else if (stateMachine == 'hidden' || stateMachine == 'draft') {
       actions.add(SizedBox(
         width: 120,

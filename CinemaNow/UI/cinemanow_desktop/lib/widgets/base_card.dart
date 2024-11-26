@@ -84,10 +84,7 @@ class BaseCard extends StatelessWidget {
 
     if (actions.length == 1) {
       return Center(
-        child: SizedBox(
-          width: 120,
-          child: actions[0],
-        ),
+        child: actions[0],
       );
     }
 
