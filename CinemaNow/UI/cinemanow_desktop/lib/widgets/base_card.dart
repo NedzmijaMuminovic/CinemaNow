@@ -95,10 +95,7 @@ class BaseCard extends StatelessWidget {
       return Column(
         children: [
           Center(
-            child: SizedBox(
-              width: 120,
-              child: actions[0],
-            ),
+            child: actions[0],
           ),
           const SizedBox(height: 8),
           Row(

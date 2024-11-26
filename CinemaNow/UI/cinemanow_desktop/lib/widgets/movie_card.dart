@@ -1,5 +1,6 @@
 import 'package:cinemanow_desktop/providers/movie_provider.dart';
 import 'package:cinemanow_desktop/screens/add_edit_movie_screen.dart';
+import 'package:cinemanow_desktop/screens/movie_ratings_screen.dart';
 import 'package:cinemanow_desktop/widgets/base_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -52,6 +53,50 @@ class MovieCard extends StatelessWidget {
         ),
       ],
       actions: [
+        Container(
+          width: 300,
+          height: 40,
+          margin: const EdgeInsets.only(bottom: 12),
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => MovieRatingsScreen(movieId: movieId),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.grey[800],
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: const BorderSide(
+                  color: Colors.amber,
+                  width: 1.5,
+                ),
+              ),
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.star_rounded,
+                  color: Colors.amber,
+                  size: 24,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'View Ratings',
+                  style: TextStyle(
+                    color: Colors.amber,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         ElevatedButton.icon(
           onPressed: () {
             Navigator.push(

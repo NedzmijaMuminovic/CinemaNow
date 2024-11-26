@@ -293,6 +293,14 @@ namespace CinemaNow.Services
             return user.Id;
         }
 
+        public List<string> GetCurrentUserRoles()
+        {
+            var currentUserId = GetCurrentUserId();
+            var user = Context.Users.Include(u => u.Roles).FirstOrDefault(u => u.Id == currentUserId);
+
+            return user?.Roles?.Select(r => r.Name).ToList() ?? new List<string>();
+        }
+
         public async Task<bool> IsUsernameTaken(string username)
         {
             return await Context.Users.AnyAsync(u => u.Username == username);

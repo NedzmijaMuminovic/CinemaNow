@@ -45,13 +45,17 @@ namespace CinemaNow.API.Controllers
         [AllowAnonymous]
         public override void Delete(int id)
         {
-            if (User.IsInRole("User"))
+            if (User.IsInRole("Admin"))
+            {
+                _service.Delete(id);
+            }
+            else if (User.IsInRole("User"))
             {
                 _service.Delete(id);
             }
             else
             {
-                throw new ForbidException("Only users with the 'User' role can delete ratings.");
+                throw new ForbidException("You are not authorized to delete ratings.");
             }
         }
 

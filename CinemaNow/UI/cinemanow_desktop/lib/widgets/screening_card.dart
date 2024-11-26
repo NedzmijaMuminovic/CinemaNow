@@ -122,58 +122,62 @@ class ScreeningCard extends StatelessWidget {
             }
           }));
     } else if (stateMachine == 'hidden' || stateMachine == 'draft') {
-      actions.add(_buildButton(
-          context: context,
-          label: 'Activate',
-          icon: Icons.visibility,
-          color: Colors.green[800]!,
-          onPressed: () async {
-            final shouldActivate = await showDialog<bool>(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text(
-                    'Confirm Activation',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  content: const Text(
-                    'Are you sure you want to activate this screening?',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  backgroundColor: Colors.grey[900],
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child:
-                          const Text('No', style: TextStyle(color: Colors.red)),
+      actions.add(SizedBox(
+        width: 120,
+        child: _buildButton(
+            context: context,
+            label: 'Activate',
+            icon: Icons.visibility,
+            color: Colors.green[800]!,
+            onPressed: () async {
+              final shouldActivate = await showDialog<bool>(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text(
+                      'Confirm Activation',
+                      style: TextStyle(color: Colors.white),
                     ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text('Yes',
-                          style: TextStyle(color: Colors.red)),
+                    content: const Text(
+                      'Are you sure you want to activate this screening?',
+                      style: TextStyle(color: Colors.white),
                     ),
-                  ],
-                );
-              },
-            );
+                    backgroundColor: Colors.grey[900],
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('No',
+                            style: TextStyle(color: Colors.red)),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text('Yes',
+                            style: TextStyle(color: Colors.red)),
+                      ),
+                    ],
+                  );
+                },
+              );
 
-            if (shouldActivate == true) {
-              try {
-                final provider =
-                    Provider.of<ScreeningProvider>(context, listen: false);
-                await provider.activateScreening(screeningId);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Screening successfully activated!')),
-                );
-                onScreeningUpdated(0);
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Failed to activate screening')),
-                );
+              if (shouldActivate == true) {
+                try {
+                  final provider =
+                      Provider.of<ScreeningProvider>(context, listen: false);
+                  await provider.activateScreening(screeningId);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Screening successfully activated!')),
+                  );
+                  onScreeningUpdated(0);
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Failed to activate screening')),
+                  );
+                }
               }
-            }
-          }));
+            }),
+      ));
 
       if (stateMachine == 'draft') {
         actions.add(_buildButton(

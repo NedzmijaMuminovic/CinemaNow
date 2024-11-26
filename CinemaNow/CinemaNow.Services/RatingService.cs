@@ -140,7 +140,9 @@ namespace CinemaNow.Services
             }
 
             var currentUserId = _userService.GetCurrentUserId();
-            if (rating.UserId != currentUserId)
+            var currentUserRoles = _userService.GetCurrentUserRoles();
+
+            if (!currentUserRoles.Contains("Admin") && rating.UserId != currentUserId)
             {
                 throw new UnauthorizedAccessException("You can only delete your own ratings.");
             }

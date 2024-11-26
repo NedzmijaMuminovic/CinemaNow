@@ -2,6 +2,7 @@ import 'package:cinemanow_desktop/providers/actor_provider.dart';
 import 'package:cinemanow_desktop/providers/genre_provider.dart';
 import 'package:cinemanow_desktop/providers/hall_provider.dart';
 import 'package:cinemanow_desktop/providers/movie_provider.dart';
+import 'package:cinemanow_desktop/providers/rating_provider.dart';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
 import 'package:cinemanow_desktop/providers/user_provider.dart';
 import 'package:cinemanow_desktop/providers/view_mode_provider.dart';
@@ -20,6 +21,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => GenreProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => ScreeningProvider()),
+        ChangeNotifierProvider(create: (_) => RatingProvider()),
       ],
       child: const MyApp(),
     ),
@@ -32,6 +34,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: const Color(0xFF1C1C1E),
         dialogTheme: DialogTheme(
