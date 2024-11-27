@@ -1,4 +1,5 @@
 import 'package:cinemanow_desktop/screens/actor_list_screen.dart';
+import 'package:cinemanow_desktop/screens/administrators_screen.dart';
 import 'package:cinemanow_desktop/screens/management_screen.dart';
 import 'package:cinemanow_desktop/screens/movie_list_screen.dart';
 import 'package:cinemanow_desktop/screens/reports_screen.dart';
@@ -130,6 +131,28 @@ class MasterScreenState extends State<MasterScreen> {
             ),
             ListTile(
               leading: const Icon(
+                Icons.supervisor_account,
+                color: Colors.white,
+                size: 32,
+              ),
+              title: const Text('Administrators',
+                  style: TextStyle(color: Colors.white, fontSize: 18)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MasterScreen(
+                      Scaffold(
+                        body: AdministratorsScreen(),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(
                 Icons.bar_chart,
                 color: Colors.white,
                 size: 32,
@@ -156,7 +179,7 @@ class MasterScreenState extends State<MasterScreen> {
                 color: Colors.white,
                 size: 32,
               ),
-              title: const Text('Admin',
+              title: const Text('Profile',
                   style: TextStyle(color: Colors.white, fontSize: 18)),
               onTap: () {
                 Navigator.pop(context);

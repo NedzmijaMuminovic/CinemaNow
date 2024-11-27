@@ -55,6 +55,11 @@ namespace CinemaNow.Services
             if (searchObject?.IsRoleIncluded == true)
                 query = query.Include(x => x.Roles);
 
+            if (!string.IsNullOrWhiteSpace(searchObject?.RoleName))
+            {
+                query = query.Where(x => x.Roles.Any(r => r.Name == searchObject.RoleName));
+            }
+
             return query;
         }
 

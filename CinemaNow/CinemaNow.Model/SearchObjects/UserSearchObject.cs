@@ -11,5 +11,6 @@ namespace CinemaNow.Models.SearchObjects
         public string? Email { get; set; }
         public string? Username { get; set; }
         public bool? IsRoleIncluded { get; set; }
+        public string? RoleName { get; set; }
     }
 }

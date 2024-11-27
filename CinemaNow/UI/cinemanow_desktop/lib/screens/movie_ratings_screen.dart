@@ -155,7 +155,7 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
                   margin: const EdgeInsets.only(bottom: 24),
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.grey[800],
+                    color: Colors.grey[850],
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
