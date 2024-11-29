@@ -1,3 +1,4 @@
+import 'package:cinemanow_desktop/providers/movie_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:cinemanow_desktop/models/rating.dart';
 import 'package:cinemanow_desktop/providers/rating_provider.dart';
@@ -25,11 +26,9 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
 
   Future<String> _fetchMovieTitle() async {
     try {
-      final ratingProvider = context.read<RatingProvider>();
-      final ratings = await ratingProvider.getByMovieId(widget.movieId);
-      return ratings.isNotEmpty
-          ? ratings.first.movie?.title ?? 'Movie Ratings'
-          : 'Movie Ratings';
+      final movieProvider = context.read<MovieProvider>();
+      final movie = await movieProvider.getMovieById(widget.movieId);
+      return movie.title ?? 'Movie Ratings';
     } catch (e) {
       return 'Movie Ratings';
     }

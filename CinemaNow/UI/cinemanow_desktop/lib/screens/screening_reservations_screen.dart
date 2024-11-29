@@ -72,7 +72,10 @@ class _ScreeningReservationsScreenState
         ),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(
+              color: Colors.red,
+            ))
           : errorMessage != null
               ? Center(
                   child: Text(

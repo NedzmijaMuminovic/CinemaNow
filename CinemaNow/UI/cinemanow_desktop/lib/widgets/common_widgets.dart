@@ -6,7 +6,8 @@ Widget buildInputField(
     bool readOnly = false,
     VoidCallback? onTap,
     MouseCursor? cursor,
-    String? errorMessage}) {
+    String? errorMessage,
+    bool obscureText = false}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0),
     child: Column(
@@ -38,6 +39,7 @@ Widget buildInputField(
                       child: TextFormField(
                         controller: controller,
                         readOnly: readOnly,
+                        obscureText: obscureText,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.grey[800],

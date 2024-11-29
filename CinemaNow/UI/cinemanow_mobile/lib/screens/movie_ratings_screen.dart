@@ -42,7 +42,7 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
     try {
       final movieProvider = context.read<MovieProvider>();
       final movie = await movieProvider.getById(widget.movieId);
-      return movie.title!;
+      return movie.title ?? 'Movie Ratings';
     } catch (e) {
       return 'Movie Ratings';
     }

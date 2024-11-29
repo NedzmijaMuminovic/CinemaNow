@@ -15,8 +15,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
 
     const apiHost =
         String.fromEnvironment("API_HOST", defaultValue: "localhost");
-    const apiPort =
-        String.fromEnvironment("API_PORT", defaultValue: "5199");
+    const apiPort = String.fromEnvironment("API_PORT", defaultValue: "5199");
 
     _baseUrl = "http://$apiHost:$apiPort/";
   }

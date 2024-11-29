@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 import 'package:cinemanow_desktop/providers/auth_provider.dart';
+import 'package:cinemanow_desktop/screens/add_edit_admin_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cinemanow_desktop/models/user.dart';
 import 'package:cinemanow_desktop/providers/user_provider.dart';
 
 class AdministratorsScreen extends StatefulWidget {
-  const AdministratorsScreen({Key? key}) : super(key: key);
+  const AdministratorsScreen({super.key});
 
   @override
   State<AdministratorsScreen> createState() => _AdministratorsScreenState();
@@ -56,10 +57,6 @@ class _AdministratorsScreenState extends State<AdministratorsScreen> {
     }
   }
 
-  void _addAdmin() {
-    print('Add Admin');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,7 +67,10 @@ class _AdministratorsScreenState extends State<AdministratorsScreen> {
           future: _adminsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                  child: CircularProgressIndicator(
+                color: Colors.red,
+              ));
             } else if (snapshot.hasError) {
               return Center(
                 child: Text(
@@ -111,21 +111,21 @@ class _AdministratorsScreenState extends State<AdministratorsScreen> {
                 itemBuilder: (context, index) {
                   final admin = admins[index];
                   bool isCurrentAdmin = admin.id == AuthProvider.userId;
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    color: Colors.grey[850],
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: isCurrentAdmin
-                          ? BorderSide(color: Colors.red, width: 1)
-                          : BorderSide.none,
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 24),
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[850],
+                      borderRadius: BorderRadius.circular(16),
+                      border: isCurrentAdmin
+                          ? Border.all(color: Colors.red, width: 1)
+                          : null,
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          radius: 28,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
                           backgroundColor: Colors.grey[700],
                           backgroundImage: admin.imageBase64 != null &&
                                   admin.imageBase64!.isNotEmpty
@@ -136,86 +136,95 @@ class _AdministratorsScreenState extends State<AdministratorsScreen> {
                               ? const Icon(
                                   Icons.person,
                                   color: Colors.white,
-                                  size: 28,
+                                  size: 40,
                                 )
                               : null,
                         ),
-                        title: Text(
-                          '${admin.name} ${admin.surname}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                        const SizedBox(width: 24),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${admin.name} ${admin.surname}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                admin.email!,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '@${admin.username}',
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              admin.email!,
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            Text(
-                              '@${admin.username}',
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 14,
+                        if (AuthProvider.userId != admin.id)
+                          Center(
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
                               ),
-                            ),
-                          ],
-                        ),
-                        trailing: AuthProvider.userId != admin.id
-                            ? IconButton(
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
-                                iconSize: 28,
-                                onPressed: () async {
-                                  final confirmed = await showDialog<bool>(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: const Text(
-                                          'Confirm Deletion',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        content: const Text(
-                                          'Are you sure you want to delete this admin?',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        backgroundColor: Colors.grey[900],
-                                        actions: <Widget>[
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.of(context)
-                                                    .pop(false),
-                                            child: const Text(
-                                              'No',
-                                              style:
-                                                  TextStyle(color: Colors.red),
-                                            ),
+                              iconSize: 28,
+                              onPressed: () async {
+                                final confirmed = await showDialog<bool>(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text(
+                                        'Confirm Deletion',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      content: const Text(
+                                        'Are you sure you want to delete this admin?',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      backgroundColor: Colors.grey[900],
+                                      actions: <Widget>[
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(false),
+                                          child: const Text(
+                                            'No',
+                                            style: TextStyle(color: Colors.red),
                                           ),
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(true),
-                                            child: const Text(
-                                              'Yes',
-                                              style:
-                                                  TextStyle(color: Colors.red),
-                                            ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(true),
+                                          child: const Text(
+                                            'Yes',
+                                            style: TextStyle(color: Colors.red),
                                           ),
-                                        ],
-                                      );
-                                    },
-                                  );
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
 
-                                  if (confirmed == true) {
-                                    _deleteAdmin(admin.id!);
-                                  }
-                                },
-                              )
-                            : null,
-                      ),
+                                if (confirmed == true) {
+                                  _deleteAdmin(admin.id!);
+                                }
+                              },
+                            ),
+                          ),
+                      ],
                     ),
                   );
                 },
@@ -225,7 +234,15 @@ class _AdministratorsScreenState extends State<AdministratorsScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addAdmin,
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => AddEditAdminScreen(
+                onAdminAdded: _refreshAdmins,
+              ),
+            ),
+          );
+        },
         backgroundColor: Colors.grey[850],
         child: const Icon(Icons.add, color: Colors.white),
       ),

@@ -3,6 +3,7 @@ import 'package:cinemanow_desktop/providers/genre_provider.dart';
 import 'package:cinemanow_desktop/providers/hall_provider.dart';
 import 'package:cinemanow_desktop/providers/movie_provider.dart';
 import 'package:cinemanow_desktop/providers/rating_provider.dart';
+import 'package:cinemanow_desktop/providers/role_provider.dart';
 import 'package:cinemanow_desktop/providers/screening_provider.dart';
 import 'package:cinemanow_desktop/providers/user_provider.dart';
 import 'package:cinemanow_desktop/providers/view_mode_provider.dart';
@@ -19,6 +20,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => ViewModeProvider()),
         ChangeNotifierProvider(create: (_) => ActorProvider()),
         ChangeNotifierProvider(create: (_) => GenreProvider()),
+        ChangeNotifierProvider(create: (_) => RoleProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => ScreeningProvider()),
         ChangeNotifierProvider(create: (_) => RatingProvider()),
