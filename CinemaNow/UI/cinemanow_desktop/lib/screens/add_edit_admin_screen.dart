@@ -152,6 +152,12 @@ class _AddEditAdminScreenState extends State<AddEditAdminScreen> {
     setState(() {
       _nameController.text = admin.name ?? '';
       _surnameController.text = admin.surname ?? '';
+      _emailController.text = admin.email ?? '';
+      _usernameController.text = admin.username ?? '';
+
+      _passwordController.text = '********';
+      _passwordConfirmationController.text = '********';
+
       _imageBase64 = admin.imageBase64 ?? '';
 
       _isLoading = false;
@@ -170,36 +176,57 @@ class _AddEditAdminScreenState extends State<AddEditAdminScreen> {
   }
 
   Future<void> _submitAdmin() async {
+    String? password;
+    String? confirmPassword;
+
     setState(() {
       _isFormSubmitted = true;
+
       _nameError = _nameController.text.isEmpty
           ? 'Please fill in this field.'
           : Validator.validateName(_nameController.text);
+
       _surnameError = _surnameController.text.isEmpty
           ? 'Please fill in this field.'
           : Validator.validateSurname(_surnameController.text);
+
       _emailError = _emailController.text.isEmpty
           ? 'Please fill in this field.'
           : Validator.validateEmail(_emailController.text);
+
       _usernameError = _usernameController.text.isEmpty
           ? 'Please fill in this field.'
           : Validator.validateUsername(_usernameController.text);
 
-      final password = _passwordController.text;
-      final confirmPassword = _passwordConfirmationController.text;
-
-      if (password.isEmpty) {
-        _passwordError = 'Please fill in this field.';
-      } else {
-        _passwordError = Validator.validatePassword(password);
+      if (_isEditing) {
+        if (_passwordController.text != '********') {
+          if (_passwordConfirmationController.text == '********') {
+            _passwordConfirmationError = 'Please confirm the new password.';
+            return;
+          }
+        }
       }
 
-      if (confirmPassword.isEmpty) {
+      password = _passwordController.text == '********'
+          ? null
+          : _passwordController.text;
+
+      confirmPassword = _passwordConfirmationController.text == '********'
+          ? null
+          : _passwordConfirmationController.text;
+
+      if (password != null && password!.isEmpty) {
+        _passwordError = 'Please fill in this field.';
+      } else if (password != null) {
+        _passwordError = Validator.validatePassword(password!);
+      }
+
+      if (confirmPassword != null && confirmPassword!.isEmpty) {
         _passwordConfirmationError = 'Please fill in this field.';
-      } else {
+      } else if (confirmPassword != null) {
         _passwordConfirmationError = Validator.validatePasswordConfirmation(
-          password,
-          confirmPassword,
+          password ?? '',
+          confirmPassword!,
         );
       }
     });
@@ -226,7 +253,6 @@ class _AddEditAdminScreenState extends State<AddEditAdminScreen> {
       }
 
       final roleProvider = Provider.of<RoleProvider>(context, listen: false);
-
       final adminRole = await roleProvider.fetchRoleByName("Admin");
 
       if (_isEditing) {
@@ -239,8 +265,8 @@ class _AddEditAdminScreenState extends State<AddEditAdminScreen> {
           _surnameController.text,
           _emailController.text,
           _usernameController.text,
-          _passwordController.text,
-          _passwordConfirmationController.text,
+          password,
+          confirmPassword,
           _imageBase64,
           [adminRole.id!],
         );
@@ -257,8 +283,8 @@ class _AddEditAdminScreenState extends State<AddEditAdminScreen> {
           'surname': _surnameController.text,
           'email': _emailController.text,
           'username': _usernameController.text,
-          'password': _passwordController.text,
-          'passwordConfirmation': _passwordConfirmationController.text,
+          'password': password,
+          'passwordConfirmation': confirmPassword,
           'imageBase64': _imageBase64,
           'roleIds': [adminRole.id],
         });

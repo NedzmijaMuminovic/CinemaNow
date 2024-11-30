@@ -314,14 +314,31 @@ namespace CinemaNow.Services
         public override Models.User Update(int id, UserUpdateRequest request)
         {
             var currentUserId = GetCurrentUserId();
+            var currentUserRoles = GetCurrentUserRoles();
 
-            if (id != currentUserId)
+            bool isAdmin = currentUserRoles.Contains("Admin");
+
+            if (!isAdmin && id != currentUserId)
             {
                 throw new UnauthorizedAccessException("You are not authorized to update this user's information.");
             }
 
+            var userToUpdate = Context.Users.Include(u => u.Roles).FirstOrDefault(u => u.Id == id);
+            if (userToUpdate == null)
+            {
+                throw new Exception("User not found.");
+            }
+
+            bool isTargetUserAdmin = userToUpdate.Roles.Any(r => r.Name == "Admin");
+
+            if (isTargetUserAdmin && !isAdmin)
+            {
+                throw new UnauthorizedAccessException("You are not authorized to update an admin's information.");
+            }
+
             return base.Update(id, request);
         }
+
 
         public override void Delete(int id)
         {

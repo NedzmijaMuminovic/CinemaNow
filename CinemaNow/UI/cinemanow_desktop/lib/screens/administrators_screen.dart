@@ -57,6 +57,17 @@ class _AdministratorsScreenState extends State<AdministratorsScreen> {
     }
   }
 
+  void _editAdmin(User admin) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AddEditAdminScreen(
+          userId: admin.id,
+          onAdminUpdated: _refreshAdmins,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -174,7 +185,17 @@ class _AdministratorsScreenState extends State<AdministratorsScreen> {
                             ],
                           ),
                         ),
-                        if (AuthProvider.userId != admin.id)
+                        if (AuthProvider.userId != admin.id) ...[
+                          Center(
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.edit,
+                                color: Colors.blue,
+                              ),
+                              iconSize: 28,
+                              onPressed: () => _editAdmin(admin),
+                            ),
+                          ),
                           Center(
                             child: IconButton(
                               icon: const Icon(
@@ -224,6 +245,7 @@ class _AdministratorsScreenState extends State<AdministratorsScreen> {
                               },
                             ),
                           ),
+                        ],
                       ],
                     ),
                   );
