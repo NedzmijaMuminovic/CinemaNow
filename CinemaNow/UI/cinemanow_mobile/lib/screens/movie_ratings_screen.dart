@@ -126,7 +126,10 @@ class _MovieRatingsScreenState extends State<MovieRatingsScreen> {
             ),
             backgroundColor: Colors.grey[850],
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.white70,
+              ),
               onPressed: () {
                 Navigator.of(context).pop(_hasChanges);
               },
