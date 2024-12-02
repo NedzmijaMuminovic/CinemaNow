@@ -114,21 +114,21 @@ Use the following information for testing Stripe payments:
 <details>
   <summary>Desktop Screenshots</summary>
 
-  <img src="screenshots/desktop/1.png" alt="Screenshot 1" width="300px">
-  <img src="screenshots/desktop/2.png" alt="Screenshot 2" width="300px">
-  <img src="screenshots/desktop/3.png" alt="Screenshot 3" width="300px">
-  <img src="screenshots/desktop/4.png" alt="Screenshot 4" width="300px">
-  <img src="screenshots/desktop/5.png" alt="Screenshot 5" width="300px">
-  <img src="screenshots/desktop/6.png" alt="Screenshot 6" width="300px">
-  <img src="screenshots/desktop/7.png" alt="Screenshot 7" width="300px">
-  <img src="screenshots/desktop/8.png" alt="Screenshot 8" width="300px">
-  <img src="screenshots/desktop/9.png" alt="Screenshot 9" width="300px">
-  <img src="screenshots/desktop/10.png" alt="Screenshot 10" width="300px">
-  <img src="screenshots/desktop/11.png" alt="Screenshot 11" width="300px">
-  <img src="screenshots/desktop/12.png" alt="Screenshot 12" width="300px">
-  <img src="screenshots/desktop/13.png" alt="Screenshot 13" width="300px">
-  <img src="screenshots/desktop/14.png" alt="Screenshot 14" width="300px">
-  <img src="screenshots/desktop/15.png" alt="Screenshot 15" width="300px">
+  <img src="screenshots/desktop/1.png" alt="Screenshot 1" width="400px">
+  <img src="screenshots/desktop/2.png" alt="Screenshot 2" width="400px">
+  <img src="screenshots/desktop/3.png" alt="Screenshot 3" width="400px">
+  <img src="screenshots/desktop/4.png" alt="Screenshot 4" width="400px">
+  <img src="screenshots/desktop/5.png" alt="Screenshot 5" width="400px">
+  <img src="screenshots/desktop/6.png" alt="Screenshot 6" width="400px">
+  <img src="screenshots/desktop/7.png" alt="Screenshot 7" width="400px">
+  <img src="screenshots/desktop/8.png" alt="Screenshot 8" width="400px">
+  <img src="screenshots/desktop/9.png" alt="Screenshot 9" width="400px">
+  <img src="screenshots/desktop/10.png" alt="Screenshot 10" width="400px">
+  <img src="screenshots/desktop/11.png" alt="Screenshot 11" width="400px">
+  <img src="screenshots/desktop/12.png" alt="Screenshot 12" width="400px">
+  <img src="screenshots/desktop/13.png" alt="Screenshot 13" width="400px">
+  <img src="screenshots/desktop/14.png" alt="Screenshot 14" width="400px">
+  <img src="screenshots/desktop/15.png" alt="Screenshot 15" width="400px">
 
 </details>
 
