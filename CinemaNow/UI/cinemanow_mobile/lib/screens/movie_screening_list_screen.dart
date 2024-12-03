@@ -203,7 +203,7 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(
-                      vertical: 16.0, horizontal: 20.0),
+                      vertical: 8.0, horizontal: 10.0),
                   child: _buildMovieCard(movie, screenings),
                 );
               },
@@ -232,7 +232,7 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
                   const BorderRadius.vertical(top: Radius.circular(20)),
               child: SizedBox(
                 width: double.infinity,
-                height: 300,
+                height: 320,
                 child: movie.imageBase64 != null
                     ? Image.memory(
                         base64Decode(movie.imageBase64!),
@@ -258,7 +258,7 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
                   Text(
                     movie.title ?? 'Unknown Title',
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -305,7 +305,7 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
                     title: const Text(
                       'View Screenings',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 16,
                         color: Colors.red,
                         fontWeight: FontWeight.w600,
                       ),
@@ -327,7 +327,7 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
 
   Widget _buildScreeningTile(Screening screening) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -336,9 +336,9 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  DateFormat('EEEE, MMM d, yyyy').format(screening.dateTime!),
+                  DateFormat('EEE, MMM d, yyyy').format(screening.dateTime!),
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -347,20 +347,20 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
                 Text(
                   DateFormat('HH:mm').format(screening.dateTime!),
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     color: Colors.grey[300],
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   '${screening.hall?.name ?? 'Unknown Hall'} - ${screening.viewMode?.name ?? 'Unknown View Mode'}',
-                  style: TextStyle(fontSize: 16, color: Colors.grey[400]),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[400]),
                 ),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: Colors.red[700],
               borderRadius: BorderRadius.circular(20),
@@ -368,7 +368,7 @@ class _MovieScreeningListScreenState extends State<MovieScreeningListScreen>
             child: Text(
               '\$${formatNumber(screening.price)}',
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
