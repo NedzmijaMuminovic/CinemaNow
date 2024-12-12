@@ -16,7 +16,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load(fileName: 'assets/.env');
+  try {
+    await dotenv.load(fileName: 'assets/.env');
+  } catch (e) {
+    debugPrint('Error loading .env file: $e');
+  }
 
   String? stripePublishableKey = const String.fromEnvironment(
     'STRIPE_PUBLISHABLE_KEY',
@@ -24,10 +28,10 @@ void main() async {
   );
 
   if (stripePublishableKey.isEmpty) {
-    stripePublishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'];
+    stripePublishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'] ?? '';
   }
 
-  if (stripePublishableKey == null || stripePublishableKey.isEmpty) {
+  if (stripePublishableKey.isEmpty) {
     throw Exception(
         'Stripe publishable key is missing from both dart-define and .env file');
   }
